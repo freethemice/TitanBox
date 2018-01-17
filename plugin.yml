@@ -1,0 +1,17 @@
+name: TitanBox
+main: com.firesoftitan.play.titanbox.TitanBox
+version: 1.0.0
+author: [freethemice]
+depend: [CS-CoreLib, Slimefun, GriefPrevention, Vault, FoTXRay]
+commands:
+   titanbox:
+      description: titanbox
+      usage: /<command>
+   tb:
+      description: fotb
+      usage: /<command>
+permissions:
+   titanbox.use:
+     description: Gives access to use lir
+   titanbox.admin:
+     description: Gives access to use lir and edit it
