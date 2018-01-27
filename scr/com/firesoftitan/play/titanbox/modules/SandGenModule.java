@@ -11,14 +11,14 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
-public class CobblestoneGenModule extends MainModule {
+public class SandGenModule extends MainModule {
 
 
     private Location waterPump = null;
     private Location lavaPump = null;
-    public CobblestoneGenModule()
+    public SandGenModule()
     {
-        type = ModuleTypeEnum.Cobblestone;
+        type = ModuleTypeEnum.Sand;
     }
     @Override
     public String getLinkLore()
@@ -69,7 +69,7 @@ public class CobblestoneGenModule extends MainModule {
                 this.waterPump = link.clone();
                 saveInfo();
                 if (player != null) {
-                    player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Water pummp  linked!");
+                    player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Water pummp linked!");
                 }
                 return true;
             }
@@ -78,7 +78,7 @@ public class CobblestoneGenModule extends MainModule {
                 this.lavaPump = link.clone();
                 saveInfo();
                 if (player != null) {
-                    player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Lava pummp  linked!");
+                    player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Lava pummp linked!");
                 }
                 return true;
             }
@@ -115,7 +115,7 @@ public class CobblestoneGenModule extends MainModule {
     @Override
     public ItemStack getMeAsIcon()
     {
-        return new ItemStack(Material.COBBLESTONE, 1);
+        return new ItemStack(Material.SAND, 1);
     }
     @Override
     public boolean isLoaded()
@@ -140,7 +140,8 @@ public class CobblestoneGenModule extends MainModule {
         {
             if (Pumps.getLiquid(waterPump, "Water") && Pumps.getLiquid(lavaPump, "Lava"))
             {
-                TitanBox.addItemToStorage(owner, Material.COBBLESTONE, 64);
+                TitanBox.addItemToStorage(owner, Material.SAND, 64);
+                TitanBox.addItemToStorage(owner, Material.SAND, 64);
             }
         }
         else
@@ -148,7 +149,7 @@ public class CobblestoneGenModule extends MainModule {
             if (TitanBox.hasItem(owner, Material.WATER_BUCKET))
             {
                 if (TitanBox.hasItem(owner, Material.LAVA_BUCKET)) {
-                    TitanBox.addItemToStorage(owner, Material.COBBLESTONE, 32);
+                    TitanBox.addItemToStorage(owner, Material.SAND, 64);
                     TitanBox.addItemToStorage(owner, Material.BUCKET, 1);
                 }
                 TitanBox.addItemToStorage(owner, Material.BUCKET, 1);

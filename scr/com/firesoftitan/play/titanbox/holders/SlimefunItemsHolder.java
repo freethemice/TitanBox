@@ -90,6 +90,7 @@ public class SlimefunItemsHolder {
     public static ItemStack INGOTUP;
     public static ItemStack BEDROCKDRILL;
     public static ItemStack VOIDMINNER;
+
     public static ItemStack BEDROCK_DRILL;
     public static ItemStack LASER_CHARGE;
     public static ItemStack BEDROCK_DRILL_OLD;
@@ -102,6 +103,7 @@ public class SlimefunItemsHolder {
     public static ItemStack REPAIRED_SPAWNER_ENDERMAN;
 
 
+    public static ItemStack XPPLATE = new CustomItem(new ItemStack(Material.CARPET, 1, (short) 7), "&bXP Plate", new String[] {"&f-Stand on plate to get XP", "&8\u21E8 &e\u26A1 &730 J/s"});
     public static ItemStack DIAMOND_WRITING_PLATE  = new CustomItem(new ItemStack(Material.CARPET, 1, (short) 3), "&bDiamond Writing Plate", new String[] {"&f-A Strong plate for writing complex codes"});
     public static ItemStack EMERALD_WRITING_PLATE  = new CustomItem(new ItemStack(Material.CARPET, 1, (short) 5), "&eEmerald Writing Plate", new String[] {"&f-A Strong plate for writing complex codes"});
     public static ItemStack ENDER_WRITING_PLATE  = new CustomItem(new ItemStack(Material.CARPET, 1, (short) 9), "&3Ender Writing Plate", new String[] {"&f-A plate for writing teleporting codes"});

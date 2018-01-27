@@ -31,10 +31,9 @@ import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.*;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -50,6 +49,7 @@ public class TitanBox extends JavaPlugin
     public static TitanBox instants;
     public static ListenerMain listen;
     public static Config config = new Config("plugins" + File.separator + "TitanBox" + File.separator  + "config.yml");
+    public static Config barcodes = new Config("data-storage" + File.separator + "TitanBox" + File.separator  + "barcodes.yml");
     public Economy economy;
     public static long cost = 10000;
     public HashMap<String, EntityPlayer> npcs;
@@ -234,7 +234,18 @@ public class TitanBox extends JavaPlugin
         Bukkit.getScheduler().scheduleSyncRepeatingTask(TitanBox.instants, RouterTimer, 200, RouterHolder.speed);
 
     }
-
+    public List<Entity>  getNearbyEntities(Location loc)
+    {
+        return getNearbyEntities(loc, 5);
+    }
+    public List<Entity>  getNearbyEntities(Location loc, int rad)
+    {
+        EntityPlayer npc = TitanBox.instants.npcs.get(loc.getWorld().getName());
+        npc.setLocation(loc.getX(), loc.getY(), loc.getZ(), 0, 0);
+        CraftPlayer opCr = npc.getBukkitEntity();
+        List<Entity> nearEntity = npc.getBukkitEntity().getNearbyEntities(rad,rad,rad);
+        return nearEntity;
+    }
     public void checkRegisterdPower()
     {
         if (EnergyNet.getComponent("FOTStorageUnti") == null)
@@ -264,6 +275,7 @@ public class TitanBox extends JavaPlugin
         Pumps.savePumps();
         Elevator.saveElevators();
         BackpackRecover.saveRecovers();
+        barcodes.save();
     }
     public void onDisable()
     {
@@ -786,8 +798,8 @@ public class TitanBox extends JavaPlugin
                             itemStackOut.setAmount(1);
                             itemStackOut = TitanBox.changeName(itemStackOut, name);
                         }
+                        itemStackOut = TitanBox.clearLore(itemStackOut);
                         if (Reaklore.size() > 0) {
-                            itemStackOut = TitanBox.clearLore(itemStackOut);
                             itemStackOut = TitanBox.addLore(itemStackOut, Reaklore);
                         }
                         Object[] tmpout = {itemStackOut.clone(), amount};
@@ -912,6 +924,12 @@ public class TitanBox extends JavaPlugin
 
             }
         }
+        if (whatItem.equalsIgnoreCase("network"))
+        {
+            ItemStack placeMe = NetworkMonitor.getMeAsDrop();
+            return  placeMe.clone();
+
+        }
         if (whatItem.equalsIgnoreCase("module"))
         {
             ModuleTypeEnum type = ModuleTypeEnum.Inventory;
@@ -941,7 +959,7 @@ public class TitanBox extends JavaPlugin
                 ItemStack placeMe = me.getItem();
                 placeMe = TitanBox.changeName(placeMe, ChatColor.YELLOW + "Upgrade Device");
                 placeMe = TitanBox.addLore(placeMe,  "Used On: " + ChatColor.WHITE + "Storage Unit, and Routers", ChatColor.WHITE + "Hold in main hand and click block thats placed!");
-
+                placeMe = TitanBox.getNewBarcode(placeMe);
                 return  placeMe.clone();
             }
         }
@@ -978,6 +996,104 @@ public class TitanBox extends JavaPlugin
         if (!isEmpty(item)) {
             sender.getInventory().addItem(item);
         }
+    }
+    public static String getName(ItemStack toName)
+    {
+        String name = toName.getType().name() + "_" + toName.getDurability();
+        if (toName.hasItemMeta())
+        {
+            if (toName.getItemMeta().hasDisplayName())
+            {
+                name = ChatColor.stripColor(toName.getItemMeta().getDisplayName());
+            }
+        }
+        return name;
+    }
+    public static boolean hasBarcodeGood(ItemStack toBarcode)
+    {
+        if (!TitanBox.isEmpty(toBarcode)) {
+            if (toBarcode.hasItemMeta()) {
+                if (toBarcode.getItemMeta().hasLore()) {
+                    String name = getName(toBarcode);
+                    List<String> check = toBarcode.getItemMeta().getLore();
+                    for(String s: check)
+                    {
+                        if (s.startsWith(ChatColor.MAGIC + "barcode:"))
+                        {
+                            String saltStr = s.replace(ChatColor.MAGIC + "barcode:", "");
+                            if (barcodes.contains(name + "." + saltStr)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    public static void setBarcodeTrue(ItemStack toBarcode)
+    {
+        if (!TitanBox.isEmpty(toBarcode)) {
+            if (toBarcode.hasItemMeta()) {
+                if (toBarcode.getItemMeta().hasLore()) {
+                    String name = getName(toBarcode);
+                    List<String> check = toBarcode.getItemMeta().getLore();
+                    for(String s: check)
+                    {
+                        if (s.startsWith(ChatColor.MAGIC + "barcode:"))
+                        {
+                            String saltStr = s.replace(ChatColor.MAGIC + "barcode:", "");
+                            if (barcodes.contains(name + "." + saltStr)) {
+                                barcodes.setValue(name + "." + saltStr, true);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    public static String readBarcode(ItemStack toBarcode)
+    {
+        if (!TitanBox.isEmpty(toBarcode)) {
+            if (toBarcode.hasItemMeta()) {
+                if (toBarcode.getItemMeta().hasLore()) {
+                    String name = getName(toBarcode);
+                    List<String> check = toBarcode.getItemMeta().getLore();
+                    for(String s: check)
+                    {
+                        if (s.startsWith(ChatColor.MAGIC + "barcode:"))
+                        {
+                            String saltStr = s.replace(ChatColor.MAGIC + "barcode:", "");
+                            if (barcodes.contains(name + "." + saltStr)) {
+                                return barcodes.getBoolean(name + "." + saltStr) + "";
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    public static ItemStack getNewBarcode(ItemStack toBarcode)
+    {
+        if (!TitanBox.isEmpty(toBarcode)) {
+            String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+            StringBuilder salt = new StringBuilder();
+            Random rnd = new Random(System.currentTimeMillis());
+            while (salt.length() < 36) { // length of the random string.
+                int index = (int) (rnd.nextFloat() * SALTCHARS.length());
+                salt.append(SALTCHARS.charAt(index));
+            }
+            String saltStr = salt.toString();
+
+            String name = getName(toBarcode);
+            if (barcodes.contains(name + "." + saltStr)) {
+                return getNewBarcode(toBarcode);
+            }
+            barcodes.setValue(name + "." + saltStr, false);
+            toBarcode = TitanBox.addLore(false, toBarcode.clone(), ChatColor.MAGIC + "barcode:" + saltStr);
+        }
+        return toBarcode;
     }
 
 }

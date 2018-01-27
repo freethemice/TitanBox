@@ -15,7 +15,8 @@ public enum ModuleTypeEnum {
     Item("Item", "Item Module", new ItemStack(Material.HOPPER, 1)),
     Killer("Killer", "Killer Module", new ItemStack(Material.DIAMOND_SWORD, 1)),
     Infernal("Infernal", "Infernal Module", new ItemStack(Material.NETHER_WART_BLOCK, 1)),
-    Farm("Farm", "Farm Module", new ItemStack(Material.DIAMOND_HOE, 1));
+    Farm("Farm", "Farm Module", new ItemStack(Material.DIAMOND_HOE, 1)),
+    Sand("Sand", "Sand Module", new ItemStack(Material.SAND, 1));
 
     private final String type;
     private final String title;
@@ -78,6 +79,10 @@ public enum ModuleTypeEnum {
         if (this.type.equals("Farm"))
         {
             return new FarmModule();
+        }
+        if (this.type.equals("Sand"))
+        {
+            return new SandGenModule();
         }
         return new MainModule();
     }

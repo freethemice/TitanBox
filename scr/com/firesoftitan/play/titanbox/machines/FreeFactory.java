@@ -19,12 +19,15 @@ import java.util.List;
 import java.util.Random;
 
 public abstract class FreeFactory extends BContainer {;
-    private Material freeType = null;
+    private ItemStack freeType = null;
     public FreeFactory(Category category, ItemStack item, String name, RecipeType recipeType, ItemStack[] recipe, Material freeType) {
         super(category, item, name, recipeType, recipe);
-        this.freeType = freeType;
+        this.freeType = new ItemStack(freeType, 1, (short)0);
     }
-
+    public FreeFactory(Category category, ItemStack item, String name, RecipeType recipeType, ItemStack[] recipe, ItemStack freeType) {
+        super(category, item, name, recipeType, recipe);
+        this.freeType = freeType.clone();
+    }
     @Override
     public String getInventoryTitle() {
         return "&bEnd Game Factory";
@@ -79,9 +82,8 @@ public abstract class FreeFactory extends BContainer {;
         else {
 
             Random number = new Random(System.currentTimeMillis());
-            ItemStack adding = new ItemStack(freeType, 1 + number.nextInt(10), (short)0);
-
-            adding = adding.clone();
+            ItemStack adding = freeType.clone();
+            adding.setAmount( 1 + number.nextInt(10));
 
             MachineRecipe r = new MachineRecipe(4 / getSpeed(), new ItemStack[0], new ItemStack[] {adding});
             /*if (!fits(b, r.getOutput())) return;

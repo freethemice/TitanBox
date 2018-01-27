@@ -23,7 +23,6 @@ public class mainGUI {
         this.size = size;
         this.parent = parent;
     }
-
     public String getName() {
         return name;
     }

@@ -8,12 +8,15 @@ import com.firesoftitan.play.titanbox.items.TitanTalisman;
 import com.firesoftitan.play.titanbox.machines.*;
 import com.firesoftitan.play.titanbox.modules.MainModule;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunItem;
+import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -71,6 +74,25 @@ public class ListenerMain implements Listener {
         }
     }
     @EventHandler
+    public void  onBlockPhysicsEvent(BlockPhysicsEvent event)
+    {
+        if (!event.isCancelled()) {
+            String id = BlockStorage.getBlockInfo(event.getBlock(), "id");
+            if (id != null) {
+                if (event.getBlock().getType() == Material.AIR)
+                {
+                    System.out.println("Deleting");
+                    BlockStorage.clearBlockInfo(event.getBlock());
+                }
+                if (!id.equals("")) {//if (id.equals("XP_PLATE")) {
+
+                    event.setCancelled(true);
+                }
+            }
+        }
+
+    }
+    @EventHandler
     public void onPlayerInteractEvent(PlayerInteractEvent event)
     {
         String myUUID = event.getPlayer().getUniqueId().toString();
@@ -89,6 +111,8 @@ public class ListenerMain implements Listener {
             BackpackRecover.onPlayerInteractEvent(event);
 
             StorageRecover.onPlayerInteractEvent(event);
+
+            NetworkMonitor.onPlayerInteractEvent(event);
         }
         lastedPressed.put(myUUID, System.currentTimeMillis());
 
@@ -106,6 +130,7 @@ public class ListenerMain implements Listener {
             Elevator.onBlockBreakEvent(event);
             BackpackRecover.onBlockBreakEvent(event);
             StorageRecover.onBlockBreakEvent(event);
+            NetworkMonitor.onBlockBreakEvent(event);
         }
     }
     @EventHandler
@@ -122,6 +147,7 @@ public class ListenerMain implements Listener {
     @EventHandler
     public void onBlockPlaceEvent(BlockPlaceEvent event)
     {
+
         if (!event.isCancelled()) {
             StorageUnit.onBlockPlaceEvent(event);
             RouterHolder.onBlockPlaceEvent(event);
@@ -129,6 +155,7 @@ public class ListenerMain implements Listener {
             Elevator.onBlockPlaceEvent(event);
             BackpackRecover.onBlockPlaceEvent(event);
             StorageRecover.onBlockPlaceEvent(event);
+            NetworkMonitor.onBlockPlaceEvent(event);
 
             if (event.getItemInHand() != null) {
                 ItemStack tM = event.getItemInHand().clone();
@@ -241,6 +268,8 @@ public class ListenerMain implements Listener {
         BackpackRecover.onInventoryClickEvent(event);
 
         StorageRecover.onInventoryClickEvent(event);
+
+        NetworkMonitor.onInventoryClickEvent(event);
 
         if (!event.isCancelled()) {
             if (event.getRawSlot() == 2 && event.getWhoClicked() instanceof Player && event.getInventory().getType() == InventoryType.ANVIL) {

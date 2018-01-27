@@ -45,7 +45,7 @@ public class RouterHolder {
         if (bufferList.size() == 0)
         {
             if (System.currentTimeMillis() > lastTime) {
-                 System.out.println("Starting Run of " + routersByID.size());
+                 //System.out.println("Starting Run of " + routersByID.size());
             }
             for(String key: routersByID.keySet())
             {
@@ -55,6 +55,9 @@ public class RouterHolder {
                         Player player = Bukkit.getPlayer(locofRouter.getOwner());
                         if (player != null) {
                             if (player.isOnline()) {
+                                if (System.currentTimeMillis() > lastTime) {
+                                  //  System.out.println("Adding Router: " +player.getName());
+                                }
                                 bufferList.add(key);
                                 checkPower(locofRouter.getLocation());
                             }
@@ -78,6 +81,7 @@ public class RouterHolder {
                     if (System.currentTimeMillis() > lastTime) {
                         //System.out.println("No Power On Router: " + locofRouter.toString());
                     }
+                    bufferList.remove(0);
                     return;
                 }
                 setCharge(locofRouter, charge - 1);
@@ -115,7 +119,7 @@ public class RouterHolder {
         if (bufferList.size() ==0)
         {
             if (System.currentTimeMillis() > lastTime) {
-                System.out.println("Done with run");
+                //System.out.println("Done with run");
                 lastTime = System.currentTimeMillis() + 300000;
             }
         }
@@ -237,6 +241,26 @@ public class RouterHolder {
                         if (item.getItemMeta().hasDisplayName()) {
                             if (item.getItemMeta().getDisplayName().startsWith(ChatColor.YELLOW + "Upgrade Device")) {
                                 event.setCancelled(true);
+                                if (!TitanBox.hasBarcodeGood(item))
+                                {
+                                    event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "This is an invalid device! Most likely an old one.");
+                                    return;
+                                }
+                                String barcode = TitanBox.readBarcode(item);
+                                if (barcode == null)
+                                {
+                                    event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "This is an invalid device! Most likely an old one.");
+                                    return;
+                                }
+                                boolean barcodeTrue = Boolean.valueOf(barcode);
+                                if (barcodeTrue)
+                                {
+                                    event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "This is an invalid device! It has been duped and you have been reported.");
+                                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mail send freethemice " + event.getPlayer().getName() + " has used a dupped Upgrade Device!");
+                                    return;
+                                }
+                                TitanBox.setBarcodeTrue(item);
+
                                 Random rnd = new Random(System.currentTimeMillis());
                                 int addint = rnd.nextInt(9) + 1;
                                 int newSLots = Math.min(tmpRL.getMax() + addint, bigMax);
@@ -245,6 +269,7 @@ public class RouterHolder {
                                     return;
                                 }
                                 tmpRL.setMax(newSLots);
+                                tmpRL.SaveMe();
                                 if (mainHand.getAmount() < 2) {
                                     event.getPlayer().getInventory().setItemInMainHand(null);
                                 } else {

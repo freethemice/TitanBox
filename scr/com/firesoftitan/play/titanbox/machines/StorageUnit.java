@@ -6,6 +6,7 @@ import com.firesoftitan.play.titanbox.guis.buttonGUIs;
 import com.firesoftitan.play.titanbox.guis.mainGUI;
 import com.firesoftitan.play.titanbox.holders.ItemHolder;
 import com.firesoftitan.play.titanbox.interfaces.InventoryHolder;
+import com.firesoftitan.play.titanbox.runnables.StorageGuiRunnable;
 import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
 import me.mrCookieSlime.Slimefun.Lists.SlimefunItems;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
@@ -120,7 +121,7 @@ public class StorageUnit implements InventoryHolder {
             tmpFrom = storageItems[from].clone();
             countFrom = storageCount[from];
         }
-        if (storageItems[from] != null) {
+        if (storageItems[to] != null) {
             tmpTo = storageItems[to].clone();
             countTo = storageCount[to];
         }
@@ -230,7 +231,7 @@ public class StorageUnit implements InventoryHolder {
         reBuildMenu();
         reBuildSlots();
     }
-    private void reBuildMenu()
+    public void reBuildMenu()
     {
         if (gui == null)
         {
@@ -299,139 +300,6 @@ public class StorageUnit implements InventoryHolder {
 
         //Storage ----------------------------------------------------------------------------------
     }
-    /*
-    private void makeGui()
-    {
-        myGui = Bukkit.createInventory(null, 54, guiname + " " + getMyId());
-        ItemStack blank = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 12);
-        blank = TitanBox.changeName(blank,"-");
-        for (int i = size; i < 54; i++)
-        {
-            myGui.setItem(i, blank.clone());
-        }
-        ItemStack play = TitanBox.getSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGFlMjk0MjJkYjQwNDdlZmRiOWJhYzJjZGFlNWEwNzE5ZWI3NzJmY2NjODhhNjZkOTEyMzIwYjM0M2MzNDEifX19");
-        play = TitanBox.changeName(play, "Sort All");
-        String rTexture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTUzZGQ0NTc5ZWRjMmE2ZjIwMzJmOTViMWMxODk4MTI5MWI2YzdjMTFlYjM0YjZhOGVkMzZhZmJmYmNlZmZmYiJ9fX0=";
-        String rname = "Remember Empty Slots: " + ChatColor.GRAY + "off";
-        if (isRemember())
-        {
-            rTexture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmM4ZGVmNjdhMTI2MjJlYWQxZGVjZDNkODkzNjQyNTdiNTMxODk2ZDg3ZTQ2OTgxMzEzMWNhMjM1YjVjNyJ9fX0=";
-            rname = "Remember Empty Slots: " + ChatColor.BLUE + "on";
-        }
-        ItemStack remembered = TitanBox.getSkull(rTexture);
-        remembered = TitanBox.changeName(remembered, rname);
-        String lTexture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDJjODFiNDM1ZGMyMmQyOWQ0Nzc4ZmZkMjJmZWI4NDZhNjhiNjQ4ZGQxYWY1ZGU4MThiNTE3ZjA1NzRkIn19fQ==";
-        String lname = "Lock Empty Slots: " + ChatColor.GRAY + "off";
-        if (isLocked()) {
-            lTexture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2NjMjE3YTliOWUzY2UzY2QwNDg0YzdlOGNlNDlkMWNmNzQxMjgxYmRkYTVhNGQ2Y2I4MjFmMzc4NzUyNzE4In19fQ==";
-            lname = "Lock Empty Slots: " + ChatColor.BLUE + "on";
-        }
-        ItemStack locked = TitanBox.getSkull(lTexture);
-        locked = TitanBox.changeName(locked, lname);
-        //100%  eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTE2YjY4Mzc2YzE4MWM5YTczNDNmZWUzNjk3ZmFhY2VjMzUxMjlmYjY0ZGU1OTE0YmRiZjg2OWM2NTJjIn19fQ==
-        //66% eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWQ3OGE5NWIxYmU1ODU5M2EwM2NmMTQ3MjYzYmRhM2I4YjM0Njg5OWJlMTEwZDMxNDY1ZWQyZmViYzBiZDEwIn19fQ==
-        //33%  eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmM4YTU4M2JiMWNkZDlkMWE1MTQ0YjI0YWQ1NTBkYTlhMmY2NGRhZTIxZjIwNGU3MWJjYzhkZTVhNTM5ZDgifX19
-        //0% eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGQyYzE5YjQ0MjU0MTM1MWE2YjgxZWViNmNiZWY0MTk2NmZmYjdkYmU0YzEzNmI4N2Y1YmFmOWQxNGEifX19
-        String bTexture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGQyYzE5YjQ0MjU0MTM1MWE2YjgxZWViNmNiZWY0MTk2NmZmYjdkYmU0YzEzNmI4N2Y1YmFmOWQxNGEifX19";
-        double percent = (double)this.getCharge() / (double)this.getCapacity();
-        percent = percent *100;
-        int iPercent = (int)percent;
-        String bName = ChatColor.YELLOW + "Charge@ " + ChatColor.WHITE + (int)iPercent + "%";
-        if (iPercent > 0)
-        {
-            bTexture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmM4YTU4M2JiMWNkZDlkMWE1MTQ0YjI0YWQ1NTBkYTlhMmY2NGRhZTIxZjIwNGU3MWJjYzhkZTVhNTM5ZDgifX19";
-        }
-        if (iPercent > 33)
-        {
-            bTexture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWQ3OGE5NWIxYmU1ODU5M2EwM2NmMTQ3MjYzYmRhM2I4YjM0Njg5OWJlMTEwZDMxNDY1ZWQyZmViYzBiZDEwIn19fQ==";
-        }
-        if (iPercent > 66)
-        {
-            bTexture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTE2YjY4Mzc2YzE4MWM5YTczNDNmZWUzNjk3ZmFhY2VjMzUxMjlmYjY0ZGU1OTE0YmRiZjg2OWM2NTJjIn19fQ==";
-        }
-        ItemStack battery = TitanBox.getSkull(bTexture);
-        battery = TitanBox.changeName(battery, bName);
-        //white X eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzkxZDZlZGE4M2VkMmMyNGRjZGNjYjFlMzNkZjM2OTRlZWUzOTdhNTcwMTIyNTViZmM1NmEzYzI0NGJjYzQ3NCJ9fX0=
-        //Blue X eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2M2OGRlYjhiYzU3NmI0ZDYzMWVhZGRlODlkYzljZDk0NmEzYmI3ZTM0N2I4YzRkYTVkODJjODg4ZWQxNWMzYyJ9fX0=
-        String mTexure = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzkxZDZlZGE4M2VkMmMyNGRjZGNjYjFlMzNkZjM2OTRlZWUzOTdhNTcwMTIyNTViZmM1NmEzYzI0NGJjYzQ3NCJ9fX0=";
-        String text = "Re-organize: " + ChatColor.GRAY + "off";
-        if (moving)
-        {
-            mTexure = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2M2OGRlYjhiYzU3NmI0ZDYzMWVhZGRlODlkYzljZDk0NmEzYmI3ZTM0N2I4YzRkYTVkODJjODg4ZWQxNWMzYyJ9fX0=";
-            text = "Re-organize: " + ChatColor.BLUE + "on";
-        }
-
-        ItemStack Mover = TitanBox.getSkull(mTexure);
-        Mover = TitanBox.changeName(Mover, text);
-
-        ItemStack batteryA = SlimefunItems.BATTERY.clone();
-        batteryA = TitanBox.changeName(batteryA, "Charge Unit");
-        batteryA = TitanBox.addLore(batteryA, "If unit isn't powered, you can charge it manually ","click here and it will remove 1 battery from your invitory", "and will charge the unit " + ChatColor.WHITE + "40j");
-
-        myGui.setItem(45, play);
-        myGui.setItem(46, remembered);
-        myGui.setItem(47, locked);
-        myGui.setItem(48, batteryA);
-        myGui.setItem(53, Mover);
-        myGui.setItem(49, battery);
-        for (int i = 0; i < size; i++)
-        {
-            if (storageItems[i] != null)
-            {
-                storageItems[i].setAmount(1);
-            }
-            if (!TitanBox.isEmpty(storageItems[i]))
-            {
-                ItemStack interfaceItem = storageItems[i].clone();
-                String type = "";
-                if (!interfaceItem.hasItemMeta())
-                {
-                    type = ChatColor.WHITE + interfaceItem.getType().name();
-                }
-                else
-                {
-                    type = ChatColor.WHITE + interfaceItem.getItemMeta().getDisplayName();
-                }
-                Double per = Double.valueOf(storageCount[i]) / Double.valueOf(Long.MAX_VALUE);
-                per = per *100;
-                int perc = (int) Math.round(per);
-                String storpec =  "" + ChatColor.WHITE + perc + "%";
-                if (per < 1)
-                {
-                    storpec =  "" + ChatColor.WHITE + "<1%";
-                }
-                if (per > 99 && !this.isFull(i))
-                {
-                    storpec =  "" + ChatColor.WHITE + "<100%";
-                }
-                if (storageCount[i].equals(Long.valueOf(0)))
-                {
-                    storpec =  "" + ChatColor.WHITE + "empty";
-                }
-                interfaceItem = TitanBox.changeName(interfaceItem, "Stored Item");
-                interfaceItem = TitanBox.addLore(true, interfaceItem, ChatColor.YELLOW + "" + ChatColor.STRIKETHROUGH + "---------------------------", ChatColor.YELLOW + "Name: " + type,  ChatColor.YELLOW + "Stock: " + ChatColor.WHITE + storageCount[i], ChatColor.YELLOW + "Capacity: " +storpec, ChatColor.AQUA + "" + ChatColor.STRIKETHROUGH + "---------------------------",ChatColor.AQUA + "Left Click: " + ChatColor.WHITE + "64", ChatColor.AQUA + "Right Click: " + ChatColor.WHITE + "1", ChatColor.AQUA + "Shift Click: " + ChatColor.WHITE + "4x64 (256)");//,ChatColor.YELLOW + "Max Storage: " + Long.MAX_VALUE);
-                interfaceItem.setAmount(1);
-                myGui.setItem(i, interfaceItem.clone());
-            }
-            else
-            {
-                if (isLocked())
-                {
-                    ItemStack blocked = new ItemStack(Material.BARRIER);
-                    blocked = TitanBox.changeName(blocked, "Lock is on");
-                    myGui.setItem(i, blocked.clone());
-                }
-            }
-        }
-        ItemStack movingB = TitanBox.getSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGZhNjA1ZTI1ZjRmYzJjZWE1YTc2NmQ3OWE4YmZhMjkwMzEzZTQ1ZDhmNWU5NTdkOTU4YTBmMzNmY2IxNiJ9fX0=");
-        movingB = TitanBox.changeName(movingB, "Click new slot to switch!");
-        if (from > 0)
-        {
-            myGui.setItem(from, movingB);
-        }
-
-    }
-*/
     public boolean isLocked() {
         return locked;
     }
@@ -547,17 +415,32 @@ public class StorageUnit implements InventoryHolder {
         return MyId;
     }
 
+    public mainGUI getGui() {
+        return gui;
+    }
+
     public void OpenGui(Player player)
     {
         if (lastUpdated + 750 < System.currentTimeMillis()) {
             lastUpdated = System.currentTimeMillis();
             if (location != null) {
                 if ((GriefPrevention.instance.allowBuild(player, location) == null) || player.hasPermission("titanbox.admin")) {
-                    lastAccessed = System.currentTimeMillis();
+                    if (gui == null) {
+                        lastAccessed = System.currentTimeMillis();
 
-                    buildGUI();
+                        buildGUI();
 
-                    gui.showGUI(player);
+                        gui.showGUI(player);
+
+                        StorageGuiRunnable SGR = new StorageGuiRunnable();
+                        SGR.myStorageUnit = this;
+                        SGR.myID = Bukkit.getScheduler().scheduleSyncRepeatingTask(TitanBox.instants, SGR, 1, 1);
+
+                    }
+                    else
+                    {
+                        player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Someone is viewing this storage unit.");
+                    }
                 }
             }
         }
@@ -695,7 +578,6 @@ public class StorageUnit implements InventoryHolder {
                             }
                         }
                         saveMe();
-                        reBuildSlots();
                         return gettting.clone();
                     } else {
                         lastAccessed = System.currentTimeMillis();
@@ -712,13 +594,11 @@ public class StorageUnit implements InventoryHolder {
                             }
                         }
                         saveMe();
-                        reBuildSlots();
                         return gettting.clone();
                     }
                 }
             }
             saveMe();
-            reBuildSlots();
             return null;
         }
         catch (Exception e)
@@ -748,7 +628,6 @@ public class StorageUnit implements InventoryHolder {
                 {
                     storageCount[i] = storageCount[i] + Long.valueOf(placingClone.getAmount());
                     saveMe();
-                    reBuildSlots();
                     return null;
                 }
                 else {
@@ -757,13 +636,11 @@ public class StorageUnit implements InventoryHolder {
                     placingClone.setAmount(Math.toIntExact(OutValue));
                     lastAccessed =System.currentTimeMillis();
                     saveMe();
-                    reBuildSlots();
                     return placingClone;
                 }
 
            }
         }
-        reBuildSlots();
         return placingClone;
     }
     public boolean insertItem(ItemStack placing, Long Amount)
@@ -779,7 +656,6 @@ public class StorageUnit implements InventoryHolder {
                 {
                     storageCount[i] = storageCount[i] + Amount;
                     saveMe();
-                    reBuildSlots();
                     return true;
                 }
                 else {
@@ -788,13 +664,11 @@ public class StorageUnit implements InventoryHolder {
                     placingClone.setAmount(Math.toIntExact(OutValue));
                     lastAccessed =System.currentTimeMillis();
                     saveMe();
-                    reBuildSlots();
                     return true;
                 }
 
             }
         }
-        reBuildSlots();
         return false;
     }
     private boolean addToEmpty(ItemStack placingClone, Long Amount) {
@@ -806,7 +680,6 @@ public class StorageUnit implements InventoryHolder {
                     storageItems[i] = placingClone;
                     lastAccessed = System.currentTimeMillis();
                     saveMe();
-                    reBuildSlots();
                     return true;
                 }
             }
@@ -822,7 +695,6 @@ public class StorageUnit implements InventoryHolder {
                     storageItems[i] = placingClone;
                     lastAccessed = System.currentTimeMillis();
                     saveMe();
-                    reBuildSlots();
                     return true;
                 }
             }
@@ -984,144 +856,6 @@ public class StorageUnit implements InventoryHolder {
             }
             tmp.gui.onInventoryClickEvent(event);
         }
-                    /*
-            int slot = event.getRawSlot();
-            if (slot > -1 && slot < 54) {
-                if (slot == 45)
-                {
-                    for (int i = 0; i < 36; i++) {
-                        ItemStack item =event.getWhoClicked().getInventory().getItem(i);
-                        if (!TitanBox.isEmpty(item)) {
-                            ItemStack left = tmp.insertItem(item);
-                            event.getWhoClicked().getInventory().setItem(i, left);
-                        }
-                    }
-                    tmp.OpenGui((Player) event.getWhoClicked());
-                    return;
-                }
-                if (slot == 46)
-                {
-                    tmp.setRemember(!tmp.isRemember());
-                    tmp.OpenGui((Player) event.getWhoClicked());
-                    return;
-                }
-                if (slot == 47)
-                {
-                    tmp.setLocked(!tmp.isLocked());
-                    tmp.OpenGui((Player) event.getWhoClicked());
-                    return;
-                }
-                if (slot == 48)
-                {
-                    boolean havebattery = false;
-                    for (int i = 0; i < 36; i++) {
-                        ItemStack checkItem = event.getWhoClicked().getInventory().getItem(i);
-                        if (!TitanBox.isEmpty(checkItem)) {
-                            if (TitanBox.isItemEqual(SlimefunItems.BATTERY, checkItem))
-                            {
-                                if (checkItem.getAmount() < 2)
-                                {
-                                    event.getWhoClicked().getInventory().setItem(i, null);
-                                }else {
-                                    checkItem.setAmount(checkItem.getAmount() - 1);
-                                    event.getWhoClicked().getInventory().setItem(i, checkItem);
-                                }
-                                havebattery = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (havebattery) {
-                        String power = BlockStorage.getBlockInfo(tmp.getLocation(), "energy-charge");
-                        int powerA = 0;
-                        try {
-                            powerA = Integer.parseInt(power);
-                        }
-                        catch (Exception e)
-                        {
-
-                        }
-                        powerA = powerA + 40;
-                        BlockStorage.addBlockInfo(tmp.getLocation(), "energy-charge", powerA + "");
-                    }
-                    tmp.OpenGui((Player) event.getWhoClicked());
-                    return;
-                }
-                if (slot == 53)
-                {
-                    tmp.setMoving(!tmp.isMoving());
-                    tmp.OpenGui((Player) event.getWhoClicked());
-                    return;
-                }
-                if (slot > tmp.getSize())
-                {
-                    return;
-                }
-                ItemStack item = tmp.viewSlot(slot);
-                int Amount = 64;
-                if (event.isShiftClick())
-                {
-                    Amount = 256;
-                }
-                if (event.isRightClick())
-                {
-                    Amount = 1;
-                }
-                if (BlockStorage.getBlockInfo(tmp.getLocation()) != null) {
-                    if (!tmp.isMoving()) {
-                        ItemStack IS = tmp.getItem(slot, Amount);
-                        if (IS != null) {
-                            event.getWhoClicked().getInventory().addItem(IS);
-                            for (int i = 0; i < 36; i++) {
-                                ItemStack checkItem = event.getWhoClicked().getInventory().getItem(i);
-                                if (!TitanBox.isEmpty(checkItem)) {
-                                    if (checkItem.getAmount() > checkItem.getMaxStackSize()) {
-                                        int dif = checkItem.getAmount() - checkItem.getMaxStackSize();
-                                        checkItem.setAmount(checkItem.getMaxStackSize());
-                                        //make sure we don't go over the bigMax stack size, like arrmor, things over 64 doesn't matter...
-                                        event.getWhoClicked().getInventory().setItem(i, checkItem.clone());
-                                        while (dif > 0) {
-                                            dif = dif - checkItem.getMaxStackSize();
-                                            event.getWhoClicked().getInventory().addItem(checkItem.clone());
-                                        }
-                                    }
-                                }
-                            }
-
-                            tmp.OpenGui((Player) event.getWhoClicked());
-                        }
-                    }
-                    else
-                    {
-                       if (tmp.from < 0)
-                       {
-                           tmp.from = event.getRawSlot();
-
-                       }
-                       else
-                       {
-                           tmp.moveSlot(tmp.from, event.getRawSlot());
-                           tmp.from = -1;
-                       }
-                        tmp.OpenGui((Player) event.getWhoClicked());
-                    }
-                }
-
-            }
-            else
-            {
-                if (slot > 53 && slot < 90) {
-                    ItemStack item = event.getClickedInventory().getItem(event.getSlot());
-                    if (!TitanBox.isEmpty(item)) {
-                        ItemStack left = tmp.insertItem(item);
-                        event.getClickedInventory().setItem(event.getSlot(), left);
-                        tmp.OpenGui((Player) event.getWhoClicked());
-                    }
-                }
-            }
-
-        }
-*/
     }
     public static void onPlayerInteractEvent(PlayerInteractEvent event)
     {
@@ -1137,8 +871,28 @@ public class StorageUnit implements InventoryHolder {
                         if (item.getItemMeta().hasDisplayName()) {
                             if (item.getItemMeta().getDisplayName().startsWith(ChatColor.YELLOW + "Upgrade Device")) {
                                 event.setCancelled(true);
+                                if (!TitanBox.hasBarcodeGood(item))
+                                {
+                                    event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "This is an invalid device! Most likely an old one.");
+                                    return;
+                                }
+                                String barcode = TitanBox.readBarcode(item);
+                                if (barcode == null)
+                                {
+                                    event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "This is an invalid device! Most likely an old one.");
+                                    return;
+                                }
+                                boolean barcodeTrue = Boolean.valueOf(barcode);
+                                if (barcodeTrue)
+                                {
+                                    event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "This is an invalid device! It has been duped and you have been reported.");
+                                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mail send freethemice " + event.getPlayer().getName() + " has used a dupped Upgrade Device!");
+                                    return;
+                                }
+                                TitanBox.setBarcodeTrue(item);
+
                                 Random rnd = new Random(System.currentTimeMillis());
-                                int addint = rnd.nextInt(3) + 1;
+                                int addint = rnd.nextInt(7) + 1;
                                 int cap = Math.min(tmp.getSize(), addint);
                                 if (tmp.getSize() >= 45)
                                 {
@@ -1266,7 +1020,6 @@ public class StorageUnit implements InventoryHolder {
                     }
                 }
                 saveMe();
-                reBuildSlots();
                 return;
             }
             if (slot == 46)
@@ -1274,8 +1027,6 @@ public class StorageUnit implements InventoryHolder {
                 this.setRemember(!this.isRemember());
                 button.setToggle(buttonEnum.getType(this.isRemember()));
                 saveMe();
-                reBuildMenu();
-                reBuildSlots();
                 return;
             }
             if (slot == 47)
@@ -1283,8 +1034,6 @@ public class StorageUnit implements InventoryHolder {
                 this.setLocked(!this.isLocked());
                 button.setToggle(buttonEnum.getType(this.isLocked()));
                 saveMe();
-                reBuildMenu();
-                reBuildSlots();
                 return;
             }
             if (slot == 48)
@@ -1374,7 +1123,6 @@ public class StorageUnit implements InventoryHolder {
                             }
 
                             saveMe();
-                            reBuildSlots();
                         }
                     }
                     else
@@ -1392,7 +1140,6 @@ public class StorageUnit implements InventoryHolder {
                             }
                         }
                         saveMe();
-                        reBuildSlots();
                     }
                 }
                 else
@@ -1408,7 +1155,6 @@ public class StorageUnit implements InventoryHolder {
                         this.from = -1;
                     }
                     saveMe();
-                    reBuildSlots();
                 }
             }
 
@@ -1454,7 +1200,6 @@ public class StorageUnit implements InventoryHolder {
                     event.getWhoClicked().getInventory().setItem(event.getSlot(), left);
 
                     saveMe();
-                    reBuildSlots();
                 }
             }
         }

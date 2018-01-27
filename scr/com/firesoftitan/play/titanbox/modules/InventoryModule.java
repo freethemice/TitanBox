@@ -168,14 +168,6 @@ public class InventoryModule extends MainModule {
             else
             {
                 BlockStorage storage = BlockStorage.getStorage(getLink().getWorld());
-                /*if (storage.hasUniversalInventory(getLink())) {
-
-                    UniversalBlockMenu menu = storage.getUniversalInventory(getLink());
-                    for (int slot: menu.getPreset().getSlotsAccessedByItemTransport(ItemTransportFlow.INSERT)) {
-                        myGui.setItem(slot, new ItemStack(Material.BOOK, 64));
-                    }
-                }
-                else*/
                 if (storage.hasInventory(getLink())) {
                     BlockMenu menu = BlockStorage.getInventory(getLink());
 
@@ -310,7 +302,8 @@ public class InventoryModule extends MainModule {
         {
             Material mat = getLink().getBlock().getType();
             if (mat == Material.CHEST || mat == Material.TRAPPED_CHEST) {
-                for (int i = 0; i < 54; i++) {
+                Inventory inv = TitanBox.getVanillaInventoryFor(getLink().getBlock());
+                for (int i = 0; i < inv.getSize(); i++) {
                     slotsPulling.add(i);
                 }
             }
@@ -551,7 +544,7 @@ public class InventoryModule extends MainModule {
                     updateGUIClicked((Player) event.getWhoClicked(), mh, true);
                 }
             }
-            if (event.getRawSlot() > -1 && event.getRawSlot() < 45)
+            if (event.getRawSlot() > -1 && event.getRawSlot() < 54)
             {
                 if (TitanBox.isEmpty(event.getInventory().getItem(event.getRawSlot()))) {
                     if (mh.getMode().equalsIgnoreCase("pulling"))

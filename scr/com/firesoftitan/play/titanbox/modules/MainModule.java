@@ -118,24 +118,30 @@ public class MainModule {
         ItemStack block = from.getMeAsIcon();
         String SLIMEFUNname = "";
         if (from.getLink() != null) {
-            block = new ItemStack(from.getLink().getBlock().getType(), 1, from.getLink().getBlock().getData());
-            if (block.getType() == Material.SKULL) {
-                String texture = "";
-                try {
-                    texture = CustomSkull.getTexture(from.getLink().getBlock());
-                    block = CustomSkull.getItem(texture);
-                } catch (Exception e) {
-
+            if (from.getLink().getBlock().getType() != Material.AIR) {
+                short blockDate = from.getLink().getBlock().getData();
+                Material type = from.getLink().getBlock().getType();
+                if (from.getLink().getBlock().getType() == Material.BURNING_FURNACE) {
+                    type = Material.FURNACE;
                 }
-            }
-            if (from.getLink().getBlock().getType() == Material.BREWING_STAND) {
-                block = new ItemStack(Material.BREWING_STAND_ITEM);
-            }
-            if (BlockStorage.getBlockInfo(from.getLink().getBlock()).contains("id"))
-            {
-                SLIMEFUNname = BlockStorage.getBlockInfo(from.getLink().getBlock()).getString("id");
-                SLIMEFUNname = SLIMEFUNname.replace("_", " ").toLowerCase();
-                SLIMEFUNname = WordUtils.capitalize(SLIMEFUNname);
+                block = new ItemStack(type, 1, blockDate);
+                if (block.getType() == Material.SKULL) {
+                    String texture = "";
+                    try {
+                        texture = CustomSkull.getTexture(from.getLink().getBlock());
+                        block = CustomSkull.getItem(texture);
+                    } catch (Exception e) {
+
+                    }
+                }
+                if (from.getLink().getBlock().getType() == Material.BREWING_STAND) {
+                    block = new ItemStack(Material.BREWING_STAND_ITEM);
+                }
+                if (BlockStorage.getBlockInfo(from.getLink().getBlock()).contains("id")) {
+                    SLIMEFUNname = BlockStorage.getBlockInfo(from.getLink().getBlock()).getString("id");
+                    SLIMEFUNname = SLIMEFUNname.replace("_", " ").toLowerCase();
+                    SLIMEFUNname = WordUtils.capitalize(SLIMEFUNname);
+                }
             }
         }
         block = TitanBox.changeName(block, from.getType().getTitle());

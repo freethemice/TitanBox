@@ -23,6 +23,7 @@ public class Elevator {
     public static Config elevators = new Config("data-storage" + File.separator + "TitanBox" + File.separator  + "elevator.yml");
     public Elevator()
     {
+
             //Collections.sort(lList);
     }
     public static String getKey(Location loc)

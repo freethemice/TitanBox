@@ -296,12 +296,18 @@ public class ItemRoutingRouter implements InventoryHolder {
         {
             if (button.getSlot() < 45) {
                 if (button.getSlot() + startIndex< modules.size()) {
-                    MainModule geting = modules.get(button.getSlot() + startIndex);
-                    ItemStack hereItem = MainModule.getItemfromModule(geting);
-                    modules.remove(button.getSlot() + startIndex);
-                    this.SaveMe();
-                    event.getWhoClicked().getInventory().addItem(hereItem);
-                    buildGUISlots();
+                    try {
+                        MainModule geting = modules.get(button.getSlot() + startIndex);
+                        ItemStack hereItem = MainModule.getItemfromModule(geting);
+                        modules.remove(button.getSlot() + startIndex);
+                        this.SaveMe();
+                        event.getWhoClicked().getInventory().addItem(hereItem);
+                        buildGUISlots();
+                    } catch (Exception e) {
+                        modules.remove(button.getSlot() + startIndex);
+                        this.SaveMe();
+                        buildGUISlots();
+                    }
                 }
             }
             if (button.getSlot() == 45)
