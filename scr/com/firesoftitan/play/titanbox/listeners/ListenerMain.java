@@ -7,8 +7,10 @@ import com.firesoftitan.play.titanbox.holders.SlimefunItemsHolder;
 import com.firesoftitan.play.titanbox.items.TitanTalisman;
 import com.firesoftitan.play.titanbox.machines.*;
 import com.firesoftitan.play.titanbox.modules.MainModule;
+import com.firesoftitan.play.titanbox.runnables.IRRUserRunnable;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunItem;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -230,6 +232,7 @@ public class ListenerMain implements Listener {
     @EventHandler
     public void onPlayerLoginEvent(PlayerLoginEvent event)
     {
+        System.out.println("[Player Login: " + event.getPlayer().getName() + "]: Setting up");
         String myUUDI = event.getPlayer().getUniqueId().toString();
         List<StorageUnit> tmpOwner = new ArrayList<StorageUnit>();
         for(StorageUnit key: StorageUnit.StorageById.values())
@@ -240,16 +243,65 @@ public class ListenerMain implements Listener {
             }
         }
         StorageUnit.StorageByOwner.put(myUUDI, tmpOwner);
+        System.out.println("[Player Login: " + event.getPlayer().getName() + "]: added " + tmpOwner.size() + " storage units, are now online!");
+
+        if (RouterHolder.routersByOwner.containsKey(myUUDI))
+        {
+            ItemRoutingRouter person = RouterHolder.routersByOwner.get(myUUDI);
+            if (person != null) {
+                IRRUserRunnable tmp = new IRRUserRunnable();
+                tmp.setItemRoutingRouter(person);
+                int id = Bukkit.getScheduler().scheduleSyncRepeatingTask(TitanBox.instants, tmp, 1000, RouterHolder.speed);
+                tmp.setTimerID(id);
+                RouterHolder.bufferListT.put(myUUDI, tmp);
+                System.out.println("[Player Login: " + event.getPlayer().getName() + "]: Router found, id:" + id + " will start in 1 second.");
+            }
+            else
+            {
+                System.out.println("[Player Login: " + event.getPlayer().getName() + "]: Router found, loading error.");
+            }
+        }
+        else
+        {
+            System.out.println("[Player Login: " + event.getPlayer().getName() + "]: Player doesn't have a router to load.");
+        }
+
+
 
         StorageUnit.reDrawStorage(event.getPlayer());
+        System.out.println("[Player Login: " + event.getPlayer().getName() + "]: " + "Redrew storage units.");
 
         RouterHolder.reDrawRouter(event.getPlayer());
+        System.out.println("[Player Login: " + event.getPlayer().getName() + "]: " + "Redrew Router unit.");
 
     }
     @EventHandler
     public void onPlayerQuitEvent(PlayerQuitEvent event) {
+        System.out.println("[Player Quiting: " + event.getPlayer().getName() + "]: Unloading...");
         String myUUDI = event.getPlayer().getUniqueId().toString();
         StorageUnit.StorageByOwner.remove(myUUDI);
+        System.out.println("[Player Quiting: " + event.getPlayer().getName() + "]: All Storage units removed...");
+        if (RouterHolder.bufferListT.containsKey(myUUDI))
+        {
+            IRRUserRunnable tmp = RouterHolder.bufferListT.get(myUUDI);
+            if (tmp != null)
+            {
+                int id = tmp.getTimerID();
+                Bukkit.getScheduler().cancelTask(id);
+                System.out.println("[Player Quiting: " + event.getPlayer().getName() + "]: Router found, Thread stopped");
+                RouterHolder.bufferListT.remove(myUUDI);
+                System.out.println("[Player Quiting: " + event.getPlayer().getName() + "]: Router unload successful.");
+            }
+            else
+            {
+                System.out.println("[Player Quiting: " + event.getPlayer().getName() + "]: Router found, unloading error.");
+            }
+        }
+        else
+        {
+            System.out.println("[Player Quiting: " + event.getPlayer().getName() + "]: No router to remove.");
+        }
+
 
     }
     @EventHandler

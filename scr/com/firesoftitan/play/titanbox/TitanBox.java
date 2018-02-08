@@ -31,9 +31,10 @@ import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.*;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -41,6 +42,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.text.NumberFormat;
 import java.util.*;
 
 public class TitanBox extends JavaPlugin
@@ -83,6 +85,18 @@ public class TitanBox extends JavaPlugin
         long truncated = value / (divideBy / 10); //the number part of the output times 10
         boolean hasDecimal = truncated < 100 && (truncated / 10d) != (truncated / 10);
         return hasDecimal ? (truncated / 10d) + suffix : (truncated / 10) + suffix;
+    }
+    public static String formatCommas(Long value)
+    {
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
+        String numberAsString = numberFormat.format(value);
+        return numberAsString;
+    }
+    public static String formatCommas(double value)
+    {
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
+        String numberAsString = numberFormat.format(value);
+        return numberAsString;
     }
     public static String convertToTimePasted(long lastping)
     {
@@ -229,9 +243,9 @@ public class TitanBox extends JavaPlugin
 
         Elevator.loadAllElevators();
 
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(TitanBox.instants, SaverTimer, 1200, 1200);
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(TitanBox.instants, SaverTimer, 12000, 12000);
 
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(TitanBox.instants, RouterTimer, 200, RouterHolder.speed);
+        //Bukkit.getScheduler().scheduleSyncRepeatingTask(TitanBox.instants, RouterTimer, 200, RouterHolder.speed);
 
     }
     public List<Entity>  getNearbyEntities(Location loc)
@@ -243,7 +257,7 @@ public class TitanBox extends JavaPlugin
         EntityPlayer npc = TitanBox.instants.npcs.get(loc.getWorld().getName());
         npc.setLocation(loc.getX(), loc.getY(), loc.getZ(), 0, 0);
         CraftPlayer opCr = npc.getBukkitEntity();
-        List<Entity> nearEntity = npc.getBukkitEntity().getNearbyEntities(rad,rad,rad);
+        List<Entity> nearEntity = opCr.getNearbyEntities(rad,rad,rad);
         return nearEntity;
     }
     public void checkRegisterdPower()

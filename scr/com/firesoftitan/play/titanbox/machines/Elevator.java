@@ -20,6 +20,8 @@ public class Elevator {
 
     public static HashMap<String, List<Integer>> elevatorByLocation = new HashMap<String, List<Integer>>();
     public static HashMap<String, Long> spamTimes = new HashMap<String, Long>();
+    public static HashMap<String, Long> spamTimesUp = new HashMap<String, Long>();
+    public static HashMap<String, Long> spamTimesDown = new HashMap<String, Long>();
     public static Config elevators = new Config("data-storage" + File.separator + "TitanBox" + File.separator  + "elevator.yml");
     public Elevator()
     {
@@ -70,26 +72,32 @@ public class Elevator {
             {
                 spam = spamTimes.get(sUUID);
             }
-            if (spam + 1000 < System.currentTimeMillis()) {
+            if (spam + 7000 < System.currentTimeMillis()) {
                 event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "You are on a Elevator. Sneak To Move Down, Jump to go Up");
             }
             spamTimes.put(sUUID, System.currentTimeMillis());
+
+            spam = Long.valueOf(0);
+            if (spamTimesUp.containsKey(sUUID))
+            {
+                spam = spamTimesUp.get(sUUID);
+            }
             for (int i = 0; i < floors.size(); i++) {
                 if (floors.get(i) == elevator.getY()) {
                     if (to.getY() != from.getY() && event.getPlayer().isOnGround()) {
-                        if (i + 1 < floors.size()) {
-                            int Y = floors.get(i + 1);
-                            Location nextfloor = new Location(elevator.getWorld(), event.getPlayer().getLocation().getX(), Y + 1, event.getPlayer().getLocation().getZ());
-                            event.getPlayer().teleport(nextfloor);
+                        if (spam + 500 < System.currentTimeMillis()) {
+                            if (i + 1 < floors.size()) {
+                                int Y = floors.get(i + 1);
+                                Location nextfloor = new Location(elevator.getWorld(), event.getPlayer().getLocation().getX(), Y + 1, event.getPlayer().getLocation().getZ());
+                                event.getPlayer().teleport(nextfloor);
+                            } else {
+                                event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "You are on the highest floor");
+                            }
                         }
-                        else
-                        {
-                            event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "You are on the highest floor");
-                        }
+                        spamTimesUp.put(sUUID, System.currentTimeMillis());
                     }
                     return;
                 }
-
             }
 
         }
@@ -100,24 +108,29 @@ public class Elevator {
         Location elevator = event.getPlayer().getLocation().clone().add(0 , -1, 0);
         String key = getKey(elevator);
         if (elevatorByLocation.containsKey(key)) {
-            List<Integer> floors = elevatorByLocation.get(key);
-            for (int i = 0; i < floors.size(); i++) {
-                if (floors.get(i) == elevator.getY()) {
-                    if (event.getPlayer().isSneaking() && event.getPlayer().isOnGround())
-                    {
-                        if (i - 1 > -1) {
-                            int Y = floors.get(i - 1);
-                            Location nextfloor = new Location(elevator.getWorld(), event.getPlayer().getLocation().getX(), Y + 1, event.getPlayer().getLocation().getZ());
-                            event.getPlayer().teleport(nextfloor);
-                        }
-                        else
-                        {
-                            event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "You are on the lowest floor");
+            Long spam = Long.valueOf(0);
+            String sUUID = event.getPlayer().getUniqueId().toString();
+            if (spamTimesDown.containsKey(sUUID))
+            {
+                spam = spamTimesDown.get(sUUID);
+            }
+            if (spam + 500 < System.currentTimeMillis()) {
+                List<Integer> floors = elevatorByLocation.get(key);
+                for (int i = 0; i < floors.size(); i++) {
+                    if (floors.get(i) == elevator.getY()) {
+                        if (event.getPlayer().isSneaking() && event.getPlayer().isOnGround()) {
+                            if (i - 1 > -1) {
+                                int Y = floors.get(i - 1);
+                                Location nextfloor = new Location(elevator.getWorld(), event.getPlayer().getLocation().getX(), Y + 1, event.getPlayer().getLocation().getZ());
+                                event.getPlayer().teleport(nextfloor);
+                            } else {
+                                event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "You are on the lowest floor");
+                            }
+                            spamTimesDown.put(sUUID, System.currentTimeMillis());
+                            return;
                         }
                     }
-                    return;
                 }
-
             }
 
         }

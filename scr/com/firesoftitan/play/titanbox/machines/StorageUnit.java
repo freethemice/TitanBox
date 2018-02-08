@@ -180,7 +180,7 @@ public class StorageUnit implements InventoryHolder {
                 buttonGUIs tmp = gui.getButton(i);
                 tmp.setMaterialFalse(interfaceItem);
                 tmp.setNameFalse("Stored Item");
-                tmp.addLore(ChatColor.YELLOW + "" + ChatColor.STRIKETHROUGH + "---------------------------", ChatColor.YELLOW + "Name: " + type,  ChatColor.YELLOW + "Stock: " + ChatColor.WHITE + storageCount[i], ChatColor.YELLOW + "Capacity: " +storpec, ChatColor.AQUA + "" + ChatColor.STRIKETHROUGH + "---------------------------",ChatColor.AQUA + "Left Click: " + ChatColor.WHITE + "64", ChatColor.AQUA + "Right Click: " + ChatColor.WHITE + "1", ChatColor.AQUA + "Shift Left Click: " + ChatColor.WHITE + "4x64 (256)", ChatColor.AQUA + "Shift Right Click: " + ChatColor.WHITE + "ALL (SIM)" );
+                tmp.addLore(ChatColor.YELLOW + "" + ChatColor.STRIKETHROUGH + "---------------------------", ChatColor.YELLOW + "Name: " + type,  ChatColor.YELLOW + "Stock: " + ChatColor.WHITE + TitanBox.formatCommas(storageCount[i]), ChatColor.YELLOW + "Capacity: " +storpec, ChatColor.AQUA + "" + ChatColor.STRIKETHROUGH + "---------------------------",ChatColor.AQUA + "Left Click: " + ChatColor.WHITE + "64", ChatColor.AQUA + "Right Click: " + ChatColor.WHITE + "1", ChatColor.AQUA + "Shift Left Click: " + ChatColor.WHITE + "4x64 (256)", ChatColor.AQUA + "Shift Right Click: " + ChatColor.WHITE + "ALL (SIM)", ChatColor.AQUA + "Right Click Empty: " + ChatColor.WHITE + "Remove" );
                 tmp.setMaterialFalse(interfaceItem);
                 tmp.setToggle(buttonEnum.FALSE);
             }
@@ -1099,6 +1099,11 @@ public class StorageUnit implements InventoryHolder {
                     superStorage = true;
                 }
                 Amount = 1;
+                if (storageCount[slot] == 0)
+                {
+                    storageItems[slot] = null;
+                    saveMe();
+                }
             }
             if (BlockStorage.getBlockInfo(this.getLocation()) != null) {
                 if (!this.isMoving()) {

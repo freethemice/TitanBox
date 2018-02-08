@@ -178,7 +178,7 @@ public class NetworkMonitor {
     }
     public static void onInventoryClickEvent(InventoryClickEvent event) {
 
-        if (event.getInventory().getName().startsWith("Power Generation"))
+        if (event.getInventory().getName().startsWith("Network Monitor"))
         {
             event.setCancelled(true);
         }
@@ -201,9 +201,9 @@ public class NetworkMonitor {
             if (key != null) {
                 if (BackpackRecover.recovers.contains("network.storage."  + key)) {
                     BackpackRecover.recovers.setValue(key, null);
-                    event.setDropItems(false);
+                   /* event.setDropItems(false);
                     ItemStack recover = NetworkMonitor.getMeAsDrop();
-                    event.getPlayer().getInventory().addItem(recover);
+                    event.getPlayer().getInventory().addItem(recover);*/
                     event.getPlayer().closeInventory();
                 }
             }

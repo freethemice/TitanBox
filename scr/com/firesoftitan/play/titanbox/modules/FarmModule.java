@@ -196,12 +196,16 @@ public class FarmModule extends MainModule {
                         if (crops[treeIndex].getBlock().getData() >= 7) {
                             crops[treeIndex].getBlock().setData((byte) 0);
                             crops[treeIndex].getWorld().playEffect(crops[treeIndex], Effect.STEP_SOUND, crops[treeIndex].getBlock().getType());
-                            if (crops[treeIndex].getBlock().getType() == Material.CROPS)
+                            if (crops[treeIndex].getBlock().getType() == Material.CROPS) {
                                 TitanBox.addItemToStorage(owner, Material.WHEAT, 1);
-                            if (crops[treeIndex].getBlock().getType() == Material.POTATO)
+                                TitanBox.addItemToStorage(owner, Material.SEEDS, 1);
+                            }
+                            if (crops[treeIndex].getBlock().getType() == Material.POTATO) {
                                 TitanBox.addItemToStorage(owner, Material.POTATO_ITEM, 1);
-                            if (crops[treeIndex].getBlock().getType() == Material.CARROT)
+                            }
+                            if (crops[treeIndex].getBlock().getType() == Material.CARROT) {
                                 TitanBox.addItemToStorage(owner, Material.CARROT_ITEM, 1);
+                            }
 
                         } else {
                             if (TitanBox.hasItem(owner, Material.INK_SACK, (short) 15)) {

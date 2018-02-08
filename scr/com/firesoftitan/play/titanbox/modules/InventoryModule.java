@@ -14,6 +14,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -31,6 +32,7 @@ public class InventoryModule extends MainModule {
     public List<SendingSlotHolder> bufferSlotsSending = new ArrayList<SendingSlotHolder>();
     private int tmpSlot = -1;
     private long lastran = 0;
+    private int editingSlot = -1;
 
     public InventoryModule()
     {
@@ -68,12 +70,20 @@ public class InventoryModule extends MainModule {
                 }
                 catch (Exception e)
                 {
-                    System.out.println("Bad Filter!");
+                    System.out.println("[TitanBox]: Bad Filter!");
                     modules.setValue("modules." + moduleid + ".slots.filter." + key, null);
                 }
             }
         }
 
+    }
+
+    public int getEditingSlot() {
+        return editingSlot;
+    }
+
+    public void setEditingSlot(int editingSlot) {
+        this.editingSlot = editingSlot;
     }
 
     public boolean isHidebar() {
@@ -145,6 +155,9 @@ public class InventoryModule extends MainModule {
         ItemStack itemMode = new ItemStack(Material.IRON_INGOT, 1);
         itemMode = TitanBox.changeName(itemMode, "Your Items");
 
+        ItemStack editMode = new ItemStack(Material.SIGN, 1);
+        editMode = TitanBox.changeName(editMode, "Edit Mode");
+
         ItemStack block = new ItemStack(Material.BARRIER, 1);
         ItemStack hideBlock =TitanBox.getSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjNjNjZjNDJjZGUxZGQxZjVmOTUxNDNlNDcyMjU0ZjdmYWU4ZWNjZmY0ZGM5NDNiMDg2YTk0NGIyN2JkZmIifX19");
         hideBlock = TitanBox.changeName(hideBlock, "Hide Menu Bar");
@@ -186,7 +199,7 @@ public class InventoryModule extends MainModule {
                 myGui.setItem(slot, typepulling.clone());
             }
 
-            if (!getMode().equalsIgnoreCase("items")) {
+            if (!getMode().equalsIgnoreCase("items") && !getMode().equalsIgnoreCase("edit")) {
                 for (SendingSlotHolder slot : slotsSending) {
                     myGui.setItem(slot.getSlot(), typesending.clone());
                 }
@@ -210,6 +223,8 @@ public class InventoryModule extends MainModule {
                 for (SendingSlotHolder slot : slotsSending) {
                     myGui.setItem(slot.getSlot(), slot.getItem());
                 }
+                hideBlock = TitanBox.changeName(hideBlock, "Back Menu Bar");
+                hideBlock = TitanBox.addLore(hideBlock, ChatColor.WHITE + "-Click here to go back to the main menu.");
             }
         }
 
@@ -223,17 +238,67 @@ public class InventoryModule extends MainModule {
             typepulling = TitanBox.addLore(typepulling, "Click Here To Setup Manualy", "Then Click Any Empty Slot", "or Click Arrow To Remove, above");
             typesending = TitanBox.addLore(typesending, "Click Here To Setup Manualy", "Then Click Any Empty Slot", "or Click Arrow To Remove, above");
             itemMode = TitanBox.addLore(itemMode, "Click Here To Setup Items", "Then Click Any Item In Your Inv", "or Click Slot To Remove, above");
-            myGui.setItem(46, typesending.clone());
-            myGui.setItem(47, typepulling.clone());
-            myGui.setItem(48, itemMode.clone());
+            editMode = TitanBox.addLore(editMode, "Click Here for advanced setting", "Then click the item you want to edit");
+            if (!this.getMode().equalsIgnoreCase("edit")) {
+                myGui.setItem(46, typesending.clone());
+                myGui.setItem(47, typepulling.clone());
+                myGui.setItem(48, itemMode.clone());
+                myGui.setItem(49, editMode.clone());
+
+            }
+            else {
+
+                ItemStack filterItem = getItemNSlotSending(editingSlot);
+                if (!TitanBox.isEmpty(filterItem)) {
+                    int amount = filterItem.getMaxStackSize();
+                    if (modules.contains("modules." + moduleid + ".slots.advance." + editingSlot + ".max")) {
+                        amount = modules.getInt("modules." + moduleid + ".slots.advance." + editingSlot + ".max");
+                    }
+                    ItemStack slot46 = filterItem.clone();
+                    slot46 = TitanBox.changeName(slot46, "Number To Send At A Time: " + amount);
+                    slot46 = TitanBox.addLore(true, slot46, ChatColor.AQUA + "Left Click: " + ChatColor.WHITE + "Increase", ChatColor.AQUA + "Right Click: " + ChatColor.WHITE + "Decrease", ChatColor.AQUA + "Shift Left Click: " + ChatColor.WHITE + "IncreaseX16", ChatColor.AQUA + "Shift Right Click: " + ChatColor.WHITE + "DecreaseX16");
+                    slot46.setAmount(amount);
+                    myGui.setItem(46, slot46.clone());
+
+
+                    int keep = 0;
+                    if (modules.contains("modules." + moduleid + ".slots.advance." + editingSlot + ".keep")) {
+                        keep = modules.getInt("modules." + moduleid + ".slots.advance." + editingSlot + ".keep");
+                    }
+
+                    ItemStack slot47 = TitanBox.instants.getItem("e").clone();
+                    if (keep == 0)
+                    {
+                        slot47 = new ItemStack(Material.BARRIER);
+                    }
+                    slot47 = TitanBox.changeName(slot47, "Number keep in Storage: " + keep);
+                    slot47 = TitanBox.addLore(true, slot47, ChatColor.AQUA + "Left Click: " + ChatColor.WHITE + "Increase", ChatColor.AQUA + "Right Click: " + ChatColor.WHITE + "Decrease", ChatColor.AQUA + "Shift Left Click: " + ChatColor.WHITE + "IncreaseX64", ChatColor.AQUA + "Shift Right Click: " + ChatColor.WHITE + "DecreaseX64");
+                    slot47.setAmount(1);
+                    if (keep > 1) {
+                        slot47.setAmount(keep);
+                    }
+                    if (keep > 64) {
+                        slot47.setAmount(64);
+                    }
+                    myGui.setItem(47, slot47.clone());
+
+                }
+
+
+                //myGui.setItem(47, typepulling.clone());
+                //myGui.setItem(48, itemMode.clone());
+                //myGui.setItem(49, editMode.clone());
+            }
+
             myGui.setItem(52, hideBlock.clone());
-
-
             if (this.getMode().equalsIgnoreCase("pulling")) {
                 typepulling = TitanBox.addLore(typepulling, "You are in pulling mode!", "you can place and remove pulling slots.");
                 myGui.setItem(53, typepulling.clone());
             } else if (this.getMode().equalsIgnoreCase("sending")) {
                 typesending = TitanBox.addLore(typesending, "You are in sending mode!", "you can place and remove sending slots.");
+                myGui.setItem(53, typesending.clone());
+            } else if (this.getMode().equalsIgnoreCase("edit")) {
+                typesending = TitanBox.addLore(editMode, "You are in edit mode!", "click sending items", "for advanced options");
                 myGui.setItem(53, typesending.clone());
             } else if (this.getMode().equalsIgnoreCase("items")) {
                 itemMode = new ItemStack(Material.BARRIER, 1);
@@ -273,6 +338,15 @@ public class InventoryModule extends MainModule {
         this.mode = mode;
     }
 
+    public ItemStack getItemNSlotSending(int slot)
+    {
+        int index = getIndexOfSlot(slot);
+        if (slot < 0 || index < 0 || index > slotsSending.size())
+        {
+            return null;
+        }
+        return  slotsSending.get(index).getItem();
+    }
     public int getIndexOfSlot(int slot)
     {
         for (int i = 0; i < slotsSending.size(); i++)
@@ -410,13 +484,24 @@ public class InventoryModule extends MainModule {
             int slot = mySlot.getSlot();
             ItemStack bufferItem = this.getItemAtLocation(slot);
             ItemStack fillertItem = mySlot.getItem();
+            int amountMax = 64;
+            if (!TitanBox.isEmpty(fillertItem)) {
+                amountMax = fillertItem.getMaxStackSize();
+            }
+            if (modules.contains("modules." + getModuleid() + ".slots.advance." + slot + ".max")) {
+                amountMax = modules.getInt("modules." + getModuleid() + ".slots.advance." +slot + ".max");
+            }
+            int amountKeep = 0;
+            if (modules.contains("modules." + getModuleid() + ".slots.advance." + slot + ".keep")) {
+                amountKeep = modules.getInt("modules." + getModuleid() + ".slots.advance." +slot + ".keep");
+            }
             if (!TitanBox.isEmpty(fillertItem)) {
                 for (StorageUnit stH : StorageUnit.getStorageFromOwner(owner)) {
                     for(int i = 0; i < stH.getSize(); i++) {
                         ItemStack storagedItem = stH.viewSlot(i);
 
                         if (!TitanBox.isEmpty(storagedItem)) {
-                            if (stH.getStorageCount(i) > 0) {
+                            if (stH.getStorageCount(i) > amountKeep) {
                                 if (TitanBox.isItemEqual(fillertItem, storagedItem)) {
                                     int amountneeded = 64;
                                     if (!TitanBox.isEmpty(bufferItem)) {
@@ -426,6 +511,7 @@ public class InventoryModule extends MainModule {
                                     {
                                         amountneeded = Integer.parseInt(stH.getStorageCount(i).toString());
                                     }
+                                    amountneeded = Math.min(amountMax, amountneeded);
                                     if (amountneeded > 0) {
                                         if (mySlot.getLastChecked() + RouterHolder.lagTime < System.currentTimeMillis() || amountneeded >= storagedItem.getMaxStackSize()) {
                                             mySlot.check();
@@ -524,27 +610,118 @@ public class InventoryModule extends MainModule {
     public static void onInventoryClickEvent(InventoryClickEvent event, InventoryModule mh) {
         if (event.getInventory().getName().startsWith(mh.getType().getTitle()))
         {
-            if (event.isShiftClick() || (event.getRawSlot() == 52 && !mh.isHidebar()))
+            if ((event.isShiftClick() && mh.isHidebar()) || (event.getRawSlot() == 52 && !mh.isHidebar()))
             {
+                if (mh.getMode().equals("edit"))
+                {
+                    mh.setEditingSlot(-1);
+                    mh.setMode("pulling");
+                    updateGUIClicked((Player) event.getWhoClicked(), mh, true);
+                    return;
+                }
                 mh.setHidebar(!mh.isHidebar());
                 updateGUIClicked((Player) event.getWhoClicked(), mh, true);
                 return;
             }
+            int slotTo = 54;
             if (!mh.isHidebar()) {
+                slotTo = 45;
                 if (event.getRawSlot() == 46) {
-                    mh.setMode("sending");
-                    updateGUIClicked((Player) event.getWhoClicked(), mh, true);
+                    if (mh.getMode().equals("edit"))
+                    {
+                        ItemStack filterItem = mh.getItemNSlotSending(mh.getEditingSlot());
+                        if (!TitanBox.isEmpty(filterItem)) {
+                            int amount = filterItem.getMaxStackSize();
+
+                            if (modules.contains("modules." + mh.getModuleid() + ".slots.advance." + mh.getEditingSlot() + ".max")) {
+                                amount = modules.getInt("modules." + mh.getModuleid() + ".slots.advance." + mh.getEditingSlot() + ".max");
+                            }
+                            if (event.getClick() == ClickType.LEFT || event.getClick() == ClickType.SHIFT_LEFT) {
+                                if (event.isShiftClick())
+                                {
+                                    amount = amount + 16;
+                                }
+                                else {
+                                    amount++;
+                                }
+                                if (amount > filterItem.getMaxStackSize()) {
+                                    amount = filterItem.getMaxStackSize();
+                                }
+                            }
+                            if (event.getClick() == ClickType.RIGHT || event.getClick() == ClickType.SHIFT_RIGHT) {
+                                if (event.isShiftClick()) {
+                                    amount = amount - 16;
+                                }
+                                else
+                                {
+                                    amount--;
+                                }
+                                if (amount < 1) {
+                                    amount = 1;
+                                }
+                            }
+                            modules.setValue("modules." + mh.getModuleid() + ".slots.advance." + mh.getEditingSlot() + ".max", amount);
+                        }
+                        updateGUIClicked((Player) event.getWhoClicked(), mh, true);
+                    }
+                    else {
+                        mh.setMode("sending");
+                        updateGUIClicked((Player) event.getWhoClicked(), mh, true);
+                    }
                 }
                 if (event.getRawSlot() == 47) {
-                    mh.setMode("pulling");
-                    updateGUIClicked((Player) event.getWhoClicked(), mh, true);
+                    if (mh.getMode().equals("edit"))
+                    {
+                        ItemStack filterItem = mh.getItemNSlotSending(mh.getEditingSlot());
+                        if (!TitanBox.isEmpty(filterItem)) {
+                            int  amount = 0;
+
+                            if (modules.contains("modules." + mh.getModuleid() + ".slots.advance." + mh.getEditingSlot() + ".keep")) {
+                                amount = modules.getInt("modules." + mh.getModuleid() + ".slots.advance." + mh.getEditingSlot() + ".keep");
+                            }
+                            if (event.getClick() == ClickType.LEFT || event.getClick() == ClickType.SHIFT_LEFT) {
+                                if (event.isShiftClick())
+                                {
+                                    amount = amount + 64;
+                                }
+                                else {
+                                    amount++;
+                                }
+                                if (amount > Integer.MAX_VALUE) {
+                                    amount = Integer.MAX_VALUE;
+                                }
+                            }
+                            if (event.getClick() == ClickType.RIGHT || event.getClick() == ClickType.SHIFT_RIGHT) {
+                                if (event.isShiftClick()) {
+                                    amount = amount - 64;
+                                }
+                                else
+                                {
+                                    amount--;
+                                }
+                                if (amount < 0) {
+                                    amount = 0;
+                                }
+                            }
+                            modules.setValue("modules." + mh.getModuleid() + ".slots.advance." + mh.getEditingSlot() + ".keep", amount);
+                        }
+                        updateGUIClicked((Player) event.getWhoClicked(), mh, true);
+                    }
+                    else {
+                        mh.setMode("pulling");
+                        updateGUIClicked((Player) event.getWhoClicked(), mh, true);
+                    }
                 }
                 if (event.getRawSlot() == 48) {
                     mh.setMode("items");
                     updateGUIClicked((Player) event.getWhoClicked(), mh, true);
                 }
+                if (event.getRawSlot() == 49) {
+                    mh.setMode("edit");
+                    updateGUIClicked((Player) event.getWhoClicked(), mh, true);
+                }
             }
-            if (event.getRawSlot() > -1 && event.getRawSlot() < 54)
+            if (event.getRawSlot() > -1 && event.getRawSlot() < slotTo)
             {
                 if (TitanBox.isEmpty(event.getInventory().getItem(event.getRawSlot()))) {
                     if (mh.getMode().equalsIgnoreCase("pulling"))
@@ -585,6 +762,11 @@ public class InventoryModule extends MainModule {
                 }
                 else
                 {
+                    if (mh.getMode().equalsIgnoreCase("edit"))
+                    {
+                        mh.setEditingSlot(event.getRawSlot());
+                        updateGUIClicked((Player) event.getWhoClicked(), mh, true);
+                    }
                     if (mh.getMode().equalsIgnoreCase("pulling"))
                     {
                         mh.slotsPulling.remove((Integer)event.getRawSlot());

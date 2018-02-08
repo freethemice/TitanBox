@@ -4,6 +4,7 @@ import com.firesoftitan.play.titanbox.TitanBox;
 import com.firesoftitan.play.titanbox.guis.buttonGUIs;
 import com.firesoftitan.play.titanbox.machines.ItemRoutingRouter;
 import com.firesoftitan.play.titanbox.modules.MainModule;
+import com.firesoftitan.play.titanbox.runnables.IRRUserRunnable;
 import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
@@ -36,11 +37,17 @@ public class RouterHolder {
     public static long lastTime = 0;
     public static long lagTime = 250;
     public static String name = "Item Routing Router";
+    public static HashMap<String, IRRUserRunnable> bufferListT = new HashMap<String, IRRUserRunnable>();
+
     public RouterHolder()
     {
 
     }
     public static void tick()
+    {
+
+    }
+    public static void tickold()
     {
         if (bufferList.size() == 0)
         {
@@ -102,14 +109,6 @@ public class RouterHolder {
                                 mh.runMe(owner);
                             }
                         }
-                        /*
-                        List<MainModule> tmplist = me.getModules();
-
-                        for (MainModule mh : tmplist) {
-                            if (mh != null) {
-                                mh.runMe(owner);
-                            }
-                        }*/
                     }
                 }
                 bufferList.remove(0);
@@ -339,7 +338,7 @@ public class RouterHolder {
                 ItemRoutingRouter.loadRRH(key);
             }
         }
-        System.out.println(RouterHolder.routersByID.size() + "," + RouterHolder.routersByLocation.size() + "," + RouterHolder.routersByOwner.size());
+        //System.out.println(RouterHolder.routersByID.size() + "," + RouterHolder.routersByLocation.size() + "," + RouterHolder.routersByOwner.size());
         RouterHolder.routing.save();
     }
     public static void onBlockPlaceEvent(BlockPlaceEvent event) {
@@ -373,6 +372,27 @@ public class RouterHolder {
                                         addEnergy(event.getBlock().getLocation());
                                     }
                                 }, 1);
+
+                                if (RouterHolder.routersByOwner.containsKey(makingme.getID()))
+                                {
+                                    ItemRoutingRouter person = RouterHolder.routersByOwner.get(makingme.getID());
+                                    if (person != null) {
+                                        IRRUserRunnable tmp = new IRRUserRunnable();
+                                        tmp.setItemRoutingRouter(person);
+                                        int id = Bukkit.getScheduler().scheduleSyncRepeatingTask(TitanBox.instants, tmp, 1000, RouterHolder.speed);
+                                        tmp.setTimerID(id);
+                                        RouterHolder.bufferListT.put(makingme.getID(), tmp);
+                                        System.out.println("[Player Setup: " + event.getPlayer().getName() + "]: Router found, id:" + id + " will start in 1 second.");
+                                    }
+                                    else
+                                    {
+                                        System.out.println("[Player Setup: " + event.getPlayer().getName() + "]: Router found, loading error.");
+                                    }
+                                }
+                                else
+                                {
+                                    System.out.println("[Player Setup: " + event.getPlayer().getName() + "]: Player doesn't have a router to load.");
+                                }
                             } else {
                                 event.setCancelled(true);
                                 ItemRoutingRouter tmpL = RouterHolder.routersByOwner.get(makingme.getOwner().toString());

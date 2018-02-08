@@ -4,6 +4,7 @@ import com.firesoftitan.play.fotxray.FoTXRay;
 import com.firesoftitan.play.titanbox.TitanBox;
 import com.firesoftitan.play.titanbox.holders.SlimefunItemsHolder;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -26,12 +27,18 @@ public class MainRunnable implements Runnable {
         if (helment != null) {
 
             if (helment.getItemMeta() != null) {
-                if (TitanBox.isItemEqual(helment, SlimefunItemsHolder.X_RAY_HELMEY)) {
+                if (helment.getType() == Material.LEATHER_HELMET && helment.getItemMeta().getDisplayName().equals(SlimefunItemsHolder.X_RAY_HELMEY.getItemMeta().getDisplayName())) {
                     if (!FoTXRay.xraying.containsKey(player.getUniqueId())) {
-                        FoTXRay.sendXray(player);
-                        com.firesoftitan.play.fotxray.PlayerData info = FoTXRay.xraying.get(player.getUniqueId());
-                        info.setCommandUsed(false);
-                        FoTXRay.xraying.put(player.getUniqueId(), info);
+                        try {
+                            FoTXRay.sendXray(player);
+                            com.firesoftitan.play.fotxray.PlayerData info = FoTXRay.xraying.get(player.getUniqueId());
+                            info.setCommandUsed(false);
+                            FoTXRay.xraying.put(player.getUniqueId(), info);
+                        }
+                        catch (Exception e)
+                        {
+
+                        }
                     }
                 }
                 else

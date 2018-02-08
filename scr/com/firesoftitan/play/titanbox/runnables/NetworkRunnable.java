@@ -67,8 +67,8 @@ public class NetworkRunnable implements Runnable  {
         {
             plusminus = ChatColor.RED;
         }
-        lore.add(ChatColor.DARK_GRAY + "\u21E8 Real Time: "+ ChatColor.YELLOW +"\u26A1 " + plusminus + finalperSecond + " J/s");
-        lore.add(ChatColor.DARK_GRAY + "\u21E8 Game Time: "+ ChatColor.YELLOW +"\u26A1 " + plusminus +  finalperTick + " J/t");
+        lore.add(ChatColor.DARK_GRAY + "\u21E8 Real Time: "+ ChatColor.YELLOW +"\u26A1 " + plusminus + TitanBox.formatCommas(finalperSecond) + " J/s");
+        lore.add(ChatColor.DARK_GRAY + "\u21E8 Game Time: "+ ChatColor.YELLOW +"\u26A1 " + plusminus +  TitanBox.formatCommas(finalperTick) + " J/t");
 
 
         powerGen = TitanBox.addLore(powerGen, lore);
@@ -79,8 +79,8 @@ public class NetworkRunnable implements Runnable  {
         stats = TitanBox.changeName(stats, "Statistics");
         lore = new ArrayList<String>();
 
-        lore.add(ChatColor.DARK_GRAY + "\u21E8 Generation: "+ ChatColor.YELLOW +"\u26A1 " + ChatColor.GREEN + check[7] + " J/s");
-        lore.add(ChatColor.DARK_GRAY + "\u21E8 Cosumption: "+ ChatColor.YELLOW +"\u26A1 " + ChatColor.GREEN + check[6] + " J/s");
+        lore.add(ChatColor.DARK_GRAY + "\u21E8 Generation: "+ ChatColor.YELLOW +"\u26A1 " + ChatColor.GREEN + TitanBox.formatCommas(check[7]) + " J/s");
+        lore.add(ChatColor.DARK_GRAY + "\u21E8 Cosumption: "+ ChatColor.YELLOW +"\u26A1 " + ChatColor.GREEN + TitanBox.formatCommas(check[6]) + " J/s");
 
         stats = TitanBox.addLore(stats, lore);
         myInv.setItem(1 , stats);
@@ -91,9 +91,9 @@ public class NetworkRunnable implements Runnable  {
         battery = TitanBox.clearLore(battery);
         battery = TitanBox.changeName(battery, "Energy Storage");
         lore = new ArrayList<String>();
-        lore.add(ChatColor.DARK_GRAY + "\u21E8 Capacitors: "+ ChatColor.YELLOW +"\u26A1 " + ChatColor.GREEN + check[2] + "/" + check[3]  +" J");
-        lore.add(ChatColor.DARK_GRAY + "\u21E8 Machines: "+ ChatColor.YELLOW +"\u26A1 " + ChatColor.GREEN + check[4] + "/" + check[5]  +" J");
-        lore.add(ChatColor.DARK_GRAY + "\u21E8 Buffer: "+ ChatColor.YELLOW +"\u26A1 " + ChatColor.GREEN + check[0] + "/" + check[1]  +" J");
+        lore.add(ChatColor.DARK_GRAY + "\u21E8 Capacitors: "+ ChatColor.YELLOW +"\u26A1 " + ChatColor.GREEN + TitanBox.formatCommas(check[2]) + "/" + TitanBox.formatCommas(check[3])  +" J");
+        lore.add(ChatColor.DARK_GRAY + "\u21E8 Machines: "+ ChatColor.YELLOW +"\u26A1 " + ChatColor.GREEN + TitanBox.formatCommas(check[4]) + "/" + TitanBox.formatCommas(check[5])  +" J");
+        lore.add(ChatColor.DARK_GRAY + "\u21E8 Buffer: "+ ChatColor.YELLOW +"\u26A1 " + ChatColor.GREEN + TitanBox.formatCommas(check[0]) + "/" + TitanBox.formatCommas(check[1])  +" J");
         battery = TitanBox.addLore(battery, lore);
 
         myInv.setItem(2 , battery);

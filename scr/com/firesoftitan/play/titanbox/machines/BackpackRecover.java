@@ -215,9 +215,9 @@ public class BackpackRecover {
             if (key != null) {
                 if (recovers.contains("recovers."  + key)) {
                     recovers.setValue(key, null);
-                    event.setDropItems(false);
-                    ItemStack recover = BackpackRecover.getMeAsDrop();
-                    event.getPlayer().getInventory().addItem(recover);
+                    //event.setDropItems(false);
+                    //ItemStack recover = BackpackRecover.getMeAsDrop();
+                    //event.getPlayer().getInventory().addItem(recover);
                     event.getPlayer().closeInventory();
                 }
             }

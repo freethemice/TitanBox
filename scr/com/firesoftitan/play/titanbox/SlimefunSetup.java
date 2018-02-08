@@ -78,7 +78,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 30;
+                return 15;
             }
 
             @Override
@@ -91,7 +91,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 25;
+                return 12;
             }
 
             @Override
@@ -105,7 +105,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 20;
+                return 10;
             }
 
             @Override
@@ -119,7 +119,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 30;
+                return 15;
             }
 
             @Override
@@ -134,7 +134,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 20;
+                return 10;
             }
 
             @Override
@@ -148,7 +148,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 30;
+                return 15;
             }
 
             @Override
@@ -162,7 +162,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 20;
+                return 10;
             }
 
             @Override
@@ -176,7 +176,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 30;
+                return 15;
             }
 
             @Override
@@ -192,7 +192,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 10;
+                return 5;
             }
         }.registerChargeableBlock(true, 256);
 
@@ -201,7 +201,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 50;
+                return 25;
             }
         }.registerChargeableBlock(true, 256);
 
@@ -210,7 +210,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 50;
+                return 25;
             }
         }.registerChargeableBlock(true, 256);
         new FreeFactory(CustomCategories.ELECTRICITY, SlimefunItemsHolder.BONE_FACTORY, "BONE_FACTORY", RecipeType.ENHANCED_CRAFTING_TABLE,
@@ -223,7 +223,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 30;
+                return 15;
             }
 
             @Override
@@ -243,7 +243,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 30;
+                return 15;
             }
 
             @Override
@@ -262,7 +262,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 30;
+                return 15;
             }
 
             @Override
@@ -281,7 +281,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 30;
+                return 15;
             }
 
             @Override
@@ -300,7 +300,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 30;
+                return 15;
             }
 
             @Override
@@ -319,7 +319,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 30;
+                return 15;
             }
 
             @Override
@@ -337,7 +337,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 30;
+                return 15;
             }
 
             @Override
@@ -355,7 +355,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 30;
+                return 15;
             }
 
             @Override
@@ -373,7 +373,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 30;
+                return 15;
             }
 
             @Override
@@ -387,7 +387,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 30;
+                return 15;
             }
 
             @Override
@@ -400,7 +400,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 30;
+                return 15;
             }
 
             @Override
@@ -417,7 +417,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 30;
+                return 15;
             }
 
             @Override
@@ -430,7 +430,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 700;
+                return 350;
             }
 
             @Override
@@ -443,7 +443,7 @@ public class SlimefunSetup {
 
             @Override
             public int getEnergyConsumption() {
-                return 300;
+                return 200;
             }
 
             @Override
@@ -520,7 +520,7 @@ public class SlimefunSetup {
                             }
                             if (Run && !explode) {
                                 double past = 256 * (1D - (l.getBlockY() / 100D));
-                                return past;
+                                return past * 2;
                             } else {
                                 if (explode && Run) {
                                     Bukkit.getScheduler().scheduleSyncDelayedTask(SlimefunStartup.instance, new Runnable() {
