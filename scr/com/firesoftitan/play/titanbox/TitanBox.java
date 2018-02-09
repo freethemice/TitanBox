@@ -866,6 +866,19 @@ public class TitanBox extends JavaPlugin
                             sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + ChatColor.GREEN + TitanBox.convertToTimePasted(TitanBox.isRunning));
                         }
                     }
+                    if (args[0].equalsIgnoreCase("SIM")) {
+                        if (sender.hasPermission("titanbox.admin")) {
+                            Long amount = Long.valueOf(args[1]);
+                            ItemStack toCheat = ((Player) sender).getInventory().getItemInMainHand();
+                            if (!TitanBox.isEmpty(toCheat))
+                            {
+                                ItemStack gotit = TitanBox.getSuperItemHolder(toCheat, amount);
+                                ((Player) sender).getInventory().addItem(gotit.clone());
+                                sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + ChatColor.GREEN + "Done sir.");
+                            }
+
+                        }
+                    }
                     if (args[0].equalsIgnoreCase("give")) {
                         if (sender.hasPermission("titanbox.admin")) {
                             if (args.length > 2)

@@ -251,6 +251,13 @@ public class RouterHolder {
                                     event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "This is an invalid device! Most likely an old one.");
                                     return;
                                 }
+                                Random rnd = new Random(System.currentTimeMillis());
+                                int addint = rnd.nextInt(9) + 1;
+                                int newSLots = Math.min(tmpRL.getMax() + addint, bigMax);
+                                if (tmpRL.getMax() >= bigMax) {
+                                    event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Upgrade maxed out at " + ChatColor.WHITE + bigMax);
+                                    return;
+                                }
                                 boolean barcodeTrue = Boolean.valueOf(barcode);
                                 if (barcodeTrue)
                                 {
@@ -259,13 +266,7 @@ public class RouterHolder {
                                 }
                                 TitanBox.setBarcodeTrue(item, event.getPlayer());
 
-                                Random rnd = new Random(System.currentTimeMillis());
-                                int addint = rnd.nextInt(9) + 1;
-                                int newSLots = Math.min(tmpRL.getMax() + addint, bigMax);
-                                if (tmpRL.getMax() >= bigMax) {
-                                    event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Upgrade maxed out at " + ChatColor.WHITE + bigMax);
-                                    return;
-                                }
+
                                 tmpRL.setMax(newSLots);
                                 tmpRL.SaveMe();
                                 if (mainHand.getAmount() < 2) {

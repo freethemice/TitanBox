@@ -560,8 +560,85 @@ public class SlimefunSetup {
                     }
 
                 });
-
         ChargableBlock.registerChargableBlock("THERMAL_GENERATOR", 8192, false);
+
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.FREE_ENERGY_I, "FREE_ENERGY_I", RecipeType.ENHANCED_CRAFTING_TABLE,
+            new ItemStack[] {null, null, null,
+                    null, null, null,
+                    null, null, new ItemStack(Material.BARRIER, 1, (short)1)})
+            .register(true, new EnergyTicker() {
+
+                @Override
+                public double generateEnergy(Location l, SlimefunItem item, Config data) {
+                    try {
+                        return 500;
+                    }
+                    catch (Exception e)
+                    {
+                        return 0;
+                    }
+                }
+                //8192
+                @Override
+                public boolean explode(Location l) {
+                    return false;
+                }
+
+            });
+
+        ChargableBlock.registerChargableBlock("FREE_ENERGY_I", 8192, false);
+
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.FREE_ENERGY_II, "FREE_ENERGY_II", RecipeType.ENHANCED_CRAFTING_TABLE,
+            new ItemStack[] {null, null, null,
+                    null, null, null,
+                    null, null, new ItemStack(Material.BARRIER, 1, (short)2)})
+            .register(true, new EnergyTicker() {
+
+                @Override
+                public double generateEnergy(Location l, SlimefunItem item, Config data) {
+                    try {
+                        return 1000;
+                    }
+                    catch (Exception e)
+                    {
+                        return 0;
+                    }
+                }
+                //8192
+                @Override
+                public boolean explode(Location l) {
+                    return false;
+                }
+
+            });
+
+        ChargableBlock.registerChargableBlock("FREE_ENERGY_II", 8192, false);
+
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.FREE_ENERGY_III, "FREE_ENERGY_III", RecipeType.ENHANCED_CRAFTING_TABLE,
+                new ItemStack[] {null, null, null,
+                        null, null, null,
+                        null, null, new ItemStack(Material.BARRIER, 1, (short)3)})
+                .register(true, new EnergyTicker() {
+
+                    @Override
+                    public double generateEnergy(Location l, SlimefunItem item, Config data) {
+                        try {
+                            return 2000;
+                        }
+                        catch (Exception e)
+                        {
+                            return 0;
+                        }
+                    }
+                    //8192
+                    @Override
+                    public boolean explode(Location l) {
+                        return false;
+                    }
+
+                });
+
+        ChargableBlock.registerChargableBlock("FREE_ENERGY_III", 8192, false);
 
         new TitanTalisman(SlimefunItemsHolder.TALISMAN_VOID, "TALISMAN_VOID",
                 new ItemStack[] {SlimefunItemsHolder.VOID_PARTICLES, SlimefunItemsHolder.BEDROCK_DUST, SlimefunItemsHolder.VOID_PARTICLES, SlimefunItemsHolder.TitanStone, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.TALISMAN, SlimefunItemsHolder.TitanStone, SlimefunItemsHolder.VOID_PARTICLES, SlimefunItemsHolder.BEDROCK_DUST, SlimefunItemsHolder.VOID_PARTICLES},

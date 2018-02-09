@@ -882,14 +882,6 @@ public class StorageUnit implements InventoryHolder {
                                     event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "This is an invalid device! Most likely an old one.");
                                     return;
                                 }
-                                boolean barcodeTrue = Boolean.valueOf(barcode);
-                                if (barcodeTrue)
-                                {
-                                    TitanBox.duppedAlert(event.getPlayer(), item);
-                                    return;
-                                }
-                                TitanBox.setBarcodeTrue(item, event.getPlayer());
-
                                 Random rnd = new Random(System.currentTimeMillis());
                                 int addint = rnd.nextInt(7) + 1;
                                 int cap = Math.min(tmp.getSize(), addint);
@@ -898,6 +890,16 @@ public class StorageUnit implements InventoryHolder {
                                     event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Upgrade maxed out at " + ChatColor.WHITE + 45);
                                     return;
                                 }
+
+                                boolean barcodeTrue = Boolean.valueOf(barcode);
+                                if (barcodeTrue)
+                                {
+                                    TitanBox.duppedAlert(event.getPlayer(), item);
+                                    return;
+                                }
+                                TitanBox.setBarcodeTrue(item, event.getPlayer());
+
+
                                 tmp.setSize(tmp.getSize()+ cap);
                                 if (item.getAmount() < 2)
                                 {
