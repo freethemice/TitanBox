@@ -924,6 +924,10 @@ public class TitanBox extends JavaPlugin
     }
     public ItemStack getItem(String whatItem, String sub)
     {
+            return getItem(whatItem, sub, null);
+    }
+    public ItemStack getItem(String whatItem, String sub, Player giveFor)
+    {
         if (whatItem.equalsIgnoreCase("a") || whatItem.equalsIgnoreCase("b") ||whatItem.equalsIgnoreCase("c") || whatItem.equalsIgnoreCase("d") || whatItem.equalsIgnoreCase("e"))
         {
             try {
@@ -969,11 +973,12 @@ public class TitanBox extends JavaPlugin
         if (whatItem.equalsIgnoreCase("upgrade"))
         {
             ItemHolder me = ItemHolder.UPGRADE;
-            if (me != null) {
+            if (me != null && giveFor != null) {
                 ItemStack placeMe = me.getItem();
                 placeMe = TitanBox.changeName(placeMe, ChatColor.YELLOW + "Upgrade Device");
                 placeMe = TitanBox.addLore(placeMe,  "Used On: " + ChatColor.WHITE + "Storage Unit, and Routers", ChatColor.WHITE + "Hold in main hand and click block thats placed!");
                 placeMe = TitanBox.getNewBarcode(placeMe);
+                placeMe = TitanBox.addLore(placeMe, ChatColor.YELLOW  + "User: " + ChatColor.WHITE + giveFor.getName(), ChatColor.GRAY + "If this item is dupped the above user will be perm banned!");
                 return  placeMe.clone();
             }
         }
@@ -1002,11 +1007,37 @@ public class TitanBox extends JavaPlugin
         }
         return null;
     }
+    public static void duppedAlert(Player player, ItemStack itemStack)
+    {
+        player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "This is an invalid device! It has been duped and you have been reported.");
+        String command = "mail send freethemice ";
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command + "-----StartReport-----");
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command + player.getName() + " has used a dupped Upgrade Device!");
+        if (itemStack.hasItemMeta())
+        {
+            if (itemStack.getItemMeta().hasDisplayName())
+            {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command + "Item: " + itemStack.getItemMeta().getDisplayName());
+            }
+            if (itemStack.getItemMeta().hasLore())
+            {
+                int i = 0;
+                for (String lore: itemStack.getItemMeta().getLore())
+                {
+                    i++;
+                    String list = "Line " + i + ": " + ChatColor.stripColor(lore);
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command + list);
+                }
+            }
+        }
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command + "-----EndReport-----");
+
+    }
     public void giveItems(Player sender, String whatItem) {
         giveItems(sender, whatItem, null);
     }
     public void giveItems(Player sender, String whatItem, String sub) {
-        ItemStack item = getItem(whatItem,sub);
+        ItemStack item = getItem(whatItem,sub, sender);
         if (!isEmpty(item)) {
             sender.getInventory().addItem(item);
         }
@@ -1045,22 +1076,31 @@ public class TitanBox extends JavaPlugin
         }
         return false;
     }
-    public static void setBarcodeTrue(ItemStack toBarcode)
+    public static void setBarcodeTrue(ItemStack toBarcode, Player player)
     {
         if (!TitanBox.isEmpty(toBarcode)) {
             if (toBarcode.hasItemMeta()) {
                 if (toBarcode.getItemMeta().hasLore()) {
                     String name = getName(toBarcode);
                     List<String> check = toBarcode.getItemMeta().getLore();
+                    int line = 0;
+                    String saltStr  = "";
                     for(String s: check)
                     {
                         if (s.startsWith(ChatColor.MAGIC + "barcode:"))
                         {
-                            String saltStr = s.replace(ChatColor.MAGIC + "barcode:", "");
+                            saltStr = s.replace(ChatColor.MAGIC + "barcode:", "");
                             if (barcodes.contains(name + "." + saltStr)) {
                                 barcodes.setValue(name + "." + saltStr, true);
                             }
                         }
+                    }
+                    barcodes.setValue(name + ".info." + saltStr + ".time" , System.currentTimeMillis());
+                    barcodes.setValue(name + ".info." + saltStr + ".user" , player.getName());
+                    barcodes.setValue(name + ".info." + saltStr + ".item" , toBarcode.getItemMeta().getDisplayName());
+                    for(String s: check) {
+                        barcodes.setValue(name + ".info." + saltStr + ".line" + line, s);
+                        line++;
                     }
                 }
             }

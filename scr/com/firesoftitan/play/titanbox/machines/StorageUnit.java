@@ -885,11 +885,10 @@ public class StorageUnit implements InventoryHolder {
                                 boolean barcodeTrue = Boolean.valueOf(barcode);
                                 if (barcodeTrue)
                                 {
-                                    event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "This is an invalid device! It has been duped and you have been reported.");
-                                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mail send freethemice " + event.getPlayer().getName() + " has used a dupped Upgrade Device!");
+                                    TitanBox.duppedAlert(event.getPlayer(), item);
                                     return;
                                 }
-                                TitanBox.setBarcodeTrue(item);
+                                TitanBox.setBarcodeTrue(item, event.getPlayer());
 
                                 Random rnd = new Random(System.currentTimeMillis());
                                 int addint = rnd.nextInt(7) + 1;
