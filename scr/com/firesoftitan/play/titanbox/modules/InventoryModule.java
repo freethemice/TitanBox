@@ -33,10 +33,22 @@ public class InventoryModule extends MainModule {
     private int tmpSlot = -1;
     private long lastran = 0;
     private int editingSlot = -1;
-
+    private Location[] secondary;
+    private static int secondrySize = 5;
+    private boolean didISend = false;
+    private boolean reset = false;
     public InventoryModule()
     {
         type = ModuleTypeEnum.Inventory;
+    }
+    public static void loadConfig()
+    {
+
+        if (!TitanBox.config.contains("settings.module.linking.secondarysize"))
+        {
+            TitanBox.config.setValue("settings.module.linking.secondarysize", secondrySize);
+        }
+        secondrySize = TitanBox.config.getInt("settings.module.linking.secondarysize");
     }
     @Override
     public void loadInfo()
@@ -47,6 +59,8 @@ public class InventoryModule extends MainModule {
         slotsSending.clear();
         bufferSlotsPulling.clear();
         bufferSlotsSending.clear();
+
+        secondary = new Location[secondrySize];
 
         if (modules.contains("modules." + moduleid + ".slots.hide")) {
             hidebar = modules.getBoolean("modules." + moduleid + ".slots.hide");
@@ -75,7 +89,14 @@ public class InventoryModule extends MainModule {
                 }
             }
         }
+        for (int i =0; i < secondary.length; i++)
+        {
+            Location loc = secondary[i];
+            if (modules.contains("modules." + moduleid + ".slots.secondary." + i)) {
+                secondary[i] = modules.getLocation("modules." + moduleid + ".slots.secondary." + i);
+            }
 
+        }
     }
 
     public int getEditingSlot() {
@@ -118,16 +139,26 @@ public class InventoryModule extends MainModule {
 
 
         }
+        for (int i =0; i < secondary.length; i++)
+        {
+            Location loc = secondary[i];
+            if (loc != null)
+            {
+                modules.setValue("modules." + moduleid + ".slots.secondary." + i, loc);
+            }
+        }
     }
     @Override
     public void clearInfo()
     {
         super.clearInfo();
-        slotsPulling.clear();
-        slotsSending.clear();
-        bufferSlotsPulling.clear();
-        bufferSlotsSending.clear();
-        //modules.setValue("modules." + moduleid , null);
+        if (this.reset) {
+            slotsPulling.clear();
+            slotsSending.clear();
+            bufferSlotsPulling.clear();
+            bufferSlotsSending.clear();
+            //modules.setValue("modules." + moduleid , null);
+        }
     }
 
     @Override
@@ -330,6 +361,15 @@ public class InventoryModule extends MainModule {
 
 
     }
+    @Override
+    public boolean ready()
+    {
+        if (link == null)
+        {
+            return false;
+        }
+        return true;
+    }
     public String getMode() {
         return mode;
     }
@@ -358,69 +398,155 @@ public class InventoryModule extends MainModule {
         }
         return  -1;
     }
-
+    private boolean doesStorageMatch(Location toCheck)
+    {
+        if (link != null)
+        {
+            BlockStorage storage = BlockStorage.getStorage(getLink().getWorld());
+            if (storage.hasInventory(getLink())) {
+                if (storage.hasInventory(toCheck))
+                {
+                    BlockMenu menu = BlockStorage.getInventory(getLink());
+                    List<Integer> sendingMainSlots = new ArrayList<Integer>();
+                    List<Integer> pullinggMainSlots = new ArrayList<Integer>();
+                    for (int slot : menu.getPreset().getSlotsAccessedByItemTransport(menu, ItemTransportFlow.INSERT, null)) {
+                        sendingMainSlots.add(slot);
+                    }
+                    for (int slot : menu.getPreset().getSlotsAccessedByItemTransport(menu, ItemTransportFlow.WITHDRAW, null)) {
+                        pullinggMainSlots.add(slot);
+                    }
+                    BlockMenu menuCheck = BlockStorage.getInventory(toCheck);
+                    int count = 0;
+                    for (int slot : menuCheck.getPreset().getSlotsAccessedByItemTransport(menuCheck, ItemTransportFlow.INSERT, null)) {
+                        if (!sendingMainSlots.contains(slot))
+                        {
+                            return false;
+                        }
+                        count++;
+                    }
+                    if (sendingMainSlots.size() != count)
+                    {
+                        return false;
+                    }
+                    count = 0;
+                    for (int slot : menuCheck.getPreset().getSlotsAccessedByItemTransport(menuCheck, ItemTransportFlow.WITHDRAW, null)) {
+                        if (!pullinggMainSlots.contains(slot))
+                        {
+                            return false;
+                        }
+                        count++;
+                    }
+                    if (pullinggMainSlots.size() != count)
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            else
+            {
+                Material mat = getLink().getBlock().getType();
+                Material checkMat = toCheck.getBlock().getType();
+                if (mat == Material.CHEST || mat == Material.TRAPPED_CHEST) {
+                    if (checkMat == Material.CHEST || checkMat == Material.TRAPPED_CHEST) {
+                        return true;
+                    }
+                }
+                if (mat == Material.DISPENSER || mat == Material.DROPPER)
+                {
+                    if (checkMat == Material.DISPENSER || checkMat == Material.DROPPER)
+                    {
+                        return true;
+                    }
+                }
+                if (mat == Material.HOPPER)
+                {
+                    if (checkMat == Material.HOPPER)
+                    {
+                        return true;
+                    }
+                }
+                if (mat == Material.FURNACE || mat == Material.BURNING_FURNACE)
+                {
+                    if (checkMat == Material.FURNACE || checkMat == Material.BURNING_FURNACE)
+                    {
+                        return true;
+                    }
+                }
+                if (mat == Material.BREWING_STAND)
+                {
+                    if (mat == Material.BREWING_STAND)
+                    {
+                        return true;
+                    }
+                }
+                if (mat == checkMat)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     @Override
     public void preLoadSlots()
     {
-        BlockStorage storage = BlockStorage.getStorage(getLink().getWorld());
-        if (storage.hasInventory(getLink())) {
-            BlockMenu menu = BlockStorage.getInventory(getLink());
-            for (int slot : menu.getPreset().getSlotsAccessedByItemTransport(menu, ItemTransportFlow.INSERT, null)) {
-                slotsSending.add(new SendingSlotHolder(slot, null));
-            }
-            for (int slot : menu.getPreset().getSlotsAccessedByItemTransport(menu, ItemTransportFlow.WITHDRAW, null)) {
-                slotsPulling.add(slot);
-            }
-        }
-        else
-        {
-            Material mat = getLink().getBlock().getType();
-            if (mat == Material.CHEST || mat == Material.TRAPPED_CHEST) {
-                Inventory inv = TitanBox.getVanillaInventoryFor(getLink().getBlock());
-                for (int i = 0; i < inv.getSize(); i++) {
-                    slotsPulling.add(i);
-                }
-            }
-            if (mat == Material.DISPENSER || mat == Material.DROPPER)
-            {
-                for (int i = 0; i < 9; i++) {
-                    slotsSending.add(new SendingSlotHolder(i, null));
-                }
-            }
-            if (mat == Material.HOPPER)
-            {
-                for (int i = 0; i < 5; i++) {
-                    slotsSending.add(new SendingSlotHolder(i, null));
-                }
-            }
-            if (mat == Material.FURNACE || mat == Material.BURNING_FURNACE)
-            {
-                for (int i = 0; i < 2; i++) {
-                    slotsSending.add(new SendingSlotHolder(i, null));
-
-                }
-                slotsPulling.add(2);
-
-            }
-            if (mat == Material.BREWING_STAND)
-            {
-                slotsPulling.add(3);
-                slotsSending.add(new SendingSlotHolder(0, null));
-                slotsSending.add(new SendingSlotHolder(1, null));
-                slotsSending.add(new SendingSlotHolder(2, null));
-                slotsSending.add(new SendingSlotHolder(4, null));
-
-
-            }
-
-        }
-    }
-    public void setItemAtLocation( int slot, ItemStack put)
-    {
-        try {
+        if (getLink() != null && this.reset) {
             BlockStorage storage = BlockStorage.getStorage(getLink().getWorld());
             if (storage.hasInventory(getLink())) {
                 BlockMenu menu = BlockStorage.getInventory(getLink());
+                for (int slot : menu.getPreset().getSlotsAccessedByItemTransport(menu, ItemTransportFlow.INSERT, null)) {
+                    slotsSending.add(new SendingSlotHolder(slot, null));
+                }
+                for (int slot : menu.getPreset().getSlotsAccessedByItemTransport(menu, ItemTransportFlow.WITHDRAW, null)) {
+                    slotsPulling.add(slot);
+                }
+            } else {
+                Material mat = getLink().getBlock().getType();
+                if (mat == Material.CHEST || mat == Material.TRAPPED_CHEST) {
+                    Inventory inv = TitanBox.getVanillaInventoryFor(getLink().getBlock());
+                    for (int i = 0; i < inv.getSize(); i++) {
+                        slotsPulling.add(i);
+                    }
+                }
+                if (mat == Material.DISPENSER || mat == Material.DROPPER) {
+                    for (int i = 0; i < 9; i++) {
+                        slotsSending.add(new SendingSlotHolder(i, null));
+                    }
+                }
+                if (mat == Material.HOPPER) {
+                    for (int i = 0; i < 5; i++) {
+                        slotsSending.add(new SendingSlotHolder(i, null));
+                    }
+                }
+                if (mat == Material.FURNACE || mat == Material.BURNING_FURNACE) {
+                    for (int i = 0; i < 2; i++) {
+                        slotsSending.add(new SendingSlotHolder(i, null));
+
+                    }
+                    slotsPulling.add(2);
+
+                }
+                if (mat == Material.BREWING_STAND) {
+                    slotsPulling.add(3);
+                    slotsSending.add(new SendingSlotHolder(0, null));
+                    slotsSending.add(new SendingSlotHolder(1, null));
+                    slotsSending.add(new SendingSlotHolder(2, null));
+                    slotsSending.add(new SendingSlotHolder(4, null));
+
+
+                }
+
+            }
+            this.reset = false;
+        }
+    }
+    public void setItemAtLocation(Location where, int slot, ItemStack put)
+    {
+        try {
+            BlockStorage storage = BlockStorage.getStorage(where.getWorld());
+            if (storage.hasInventory(where)) {
+                BlockMenu menu = BlockStorage.getInventory(where);
                 if (put != null) {
                     menu.replaceExistingItem(slot, put.clone());
                 }
@@ -429,7 +555,7 @@ public class InventoryModule extends MainModule {
                     menu.replaceExistingItem(slot, null);
                 }
             } else {
-                Inventory tmp = TitanBox.getVanillaInventoryFor(getLink().getBlock());
+                Inventory tmp = TitanBox.getVanillaInventoryFor(where.getBlock());
                 if (put != null) {
                     tmp.setItem(slot, put.clone());
                 }
@@ -444,16 +570,16 @@ public class InventoryModule extends MainModule {
         {
         }
     }
-    public ItemStack getItemAtLocation( int slot)
+    public ItemStack getItemAtLocation(Location where, int slot)
     {
         try {
-            BlockStorage storage = BlockStorage.getStorage(getLink().getWorld());
-            if (storage.hasInventory(getLink())) {
-                BlockMenu menu = BlockStorage.getInventory(getLink());
+            BlockStorage storage = BlockStorage.getStorage(where.getWorld());
+            if (storage.hasInventory(where)) {
+                BlockMenu menu = BlockStorage.getInventory(where);
                 ItemStack tmp = menu.getItemInSlot(slot);
                 return tmp.clone();
             } else {
-                Inventory tmp = TitanBox.getVanillaInventoryFor(getLink().getBlock());
+                Inventory tmp = TitanBox.getVanillaInventoryFor(where.getBlock());
                 return tmp.getItem(slot).clone();
 
             }
@@ -465,24 +591,85 @@ public class InventoryModule extends MainModule {
     }
 
     @Override
+    public String getLinkLore()
+    {
+        if (getLink() == null)
+        {
+            return ChatColor.WHITE  + "not set";
+        }
+        else
+        {
+            Location from = getLink();
+            int max = 0;
+            for (int i =0; i < secondary.length; i++) {
+                Location loc = secondary[i];
+                if (loc != null)
+                {
+                    max++;
+                }
+            }
+            return ChatColor.WHITE + from.getWorld().getName() + ": " + from.getBlockX() + ": " + from.getBlockY() + ": " + from.getBlockZ() + " (Secondary:" + max + "/" + secondary.length +")";
+        }
+    }
+    @Override
     public void runMe(UUID owner)
     {
-        tickPulling(owner);
+        startSendingPulling(owner);
 
-        tickSending(owner);
+        tickPulling(getLink().clone(), owner);
+
+        tickSending(getLink().clone(), owner);
+
+        int Found = 0;
+        for(int i = 0; i < secondary.length; i++)
+        {
+            Location loc = secondary[i];
+            if (loc != null)
+            {
+                Found++;
+                tickPulling(loc.clone(), owner);
+
+                tickSending(loc.clone(), owner);
+
+            }
+        }
+
+        endSendingPulling(owner);
 
     }
 
-    public void tickSending(UUID owner)
+    private void startSendingPulling(UUID owner)
     {
         if (bufferSlotsSending.size() == 0)
         {
             bufferSlotsSending.addAll(slotsSending);
         }
+        if (bufferSlotsPulling.size() == 0)
+        {
+            bufferSlotsPulling.addAll(slotsPulling);
+        }
+    }
+    private void endSendingPulling(UUID owner)
+    {
+        if (bufferSlotsSending.size() != 0) {
+
+            if (didISend) {
+                SendingSlotHolder mySlot = bufferSlotsSending.get(0);
+                mySlot.check();
+            }
+            didISend = false;
+            bufferSlotsSending.remove(0);
+        }
+        if (bufferSlotsPulling.size() != 0) {
+            bufferSlotsPulling.remove(0);
+        }
+    }
+    private void tickSending(Location where, UUID owner)
+    {
         if (bufferSlotsSending.size() != 0) {
             SendingSlotHolder mySlot = bufferSlotsSending.get(0);
             int slot = mySlot.getSlot();
-            ItemStack bufferItem = this.getItemAtLocation(slot);
+            ItemStack bufferItem = this.getItemAtLocation(where, slot);
             ItemStack fillertItem = mySlot.getItem();
             int amountMax = 64;
             if (!TitanBox.isEmpty(fillertItem)) {
@@ -499,9 +686,8 @@ public class InventoryModule extends MainModule {
                 for (StorageUnit stH : StorageUnit.getStorageFromOwner(owner)) {
                     for(int i = 0; i < stH.getSize(); i++) {
                         ItemStack storagedItem = stH.viewSlot(i);
-
                         if (!TitanBox.isEmpty(storagedItem)) {
-                            if (stH.getStorageCount(i) > amountKeep) {
+                            if (stH.getStorageCount(i) - amountMax > amountKeep) {
                                 if (TitanBox.isItemEqual(fillertItem, storagedItem)) {
                                     int amountneeded = 64;
                                     if (!TitanBox.isEmpty(bufferItem)) {
@@ -514,18 +700,17 @@ public class InventoryModule extends MainModule {
                                     amountneeded = Math.min(amountMax, amountneeded);
                                     if (amountneeded > 0) {
                                         if (mySlot.getLastChecked() + RouterHolder.lagTime < System.currentTimeMillis() || amountneeded >= storagedItem.getMaxStackSize()) {
-                                            mySlot.check();
                                             ItemStack ItemTaken = stH.getItem(i, amountneeded);
-
+                                            didISend =true;
                                             if (!TitanBox.isEmpty(bufferItem) && !TitanBox.isEmpty(ItemTaken)) {
                                                 if (storagedItem.getAmount() != storagedItem.getMaxStackSize()) {
                                                     int total = bufferItem.getAmount() + ItemTaken.getAmount();
                                                     bufferItem.setAmount(total);
-                                                    this.setItemAtLocation(slot, bufferItem.clone());
+                                                    this.setItemAtLocation(where, slot, bufferItem.clone());
                                                 }
                                             } else {
                                                 if (ItemTaken != null) {
-                                                    this.setItemAtLocation(slot, ItemTaken.clone());
+                                                    this.setItemAtLocation(where, slot, ItemTaken.clone());
                                                 }
                                             }
                                         }
@@ -537,50 +722,111 @@ public class InventoryModule extends MainModule {
                     }
                 }
             }
-            bufferSlotsSending.remove(0);
         }
     }
     @Override
     public boolean setLink(Location link, Player player) {
-        if (link == null)
+        if (link != null && this.link != null)
         {
-            this.link = null;
-            return false;
+            if (link.toString().equals(this.link.toString())) {
+                this.link = null;
+                secondary = new Location[secondrySize];
+                if (player != null) {
+                    if (link != null) {
+                        player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "inventory(s) unlinked!");
+                    }
+                }
+                return true;
+            }
         }
-        if (TitanBox.isInventory(link.getBlock())) {
-            this.link = link;
-            if (player != null) {
-                if (link != null) {
-                    player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "invitory linked!");
+        if (this.link == null) {
+            if (TitanBox.isInventory(link.getBlock())) {
+                this.link = link;
+                this.reset = true;
+                if (player != null) {
+                    if (link != null) {
+                        player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "inventory linked!");
+                    }
+                }
+                return true;
+            }
+        }
+        else
+        {
+            if (TitanBox.isInventory(link.getBlock())) {
+                if (this.doesStorageMatch(link))
+                {
+                    int max = 0;
+                    for(int i = 0; i < secondary.length; i++) {
+                        Location loc = secondary[i];
+                        if (loc != null)
+                        {
+                            max++;
+                            if (loc.toString().equals(link.toString()))
+                            {
+                                secondary[i] = null;
+                                if (player != null) {
+                                    if (link != null) {
+                                        player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "secondary inventory unlinked!");
+                                    }
+                                }
+                                return true;
+                            }
+                        }
+                    }
+
+                    for(int i = 0; i < secondary.length; i++)
+                    {
+                        Location loc = secondary[i];
+                        if (loc == null)
+                        {
+                            secondary[i] = link;
+                            if (player != null) {
+                                if (link != null) {
+                                    max++;
+                                    player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "secondary inventory linked! " + ChatColor.WHITE + max + ChatColor.GREEN  + "/" +  ChatColor.WHITE +secondary.length);
+                                }
+                            }
+                            return true;
+                        }
+                    }
+                    if (player != null) {
+                        if (link != null) {
+                            player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "secondary inventorys max! " + ChatColor.WHITE + secondary.length + ChatColor.GREEN  + "/" +  ChatColor.WHITE +secondary.length);
+                        }
+                    }
+                }
+                else
+                {
+                    if (player != null) {
+                        if (link != null) {
+                            player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "inventory doesn't match linked inventory(s)!");
+                        }
+                    }
+                    return true;
                 }
             }
-            return true;
         }
         return false;
     }
-    public void tickPulling(UUID owner)
+    private void tickPulling(Location where, UUID owner)
     {
-        if (bufferSlotsPulling.size() == 0)
-        {
-            bufferSlotsPulling.addAll(slotsPulling);
-        }
         if (bufferSlotsPulling.size() != 0) {
             int slot = bufferSlotsPulling.get(0);
 
-            ItemStack bufferItem = this.getItemAtLocation(slot);
+            ItemStack bufferItem = this.getItemAtLocation(where, slot);
             if (!TitanBox.isEmpty(bufferItem)) {
                 for (StorageUnit stH : StorageUnit.getStorageFromOwner(owner)) {
                     if (stH.getOwner().toString().equals(owner.toString())) {
                         int oldAmount = bufferItem.getAmount();
                         bufferItem = stH.insertItem(bufferItem);
                         if (TitanBox.isEmpty(bufferItem) || bufferItem.getAmount() != oldAmount) {
-                            setItemAtLocation(slot, bufferItem);
+                            setItemAtLocation(where, slot, bufferItem);
                             break;
                         }
                     }
                 }
             }
-            bufferSlotsPulling.remove(0);
         }
     }
     public static void updateGUIClicked(Player who, MainModule mh, boolean showgui) {

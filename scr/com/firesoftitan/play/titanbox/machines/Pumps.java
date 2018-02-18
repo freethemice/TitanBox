@@ -79,11 +79,16 @@ public class Pumps {
         {
             typeOfMat = Material.ICE;
         }
+        if (Type.equals("Packed Ice"))
+        {
+            typeOfMat = Material.PACKED_ICE;
+        }
         if (Type.equals("Item"))
         {
             typeOfMat = Material.AIR;
             return true;
         }
+
         if (Type.equals("Killer"))
         {
             typeOfMat = Material.AIR;

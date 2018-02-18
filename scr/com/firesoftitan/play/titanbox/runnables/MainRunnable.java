@@ -23,21 +23,42 @@ public class MainRunnable implements Runnable {
     }
     public  static void  checkSFHelment(Player player)
     {
-        ItemStack helment = player.getInventory().getHelmet();
-        if (helment != null) {
 
-            if (helment.getItemMeta() != null) {
-                if (helment.getType() == Material.LEATHER_HELMET && helment.getItemMeta().getDisplayName().equals(SlimefunItemsHolder.X_RAY_HELMEY.getItemMeta().getDisplayName())) {
-                    if (!FoTXRay.xraying.containsKey(player.getUniqueId())) {
-                        try {
-                            FoTXRay.sendXray(player);
-                            com.firesoftitan.play.fotxray.PlayerData info = FoTXRay.xraying.get(player.getUniqueId());
-                            info.setCommandUsed(false);
-                            FoTXRay.xraying.put(player.getUniqueId(), info);
+        try {
+            if (player == null)
+            {
+                return;
+            }
+            if (!player.isOnline())
+            {
+                return;
+            }
+            ItemStack helment = player.getInventory().getHelmet();
+            if (helment != null) {
+
+                if (helment.getItemMeta() != null) {
+                    if (helment.getType() == Material.LEATHER_HELMET && helment.getItemMeta().getDisplayName().equals(SlimefunItemsHolder.X_RAY_HELMEY.getItemMeta().getDisplayName())) {
+                        if (!FoTXRay.xraying.containsKey(player.getUniqueId())) {
+                            try {
+                                FoTXRay.sendXray(player);
+                                com.firesoftitan.play.fotxray.PlayerData info = FoTXRay.xraying.get(player.getUniqueId());
+                                info.setCommandUsed(false);
+                                FoTXRay.xraying.put(player.getUniqueId(), info);
+                            }
+                            catch (Exception e)
+                            {
+
+                            }
                         }
-                        catch (Exception e)
-                        {
-
+                    }
+                    else
+                    {
+                        if (FoTXRay.xraying.containsKey(player.getUniqueId())) {
+                            com.firesoftitan.play.fotxray.PlayerData info = FoTXRay.xraying.get(player.getUniqueId());
+                            if (!info.isCommandUsed())
+                            {
+                                FoTXRay.stopXraying(player);
+                            }
                         }
                     }
                 }
@@ -62,16 +83,8 @@ public class MainRunnable implements Runnable {
                     }
                 }
             }
-        }
-        else
-        {
-            if (FoTXRay.xraying.containsKey(player.getUniqueId())) {
-                com.firesoftitan.play.fotxray.PlayerData info = FoTXRay.xraying.get(player.getUniqueId());
-                if (!info.isCommandUsed())
-                {
-                    FoTXRay.stopXraying(player);
-                }
-            }
+        } catch (Exception e) {
+
         }
     }
     private void ReBirth()

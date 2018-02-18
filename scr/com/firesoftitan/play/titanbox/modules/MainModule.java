@@ -113,6 +113,10 @@ public class MainModule {
     {
         return new ItemStack(Material.PAPER, 1);
     }
+    public boolean ready()
+    {
+        return true;
+    }
     public static ItemStack getItemfromModule(MainModule from)
     {
         ItemStack block = from.getMeAsIcon();
@@ -263,7 +267,7 @@ public class MainModule {
         return printing;
     }
 
-    protected Location getLink() {
+    public Location getLink() {
         return link;
     }
 

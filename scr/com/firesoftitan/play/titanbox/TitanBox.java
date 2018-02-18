@@ -6,6 +6,7 @@ import com.firesoftitan.play.titanbox.holders.RouterHolder;
 import com.firesoftitan.play.titanbox.holders.SlimefunItemsHolder;
 import com.firesoftitan.play.titanbox.listeners.ListenerMain;
 import com.firesoftitan.play.titanbox.machines.*;
+import com.firesoftitan.play.titanbox.modules.InventoryModule;
 import com.firesoftitan.play.titanbox.modules.MainModule;
 import com.firesoftitan.play.titanbox.runnables.MainRunnable;
 import com.firesoftitan.play.titanbox.runnables.RouterRunable;
@@ -145,6 +146,8 @@ public class TitanBox extends JavaPlugin
         };
 
         setup = new SlimefunSetup();
+
+        InventoryModule.loadConfig();
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new MainRunnable(),25, 25);
 
@@ -290,7 +293,9 @@ public class TitanBox extends JavaPlugin
         Elevator.saveElevators();
         BackpackRecover.saveRecovers();
         barcodes.save();
+        config.save();
     }
+
     public void onDisable()
     {
         saveEveryThing();
@@ -374,6 +379,34 @@ public class TitanBox extends JavaPlugin
         finally {
             pickupBat.remove();
         }
+    }
+    public static ItemStack getItem(UUID owner, Material typeBucket, short data) {
+        return getItem(owner, new ItemStack(typeBucket, 1, data));
+    }
+    public static ItemStack getItem(UUID owner, Material typeBucket) {
+        return getItem(owner, typeBucket, (short) 0);
+    }
+    public static ItemStack getItem(UUID owner, ItemStack typeBucket) {
+        for (StorageUnit stH : StorageUnit.getStorageFromOwner(owner)) {
+            if (stH.getOwner().toString().equals(owner.toString())) {
+                for(int i =0;i <stH.getSize(); i++)
+                {
+                    ItemStack view = stH.viewSlot(i);
+                    if (!TitanBox.isEmpty(view))
+                    {
+                        if (TitanBox.isItemEqual(view, typeBucket))
+                        {
+                            ItemStack getIt = stH.getItem(i, view.getMaxStackSize());
+                            if (!TitanBox.isEmpty(getIt))
+                            {
+                                return  getIt;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
     public static boolean hasItem(UUID owner, Material typeBucket, short data) {
         return hasItem(owner, new ItemStack(typeBucket, 1, data));
@@ -854,6 +887,14 @@ public class TitanBox extends JavaPlugin
                     if (args[0].equalsIgnoreCase("save")) {
                         if (sender.hasPermission("titanbox.admin")) {
                             saveEveryThing();
+                        }
+                    }
+                    if (args[0].equalsIgnoreCase("reload")) {
+                        if (sender.hasPermission("titanbox.admin")) {
+                            config.reload();
+                            RouterHolder.loadConfig();
+                            InventoryModule.loadConfig();
+                            sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + "Config reloaded, Server must be restart to update already loaded Modules!");
                         }
                     }
                     if (args[0].equalsIgnoreCase("restart"))

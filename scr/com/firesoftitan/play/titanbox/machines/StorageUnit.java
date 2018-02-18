@@ -177,10 +177,40 @@ public class StorageUnit implements InventoryHolder {
                 {
                     storpec =  "" + ChatColor.WHITE + "empty";
                 }
+                String[] lore = {ChatColor.YELLOW + "" + ChatColor.STRIKETHROUGH + "---------------------------", ChatColor.YELLOW + "Name: " + type, ChatColor.YELLOW + "Stock: " + ChatColor.WHITE + TitanBox.formatCommas(storageCount[i]), ChatColor.YELLOW + "Capacity: " +storpec, ChatColor.AQUA + "" + ChatColor.STRIKETHROUGH + "---------------------------",ChatColor.AQUA + "Left Click: " + ChatColor.WHITE + "64", ChatColor.AQUA + "Right Click: " + ChatColor.WHITE + "1", ChatColor.AQUA + "Shift Left Click: " + ChatColor.WHITE + "4x64 (256)", ChatColor.AQUA + "Shift Right Click: " + ChatColor.WHITE + "ALL (SIM)", ChatColor.AQUA + "Right Click Empty: " + ChatColor.WHITE + "Remove"};
+
+                if (interfaceItem.hasItemMeta())
+                {
+                    if (interfaceItem.getItemMeta().hasLore())
+                    {
+                        List<String> loreList = interfaceItem.getItemMeta().getLore();
+                        String[] insertlore = new String[loreList.size()];
+                        for(int ii = 0; ii < loreList.size(); ii++)
+                        {
+                            insertlore[ii] =  ChatColor.DARK_PURPLE + loreList.get(ii);
+                        }
+                        List<String> rework = new ArrayList<String>();
+                        rework.add(lore[0]);
+                        rework.add(lore[1]);
+                        for(String e: insertlore)
+                        {
+                            if (!ChatColor.stripColor(e.replace(" ", "")).equals("")) {
+                                rework.add("          " + e);
+                            }
+                        }
+                        for (int o = 2; o < lore.length; o++)
+                        {
+                            rework.add(lore[o]);
+                        }
+                        lore = new String[rework.size()];
+                        lore = rework.toArray(lore);
+
+                    }
+                }
                 buttonGUIs tmp = gui.getButton(i);
                 tmp.setMaterialFalse(interfaceItem);
                 tmp.setNameFalse("Stored Item");
-                tmp.addLore(ChatColor.YELLOW + "" + ChatColor.STRIKETHROUGH + "---------------------------", ChatColor.YELLOW + "Name: " + type,  ChatColor.YELLOW + "Stock: " + ChatColor.WHITE + TitanBox.formatCommas(storageCount[i]), ChatColor.YELLOW + "Capacity: " +storpec, ChatColor.AQUA + "" + ChatColor.STRIKETHROUGH + "---------------------------",ChatColor.AQUA + "Left Click: " + ChatColor.WHITE + "64", ChatColor.AQUA + "Right Click: " + ChatColor.WHITE + "1", ChatColor.AQUA + "Shift Left Click: " + ChatColor.WHITE + "4x64 (256)", ChatColor.AQUA + "Shift Right Click: " + ChatColor.WHITE + "ALL (SIM)", ChatColor.AQUA + "Right Click Empty: " + ChatColor.WHITE + "Remove" );
+                tmp.addLore(lore);
                 tmp.setMaterialFalse(interfaceItem);
                 tmp.setToggle(buttonEnum.FALSE);
             }
@@ -776,22 +806,28 @@ public class StorageUnit implements InventoryHolder {
                                 String id = ChatColor.stripColor(item.getItemMeta().getLore().get(0));
                                 if (StorageUnit.StorageById.containsKey(id)) {
                                     StorageUnit tmp = StorageUnit.StorageById.get(id);
-                                    if (tmp.getLocation() != null) {
-                                        BlockStorage._integrated_removeBlockInfo(tmp.getLocation(), true);
-                                        tmp.getLocation().getBlock().setType(Material.AIR);
-                                        StorageUnit.StorageByLocation.remove(tmp.getLocation().toString());
-                                    }
-                                    tmp.setLocation(event.getBlock().getLocation());
-                                    StorageUnit.StorageByLocation.put(tmp.getLocation().toString(), tmp);
-                                    Bukkit.getScheduler().scheduleSyncDelayedTask(TitanBox.instants, new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            addEnergy(tmp);
-                                            tmp.setCharge(tmp.getCharge() + tmp.getBattery());
-                                            tmp.setBattery(0);
+                                    if (tmp.getOwner().toString().equals(event.getPlayer().getUniqueId().toString()) ||  event.getPlayer().hasPermission("titanbox.admin"))
+                                    {
+                                        if (tmp.getLocation() != null) {
+                                            BlockStorage._integrated_removeBlockInfo(tmp.getLocation(), true);
+                                            tmp.getLocation().getBlock().setType(Material.AIR);
+                                            StorageUnit.StorageByLocation.remove(tmp.getLocation().toString());
                                         }
-                                    }, 1);
-
+                                        tmp.setLocation(event.getBlock().getLocation());
+                                        StorageUnit.StorageByLocation.put(tmp.getLocation().toString(), tmp);
+                                        Bukkit.getScheduler().scheduleSyncDelayedTask(TitanBox.instants, new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                addEnergy(tmp);
+                                                tmp.setCharge(tmp.getCharge() + tmp.getBattery());
+                                                tmp.setBattery(0);
+                                            }
+                                        }, 1);
+                                    }
+                                    else
+                                    {
+                                        event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "You are not the owner of this unit, so you can't place it. The Owner is " + ChatColor.WHITE + Bukkit.getOfflinePlayer(tmp.getOwner()).getName());
+                                    }
                                 }
                             }
                         }

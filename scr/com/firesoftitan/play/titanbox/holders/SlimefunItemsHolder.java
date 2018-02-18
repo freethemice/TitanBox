@@ -75,6 +75,10 @@ public class SlimefunItemsHolder {
     public static ItemStack SLIME_FACTORY;
     public static ItemStack BLAZE_FACTORY;
     public static ItemStack ENDERMAN_FACTORY;
+    public static ItemStack NETHERRACK_FACTORY;
+    public static ItemStack SOULSAND_FACTORY;
+    public static ItemStack WITHERSKULL_FACTORY;
+    public static ItemStack QUARTZ_FACTORY;
     public static ItemStack ELECTRIC_COBBLE_TO_DUST;
     public static ItemStack ELECTRIC_COBBLE_TO_INGOT;
     public static ItemStack ELECTRIC_COBBLE_TO_DUST_2;
@@ -86,7 +90,7 @@ public class SlimefunItemsHolder {
     public static ItemStack CHARCOAL_FACTORY;
     public static ItemStack CHARCOAL_FACTORY_2;
     public static ItemStack CHARCOAL_FACTORY_3;
-    public static ItemStack TITAN_AUTO_DISENCHANTER;
+
     public static ItemStack ECLIPSE_COIL;
     public static ItemStack TITAN_MOTOR;
     public static ItemStack NUGGETTOINGOT;
@@ -104,7 +108,10 @@ public class SlimefunItemsHolder {
     public static ItemStack REPAIRED_SPAWNER_SLIME;
     public static ItemStack REPAIRED_SPAWNER_BLAZE;
     public static ItemStack REPAIRED_SPAWNER_ENDERMAN;
+    public static ItemStack REPAIRED_SPAWNER_WITHER;
 
+    public static ItemStack AUTO_ENCHANTER_2 = new CustomItem(new ItemStack(Material.ENCHANTMENT_TABLE, 1), "&5Auto Enchanter II",  new String[] {"", "&4End Game Machine", "&8\u21E8 &e\u26A1 &7500 J/s"});
+    public static ItemStack AUTO_DISENCHANTER_2 = new CustomItem(new ItemStack(Material.ENCHANTMENT_TABLE, 1), "&5Auto Disenchanter II",  new String[] {"", "&4End Game Machine", "&8\u21E8 &e\u26A1 &7500 J/s"});
 
     public static ItemStack XPPLATE = new CustomItem(new ItemStack(Material.CARPET, 1, (short) 7), "&bXP Plate", new String[] {"&f-Stand on plate to get XP", "&8\u21E8 &e\u26A1 &730 J/s"});
     public static ItemStack DIAMOND_WRITING_PLATE  = new CustomItem(new ItemStack(Material.CARPET, 1, (short) 3), "&bDiamond Writing Plate", new String[] {"&f-A Strong plate for writing complex codes"});
@@ -124,9 +131,9 @@ public class SlimefunItemsHolder {
             ECLIPSE_COIL = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2UzYmM0ODkzYmE0MWEzZjczZWUyODE3NGNkZjRmZWY2YjE0NWU0MWZlNmM4MmNiN2JlOGQ4ZTk3NzFhNSJ9fX0="), "&dEclipse Coil");
             TITAN_MOTOR = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGNiY2EwMTJmNjdlNTRkZTlhZWU3MmZmNDI0ZTA1NmMyYWU1OGRlNWVhY2M5NDlhYjJiY2Q5NjgzY2VjIn19fQ=="), "&dTitan Motor");
             THERMAL_GENERATOR = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTM0M2NlNThkYTU0Yzc5OTI0YTJjOTMzMWNmYzQxN2ZlOGNjYmJlYTliZTQ1YTdhYzg1ODYwYTZjNzMwIn19fQ=="), "&cThermal Generator", "", "&4End-Game Generator", "&8\u21E8 &e\u26A1 &78192 J Buffer", "&8\u21E8 &e\u26A1 &7500 J/s", "&bRequires:","&63x3 of lava below", "&63x3 of Air above", "&4Could Exploded!");
-            FREE_ENERGY_I = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTM0M2NlNThkYTU0Yzc5OTI0YTJjOTMzMWNmYzQxN2ZlOGNjYmJlYTliZTQ1YTdhYzg1ODYwYTZjNzMwIn19fQ=="), "&cFree Energy &7(&eI&7)", "", "&4End-Game Generator", "&8\u21E8 &e\u26A1 &78192 J Buffer", "&8\u21E8 &e\u26A1 &7500 J/s", "&bRequires:","&6Nothing");
-            FREE_ENERGY_II = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTM0M2NlNThkYTU0Yzc5OTI0YTJjOTMzMWNmYzQxN2ZlOGNjYmJlYTliZTQ1YTdhYzg1ODYwYTZjNzMwIn19fQ=="), "&cFree Energy &7(&eII&7)", "", "&4End-Game Generator", "&8\u21E8 &e\u26A1 &78192 J Buffer", "&8\u21E8 &e\u26A1 &71000 J/s", "&bRequires:","&6Nothing");
-            FREE_ENERGY_III = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTM0M2NlNThkYTU0Yzc5OTI0YTJjOTMzMWNmYzQxN2ZlOGNjYmJlYTliZTQ1YTdhYzg1ODYwYTZjNzMwIn19fQ=="), "&cFree Energy &7(&eIII&7)", "", "&4End-Game Generator", "&8\u21E8 &e\u26A1 &78192 J Buffer", "&8\u21E8 &e\u26A1 &72000 J/s", "&bRequires:","&6Nothing");
+            FREE_ENERGY_I = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmE3ZDI3MTdkMTBiZWM0MTU5ZThmMWQzMzM5ZWFlMzUyMjk3YTYwNzE0M2E5NmIyOWU4ZWMyODczN2UwZDkifX19"), "&cFree Energy &7(&eI&7)", "", "&4End-Game Generator", "&8\u21E8 &e\u26A1 &78192 J Buffer", "&8\u21E8 &e\u26A1 &7500 J/s", "&bRequires:","&6Nothing");
+            FREE_ENERGY_II = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmE3ZDI3MTdkMTBiZWM0MTU5ZThmMWQzMzM5ZWFlMzUyMjk3YTYwNzE0M2E5NmIyOWU4ZWMyODczN2UwZDkifX19"), "&cFree Energy &7(&eII&7)", "", "&4End-Game Generator", "&8\u21E8 &e\u26A1 &78192 J Buffer", "&8\u21E8 &e\u26A1 &71000 J/s", "&bRequires:","&6Nothing");
+            FREE_ENERGY_III = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmE3ZDI3MTdkMTBiZWM0MTU5ZThmMWQzMzM5ZWFlMzUyMjk3YTYwNzE0M2E5NmIyOWU4ZWMyODczN2UwZDkifX19"), "&cFree Energy &7(&eIII&7)", "", "&4End-Game Generator", "&8\u21E8 &e\u26A1 &78192 J Buffer", "&8\u21E8 &e\u26A1 &72000 J/s", "&bRequires:","&6Nothing");
             RAREORE_GENERATOR = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjUzNDU5ZDYxNDM5YTNlZTNiZTgyMmU0ZmVjMWE1YzE0N2U4NzQyNjJkY2JhNjUzMmFlMjYxMzRkNmNiZDVmIn19fQ=="), "&cRare Ore Generator", "", "&4End-Game Generator", "&8\u21E8 &e\u26A1 &7256 J Buffer", "&8\u21E8 &e\u26A1 &732 J/s");
             ZeroLuckyBlock = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjNiNzEwYjA4YjUyM2JiYTdlZmJhMDdjNjI5YmEwODk1YWQ2MTEyNmQyNmM4NmJlYjM4NDU2MDNhOTc0MjZjIn19fQ=="), "&rLucky Block", new String[]{"&7Luck: &r0"});
             LuckyBlock = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjNiNzEwYjA4YjUyM2JiYTdlZmJhMDdjNjI5YmEwODk1YWQ2MTEyNmQyNmM4NmJlYjM4NDU2MDNhOTc0MjZjIn19fQ=="), "&rVery lucky Block", new String[]{"&7Luck: &a+80"});
@@ -138,7 +145,6 @@ public class SlimefunItemsHolder {
             ELECTRIC_COBBLE_TO_INGOT_2 = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzRkYmNiN2UxZmJlY2VhOWE3MzUwNDM2Y2JiZWEyYjQ5NmY3NGMyOTcyMDRmMWJiOWFjYzM4NzhkNTQyY2NiIn19fQ=="), "&3Electric Cobble to Ingot &7(&eII&7)", "", "&4End-Game Machine", "&6Has a small chance of Lucky and Eclipse Ingots", "Gives 3 Ingots instead of 1", "&8\u21E8 &7Speed: 10x", "&8\u21E8 &e\u26A1 &730 J/s");
             ELECTRIC_COBBLE_TO_DUST_3 = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTU0OTQ3ZGU3ZjUyNTk4MjU1ZDZhZmVlOWQ3N2JlZmFkOWI0ZjI0YzBjNDY2M2QyOGJjZGY4YTY0NTdmMzQifX19"), "&3Electric Cobble to Dust &7(&eIII&7)", "", "&4End-Game Machine", "&6Has a small chance of Lucky and Eclipse Nuggets", "Gives 5 dust instead of 1", "&8\u21E8 &7Speed: 20x", "&8\u21E8 &e\u26A1 &720 J/s");
             ELECTRIC_COBBLE_TO_INGOT_3 = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzRkYmNiN2UxZmJlY2VhOWE3MzUwNDM2Y2JiZWEyYjQ5NmY3NGMyOTcyMDRmMWJiOWFjYzM4NzhkNTQyY2NiIn19fQ=="), "&3Electric Cobble to Ingot &7(&eIII&7)", "", "&4End-Game Machine", "&6Has a small chance of Lucky and Eclipse Ingots", "Gives 5 Ingots instead of 1", "&8\u21E8 &7Speed: 20x", "&8\u21E8 &e\u26A1 &730 J/s");
-            TITAN_AUTO_DISENCHANTER = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjJmNzkwMTZjYWQ4NGQxYWUyMTYwOWM0ODEzNzgyNTk4ZTM4Nzk2MWJlMTNjMTU2ODI3NTJmMTI2ZGNlN2EifX19"), "&3Titan Auto Disenchanter", "", "&4End-Game Machine", "&6Rename book to Titan Enchanment Name", "&6Will remove that enchanment.","&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &730 J/s");
             ELECTRIC_LUCKY_BLOCK_FACTORY = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmI1ZDhiOWEzYTk0MjFkY2VkYjE3ZDcxZTNhODg0ZDk1ZWM1MDM4YzgzOGNlMTllZDZkOGU5NmM1YjIzZWQ3In19fQ=="), "&3Electric Lucky Block Factory", "", "&4End-Game Machine", "&6Will take any Gold Ingot", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &725 J/s");
             ELECTRIC_LUCKY_BLOCK_GRINDER = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWFkNTQyNGQ5OTAzOTUzODQzNTI2YTdjNDE2ODY2ZTdkNzk1MDFjODhjZTdjZGFiZWVlNTI4NGVhMzlmIn19fQ=="), "&3Electric Lucky Block Grinder", "", "&4End-Game Machine", "&6Will almost anything Lucky or Not", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &730 J/s");
             CHARCOAL_FACTORY = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWE3ZDJhN2ZiYjRkMzdiNGQ1M2ZlODc3NTcxMjhlNWVmNjZlYzIzZDdmZjRmZTk5NDQ1NDZkYmM4Y2U3NzcifX19"), "&3Charcoal Factory", "", "&4End-Game Machine", "&6Needs: Bukkit of water", "&6Needs: Bukkit of lava", "&6Needs: Sapling", "&6Needs: Bone Meal", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &730 J/s");
@@ -158,12 +164,17 @@ public class SlimefunItemsHolder {
             REPAIRED_SPAWNER_PIG = new CustomItem(Material.MOB_SPAWNER, "&bReinforced Spawner", 0, new String[]{"&7Type: &bPig"});
             REPAIRED_SPAWNER_SLIME = new CustomItem(Material.MOB_SPAWNER, "&bReinforced Spawner", 0, new String[]{"&7Type: &bSlime"});
             REPAIRED_SPAWNER_ENDERMAN = new CustomItem(Material.MOB_SPAWNER, "&bReinforced Spawner", 0, new String[]{"&7Type: &bEnderman"});
+            REPAIRED_SPAWNER_WITHER = new CustomItem(Material.MOB_SPAWNER, "&bReinforced Spawner", 0, new String[]{"&7Type: &bWither Skeleton"});
             BONE_FACTORY = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWJiNDMzOTFhOWRiZmY5ZWFkYWUwN2I2ODYyNTk1YzkxZDA0YzU5MzhlMjNjMjg1YWM2MGM0Yjg3NjliMjQifX19"), "&3Bone Factory", "", "&4End-Game Machine", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &730 J/s");
             IRON_FACTORY = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjEzMWEzNmU3MGZmYWE3Y2E3ZTY3MmFlNmFjMjBiN2ZjMWU0NTdjNDNhOGUxMDY5ZTdiMTRlY2RiODU3NiJ9fX0="), "&3Iron Factory", "", "&4End-Game Machine", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &730 J/s");
             XP_FACTORY = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGU5YTI3ODE3YWJmODhhMmY2ZjIzMDEyYzc1ODY5MmNkOWJjZmY5OGE4ZGZjMGVmNjk1NzljNDQyZjZhYTZkZiJ9fX0="), "&3XP Factory", "", "&4End-Game Machine", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &730 J/s");
             SLIME_FACTORY = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzNlOGQ3NDZlNGJjMWZjMjlkNWUzYmQ1MzIyYjI5ODZjYmFmODZiMDY2ZmE4MzYxOGJmMjQ2ZmRmMzczIn19fQ=="), "&3Slime Factory", "", "&4End-Game Machine", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &730 J/s");
             BLAZE_FACTORY = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTNjZmQ5NGU5MjVlYWI0MzMwYTc2OGFmY2FlNmMxMjhiMGEyOGUyMzE0OWVlZTQxYzljNmRmODk0YzI0ZjNkZSJ9fX0="), "&3Blaze Factory", "", "&4End-Game Machine", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &730 J/s");
             ENDERMAN_FACTORY = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTBkN2FiMmMxYzhiNDlmMWM2ZTgxMmExOTBlOWQyYTg3N2U4NjE0ZmM1YzVmMmNlNjNhNWE1ZDhhYzZiMGQ0In19fQ=="), "&3Ender Factory", "", "&4End-Game Machine", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &730 J/s");
+            NETHERRACK_FACTORY = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTliOTkyMzhkOWY4MTM0MDE1ZDc0MzQxYjE3MTE1YmUzMGYxMjVhMzdlYTQ5MDMyYjhjOWUzYjc2OWNmN2VlMSJ9fX0="), "&3Netherrack Factory", "", "&4End-Game Machine", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &7100 J/s");
+            SOULSAND_FACTORY = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjk5NGUzZWJkZTlhZmEzZjlmOWM3ZWY4NzlhYWZmN2Y2YmY0NTNiNDNkZjE3NTk2MjJhZWYwZWM0YWFmYzJhZiJ9fX0="), "&3Soulsand Factory", "", "&4End-Game Machine", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &7100 J/s");
+            WITHERSKULL_FACTORY = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmFmZjVjOTE4M2Y5ZmVlZWI3ZjRiNjFjNDhjYjM1N2Q0MDE1OGYyMmQ3YTUzOTczMWM1MzFjM2QyZDg3In19fQ=="), "&3Wither Skull Factory", "", "&4End-Game Machine", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &7100 J/s");
+            QUARTZ_FACTORY = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmE3NGFjNGQxZjljYmQxMDdkNGFhODU4YTIzMmM0NDkxNTU3OWFhY2EzMmFhMmFmOTU0NTlmY2EwYWFjOWIifX19"), "&3Quartz Factory", "", "&4End-Game Machine", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &7100 J/s");
 
         } catch (Exception e) {
             //e.printStackTrace();

@@ -330,8 +330,10 @@ public class ListenerMain implements Listener {
                     if (check.hasItemMeta()) {
                         if (check.getItemMeta().hasDisplayName()) {
                             if (!ChatColor.stripColor(check.getItemMeta().getDisplayName()).equals(check.getItemMeta().getDisplayName())) {
-                                event.setCancelled(true);
-                                event.getWhoClicked().sendMessage(ChatColor.GREEN + "[TitanBox]: " + ChatColor.RED + "Thats look fancy, lets not mess with it!");
+                                if (check.getType() != Material.TRIPWIRE_HOOK) {
+                                    event.setCancelled(true);
+                                    event.getWhoClicked().sendMessage(ChatColor.GREEN + "[TitanBox]: " + ChatColor.RED + "Thats look fancy, lets not mess with it!");
+                                }
                             }
                         }
                     }

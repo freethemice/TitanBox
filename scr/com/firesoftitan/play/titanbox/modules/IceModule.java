@@ -49,8 +49,8 @@ public class IceModule extends MainModule {
                 this.icePump = link.clone();
                 saveInfo();
                 if (player != null) {
-                player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Ice Extractor linked!");
-            }
+                    player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Ice Extractor linked!");
+                }
                 return true;
             }
         }
@@ -97,6 +97,7 @@ public class IceModule extends MainModule {
         if (lastran + 1000  < System.currentTimeMillis()) {
             lastran = System.currentTimeMillis();
             if (icePump != null) {
+
                 if (Pumps.getLiquid(icePump, "Ice")) {
                     TitanBox.addItemToStorage(owner, Material.ICE, 3, (short) 0);
                 }

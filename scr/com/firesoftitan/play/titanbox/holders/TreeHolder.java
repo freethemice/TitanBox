@@ -218,6 +218,10 @@ public class TreeHolder {
                 return type.getTalltype();
             }
         }
+        if (type.getType() == null)
+        {
+            return TreeTypeEnum.OAK.getType();
+        }
         return type.getType();
     }
     public TreeTypeEnum getType() {

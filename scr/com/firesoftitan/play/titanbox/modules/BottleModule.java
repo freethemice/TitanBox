@@ -9,15 +9,17 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionType;
 
 import java.util.UUID;
 
-public class BucketsModule extends MainModule {
+public class BottleModule extends MainModule {
 
 
-    public BucketsModule()
+    public BottleModule()
     {
-        type = ModuleTypeEnum.Bucket;
+        type = ModuleTypeEnum.Bottle;
     }
 
     @Override
@@ -36,16 +38,7 @@ public class BucketsModule extends MainModule {
                 this.link = link.clone();
                 saveInfo();
                 if (player != null) {
-                    player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Water pummp  linked!");
-                }
-                return true;
-            }
-            if(pump.equals("Lava"))
-            {
-                this.link = link.clone();
-                saveInfo();
-                if (player != null) {
-                    player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Lava pummp  linked!");
+                    player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Water pummp linked!");
                 }
                 return true;
             }
@@ -79,14 +72,8 @@ public class BucketsModule extends MainModule {
     {
         if (link != null)
         {
-            if (Pumps.getLiquid(link, "Water") || Pumps.getLiquid(link, "Lava"))
+            if (Pumps.getLiquid(link, "Water"))
             {
-                String Type = Pumps.getPumpType(link);
-                Material typeBucket = Material.WATER_BUCKET;
-                if (Type.equals("Lava"))
-                {
-                    typeBucket = Material.LAVA_BUCKET;
-                }
                 boolean foundbucket = false;
                 for (StorageUnit stH : StorageUnit.getStorageFromOwner(owner)) {
                     if (stH.getOwner().toString().equals(owner.toString())) {
@@ -95,7 +82,7 @@ public class BucketsModule extends MainModule {
                             ItemStack view = stH.viewSlot(i);
                             if (!TitanBox.isEmpty(view))
                             {
-                                if (view.getType() == Material.BUCKET)
+                                if (view.getType() == Material.GLASS_BOTTLE)
                                 {
                                     ItemStack getIt = stH.getItem(i, 1);
                                     if (!TitanBox.isEmpty(getIt))
@@ -112,7 +99,8 @@ public class BucketsModule extends MainModule {
                     for (StorageUnit stH : StorageUnit.getStorageFromOwner(owner)) {
                         if (stH.getOwner().toString().equals(owner.toString())) {
                             int giveamount = 1;
-                            ItemStack out = stH.insertItem(new ItemStack(typeBucket, giveamount));
+                            Potion tmp = new Potion(PotionType.WATER);
+                            ItemStack out = stH.insertItem(tmp.toItemStack(1));
                             if (TitanBox.isEmpty(out)) {
                                 return;
                             }

@@ -206,7 +206,7 @@ public class RouterHolder {
                 if (!TitanBox.isEmpty(mainHand)) {
                     MainModule mh = MainModule.getModulefromItem(mainHand);
                     if (mh != null) {
-                        if (mh.getModuleid() != null) {
+                        if (mh.getModuleid() != null && mh.ready()) { // && mh.getLink() != null
                             List<MainModule> tmp = tmpRL.getModules();
                             for (int i = 0; i < tmp.size(); i++) {
                                 MainModule tmpMH = tmp.get(i);
@@ -305,29 +305,33 @@ public class RouterHolder {
             }
         }
     }
-    public static void loadAllRouters()
+    public static void loadConfig()
     {
-        if (!RouterHolder.routing.contains("settings.bigMax"))
+        if (!TitanBox.config.contains("settings.router.bigMax"))
         {
-            RouterHolder.routing.setValue("settings.bigMax", bigMax);
+            TitanBox.config.setValue("settings.router.bigMax", bigMax);
         }
-        if (!RouterHolder.routing.contains("settings.speed"))
+        if (!TitanBox.config.contains("settings.router.speed"))
         {
-            RouterHolder.routing.setValue("settings.speed", speed);
+            TitanBox.config.setValue("settings.router.speed", speed);
         }
-        if (!RouterHolder.routing.contains("settings.bufferSize"))
+        if (!TitanBox.config.contains("settings.router.bufferSize"))
         {
-            RouterHolder.routing.setValue("settings.bufferSize", bufferSize);
+            TitanBox.config.setValue("settings.router.bufferSize", bufferSize);
         }
-        if (!RouterHolder.routing.contains("settings.lagtime"))
+        if (!TitanBox.config.contains("settings.router.lagtime"))
         {
-            RouterHolder.routing.setValue("settings.lagtime", lagTime);
+            TitanBox.config.setValue("settings.router.lagtime", lagTime);
         }
 
-        bigMax = RouterHolder.routing.getInt("settings.bigMax");
-        speed = RouterHolder.routing.getInt("settings.speed");
-        bufferSize = RouterHolder.routing.getInt("settings.bufferSize");
-        lagTime = RouterHolder.routing.getLong("settings.lagtime");
+        bigMax = TitanBox.config.getInt("settings.router.bigMax");
+        speed = TitanBox.config.getInt("settings.router.speed");
+        bufferSize = TitanBox.config.getInt("settings.router.bufferSize");
+        lagTime = TitanBox.config.getLong("settings.router.lagtime");
+    }
+    public static void loadAllRouters()
+    {
+        loadConfig();
 
         RouterHolder.routersByID.clear();
         RouterHolder.routersByLocation.clear();

@@ -182,6 +182,8 @@ public abstract class BedrockDrill extends AContainer {
                     else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.DIAMOND, 1);
                     else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.EMERALD, 1);
                     else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.CLAY_BALL, 1);
+                    else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.INK_SACK, 1, (short)4);
+                    else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.REDSTONE, 1);
                     else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.DIRT, 1);
                     else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.STONE, 1, (short) 1);
                     else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.STONE, 1, (short) 3);
