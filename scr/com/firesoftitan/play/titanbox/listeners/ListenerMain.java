@@ -12,6 +12,7 @@ import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunItem;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -94,6 +95,7 @@ public class ListenerMain implements Listener {
         }
 
     }
+
     @EventHandler
     public void onPlayerInteractEvent(PlayerInteractEvent event)
     {
@@ -133,6 +135,17 @@ public class ListenerMain implements Listener {
             BackpackRecover.onBlockBreakEvent(event);
             StorageRecover.onBlockBreakEvent(event);
             NetworkMonitor.onBlockBreakEvent(event);
+        }
+        if (event.getBlock().getType() == Material.END_ROD)
+        {
+            Location loc = event.getBlock().getLocation().clone();
+            if (ElectricMiner.miners.contains(loc.toString() + ".set"))
+            {
+                event.setDropItems(false);
+                ItemStack recover = SlimefunItemsHolder.DRILL_ROD_BROKEN;
+                event.getPlayer().getWorld().dropItem(event.getPlayer().getLocation(), recover);
+                ElectricMiner.miners.setValue(loc.toString(), null);
+            }
         }
     }
     @EventHandler
@@ -175,11 +188,27 @@ public class ListenerMain implements Listener {
                                 event.setCancelled(true);
                             }
                         }
+
                     }
                 }
             }
-
-            if (TitanBox.isItemEqual(event.getItemInHand(), SlimefunItemsHolder.DIAMOND_WRITING_PLATE) || TitanBox.isItemEqual(event.getItemInHand(), SlimefunItemsHolder.EMERALD_WRITING_PLATE) || TitanBox.isItemEqual(event.getItemInHand(), SlimefunItemsHolder.ENDER_WRITING_PLATE))
+            if (TitanBox.isItemEqual(event.getItemInHand(), SlimefunItemsHolder.ELECTRIC_MINER))
+            {
+                int placingy = event.getBlock().getY();
+                int Top = event.getBlock().getWorld().getHighestBlockYAt( event.getBlock().getLocation());
+                System.out.println(placingy + "," + Top);
+                if (Top < 45)
+                {
+                    event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GOLD + "The ground is to low here.");
+                    event.setCancelled(true);
+                }
+                if (placingy != Top)
+                {
+                    event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GOLD + "Can only be placed on surface, make sure there are no trees over head.");
+                    event.setCancelled(true);
+                }
+            }
+            if (TitanBox.isItemEqual(event.getItemInHand(), SlimefunItemsHolder.DRILL_ROD) || TitanBox.isItemEqual(event.getItemInHand(), SlimefunItemsHolder.DRILL_ROD_BROKEN) || TitanBox.isItemEqual(event.getItemInHand(), SlimefunItemsHolder.DIAMOND_WRITING_PLATE) || TitanBox.isItemEqual(event.getItemInHand(), SlimefunItemsHolder.EMERALD_WRITING_PLATE) || TitanBox.isItemEqual(event.getItemInHand(), SlimefunItemsHolder.ENDER_WRITING_PLATE))
             {
                 event.setCancelled(true);
             }
@@ -194,6 +223,37 @@ public class ListenerMain implements Listener {
 
         }
     }
+    /*
+    @EventHandler(priority= EventPriority.MONITOR, ignoreCancelled=true)
+    public void onEntityExplode(EntityExplodeEvent e) {
+        Iterator<Block> blocks = e.blockList().iterator();
+        while (blocks.hasNext()) {
+            Block block = blocks.next();
+            SlimefunItem item = BlockStorage.check(block);
+            if (item != null) {
+                blocks.remove();
+                if (!item.getName().equalsIgnoreCase("HARDENED_GLASS") && !item.getName().equalsIgnoreCase("WITHER_PROOF_OBSIDIAN") && !item.getName().equalsIgnoreCase("WITHER_PROOF_GLASS") && !item.getName().equalsIgnoreCase("FORCEFIELD_PROJECTOR") && !item.getName().equalsIgnoreCase("FORCEFIELD_RELAY")) {
+                    boolean success = true;
+                    if (SlimefunItem.blockhandler.containsKey(item.getName())) {
+                        success = SlimefunItem.blockhandler.get(item.getName()).onBreak(null, block, item, UnregisterReason.EXPLODE);
+                    }
+                    if (success) {
+                        BlockStorage.clearBlockInfo(block);
+                        block.setType(Material.AIR);
+                    }
+                }
+            }
+        }
+    }
+    @EventHandler(priority=EventPriority.LOWEST)
+    public void onEntityChangeBlock(EntityChangeBlockEvent e) {
+        if (e.getEntity() instanceof Wither) {
+            SlimefunItem item = BlockStorage.check(e.getBlock());
+            if (item != null) {
+                if (item.getID().equals("WITHER_PROOF_OBSIDIAN")) e.setCancelled(true);
+            }
+        }
+    }*/
     @EventHandler
     public void onEntityDeath(EntityDeathEvent event) {
         if (event.getEntity()  != null) {

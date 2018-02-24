@@ -743,6 +743,7 @@ public class InventoryModule extends MainModule {
             if (TitanBox.isInventory(link.getBlock())) {
                 this.link = link;
                 this.reset = true;
+                secondary = new Location[secondrySize];
                 if (player != null) {
                     if (link != null) {
                         player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "inventory linked!");

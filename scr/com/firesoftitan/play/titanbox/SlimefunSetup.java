@@ -543,6 +543,23 @@ public class SlimefunSetup {
 
         new SlimefunItem(CustomCategories.SLIMEFUN_PARTS, SlimefunItemsHolder.LASER_CHARGE, "LASER_CHARGE", RecipeType.ENHANCED_CRAFTING_TABLE, new ItemStack[] { null, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.REINFORCED_ALLOY_INGOT, null, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.REINFORCED_ALLOY_INGOT, new ItemStack(Material.REDSTONE), me.mrCookieSlime.Slimefun.Lists.SlimefunItems.REINFORCED_ALLOY_INGOT, null, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.REINFORCED_ALLOY_INGOT, null }, SlimefunItemsHolder.LASER_CHARGE.clone()).register();
 
+        ItemStack OutPut =  SlimefunItemsHolder.DRILL_ROD_BROKEN.clone();
+        OutPut.setAmount(8);
+        new SlimefunItem(CustomCategories.SLIMEFUN_PARTS, SlimefunItemsHolder.DRILL_ROD_BROKEN, "DRILL_ROD_BROKEN", RecipeType.ENHANCED_CRAFTING_TABLE,
+                new ItemStack[] {
+                                    null, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.REINFORCED_ALLOY_INGOT, null,
+                                    null, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.REINFORCED_ALLOY_INGOT, null,
+                                    null, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.REINFORCED_ALLOY_INGOT, null
+                                }, OutPut).register();
+        OutPut =  SlimefunItemsHolder.DRILL_ROD.clone();
+        OutPut.setAmount(3);
+        new SlimefunItem(CustomCategories.SLIMEFUN_PARTS, SlimefunItemsHolder.DRILL_ROD, "DRILL_ROD", RecipeType.ENHANCED_CRAFTING_TABLE,
+                new ItemStack[] {
+                        null, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.REINFORCED_ALLOY_INGOT, null,
+                        null, SlimefunItemsHolder.DRILL_ROD_BROKEN, null,
+                        null, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.REINFORCED_ALLOY_INGOT, null
+                }, OutPut).register();
+
         new AGenerator(CustomCategories.ELECTRICITY, SlimefunItemsHolder.RAREORE_GENERATOR, "RAREORE_GENERATOR", RecipeType.ENHANCED_CRAFTING_TABLE,
                 new ItemStack[] {SlimefunItemsHolder.ECLIPSE_COIL, new ItemStack(Material.FURNACE), SlimefunItemsHolder.ECLIPSE_COIL, SlimefunItemsHolder.VOID_PARTICLES, SlimefunItemsHolder.BEDROCK_DUST, SlimefunItemsHolder.VOID_PARTICLES, SlimefunItemsHolder.VOID_PARTICLES_NEGATIVE, SlimefunItemsHolder.TITAN_MOTOR, SlimefunItemsHolder.VOID_PARTICLES_POSITIVE}) {
 
@@ -759,6 +776,24 @@ public class SlimefunSetup {
             }
         }.registerChargeableBlock(true, 1000);
 
+
+        new ElectricMiner(CustomCategories.ELECTRICITY, SlimefunItemsHolder.ELECTRIC_MINER, "ELECTRIC_MINER", RecipeType.ENHANCED_CRAFTING_TABLE,
+                new ItemStack[] {me.mrCookieSlime.Slimefun.Lists.SlimefunItems.HARDENED_METAL_INGOT, SlimefunItemsHolder.EclipseIngot, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.HARDENED_METAL_INGOT,
+                        SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.BEDROCKDRILL,  SlimefunItemsHolder.EclipseIngot,
+                        me.mrCookieSlime.Slimefun.Lists.SlimefunItems.HARDENED_METAL_INGOT,  SlimefunItemsHolder.EclipseIngot,  me.mrCookieSlime.Slimefun.Lists.SlimefunItems.HARDENED_METAL_INGOT}) {
+
+            @Override
+            public int getEnergyConsumption() {
+                return 1000;
+            }
+            @Override
+            public int getSpeed() {
+                return 1;
+            }
+        }.registerChargeableBlock(true, 3000);
+
+        
+
         Slimefun.registerResearch(new Research(79001, "Thermal Power Plant", 89), SlimefunItemsHolder.THERMAL_GENERATOR);
         Slimefun.registerResearch(new Research(79002, "Ancient Altar Crafter", 75), SlimefunItemsHolder.ANCIENT_ALTAR_CRAFTER);
         Slimefun.registerResearch(new Research(79003, "Vanilla Auto Crafter", 25), SlimefunItemsHolder.AUTOMATED_VANILLA_CRAFTING_CHAMBER);
@@ -803,6 +838,7 @@ public class SlimefunSetup {
 
         Slimefun.registerResearch(new Research(9578, "Painful gas", 300), new ItemStack[] { SlimefunItemsHolder.WITHERSKULL_FACTORY });
         Slimefun.registerResearch(new Research(9579, "Dark Memes", 300), new ItemStack[] { SlimefunItemsHolder.AUTO_DISENCHANTER_2, SlimefunItemsHolder.AUTO_ENCHANTER_2});
+        Slimefun.registerResearch(new Research(9580, "Black Holes", 189), new ItemStack[] { SlimefunItemsHolder.ELECTRIC_MINER});
 
 
         setupTitanBox();

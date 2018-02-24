@@ -143,8 +143,14 @@ public class MainModule {
                 }
                 if (BlockStorage.getBlockInfo(from.getLink().getBlock()).contains("id")) {
                     SLIMEFUNname = BlockStorage.getBlockInfo(from.getLink().getBlock()).getString("id");
-                    SLIMEFUNname = SLIMEFUNname.replace("_", " ").toLowerCase();
-                    SLIMEFUNname = WordUtils.capitalize(SLIMEFUNname);
+                    if (SLIMEFUNname == null) {
+                        SLIMEFUNname = SLIMEFUNname.replace("_", " ").toLowerCase();
+                        SLIMEFUNname = WordUtils.capitalize(SLIMEFUNname);
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
             }
         }

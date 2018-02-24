@@ -294,6 +294,7 @@ public class TitanBox extends JavaPlugin
         BackpackRecover.saveRecovers();
         barcodes.save();
         config.save();
+        ElectricMiner.miners.save();
     }
 
     public void onDisable()

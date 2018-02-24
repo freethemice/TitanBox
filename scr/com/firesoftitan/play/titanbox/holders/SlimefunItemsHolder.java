@@ -87,6 +87,7 @@ public class SlimefunItemsHolder {
     public static ItemStack ELECTRIC_COBBLE_TO_INGOT_3;
     public static ItemStack ELECTRIC_LUCKY_BLOCK_FACTORY;
     public static ItemStack ELECTRIC_LUCKY_BLOCK_GRINDER;
+    public static ItemStack ELECTRIC_MINER;
     public static ItemStack CHARCOAL_FACTORY;
     public static ItemStack CHARCOAL_FACTORY_2;
     public static ItemStack CHARCOAL_FACTORY_3;
@@ -120,6 +121,9 @@ public class SlimefunItemsHolder {
 
     public static ItemStack BEDROCK_DUST = new CustomItem(new ItemStack(Material.SULPHUR, 1), "&8Bedrock Dust");
     public static ItemStack VOID_PARTICLES = new CustomItem(new ItemStack(Material.SULPHUR, 1), "&8Void Particles");
+    public static ItemStack MINING_SLUDGE = new CustomItem(new ItemStack(Material.SULPHUR, 1), "&7Mining Sludge");
+    public static ItemStack DRILL_ROD = new CustomItem(new ItemStack(Material.END_ROD, 1), "&2Drill Rod");
+    public static ItemStack DRILL_ROD_BROKEN = new CustomItem(new ItemStack(Material.END_ROD, 1), "&4Broken Drill Rod");
     public static ItemStack VOID_PARTICLES_POSITIVE = new CustomItem(new ItemStack(Material.REDSTONE, 1), "&8Void Particles");
     public static ItemStack VOID_PARTICLES_NEGATIVE = new CustomItem(new ItemStack(Material.SUGAR, 1), "&8Void Particles");
     public static ItemStack TALISMAN_VOID = new CustomItem(Material.EMERALD, "&4Titan Talisman of the Void", 0, new String[] {"", "&rOne Talisman can send", "&ritems to your storage untis", "&rfrom your inventory"});
@@ -145,6 +149,7 @@ public class SlimefunItemsHolder {
             ELECTRIC_COBBLE_TO_INGOT_2 = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzRkYmNiN2UxZmJlY2VhOWE3MzUwNDM2Y2JiZWEyYjQ5NmY3NGMyOTcyMDRmMWJiOWFjYzM4NzhkNTQyY2NiIn19fQ=="), "&3Electric Cobble to Ingot &7(&eII&7)", "", "&4End-Game Machine", "&6Has a small chance of Lucky and Eclipse Ingots", "Gives 3 Ingots instead of 1", "&8\u21E8 &7Speed: 10x", "&8\u21E8 &e\u26A1 &730 J/s");
             ELECTRIC_COBBLE_TO_DUST_3 = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTU0OTQ3ZGU3ZjUyNTk4MjU1ZDZhZmVlOWQ3N2JlZmFkOWI0ZjI0YzBjNDY2M2QyOGJjZGY4YTY0NTdmMzQifX19"), "&3Electric Cobble to Dust &7(&eIII&7)", "", "&4End-Game Machine", "&6Has a small chance of Lucky and Eclipse Nuggets", "Gives 5 dust instead of 1", "&8\u21E8 &7Speed: 20x", "&8\u21E8 &e\u26A1 &720 J/s");
             ELECTRIC_COBBLE_TO_INGOT_3 = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzRkYmNiN2UxZmJlY2VhOWE3MzUwNDM2Y2JiZWEyYjQ5NmY3NGMyOTcyMDRmMWJiOWFjYzM4NzhkNTQyY2NiIn19fQ=="), "&3Electric Cobble to Ingot &7(&eIII&7)", "", "&4End-Game Machine", "&6Has a small chance of Lucky and Eclipse Ingots", "Gives 5 Ingots instead of 1", "&8\u21E8 &7Speed: 20x", "&8\u21E8 &e\u26A1 &730 J/s");
+            ELECTRIC_MINER = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjMzYmE1ZjJlZDE0ZDFmYzY0YzI5ODQ1YTA3MTNhN2ExMTkyOWM1OTE1ZjZjOTQyYTNlM2E2ZGEzZTkwMjUifX19"), "&3Electric Miner", "", "&4End-Game Machine", "&7Will dig a 5x5 whole down.", "", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &720 J/s");
             ELECTRIC_LUCKY_BLOCK_FACTORY = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmI1ZDhiOWEzYTk0MjFkY2VkYjE3ZDcxZTNhODg0ZDk1ZWM1MDM4YzgzOGNlMTllZDZkOGU5NmM1YjIzZWQ3In19fQ=="), "&3Electric Lucky Block Factory", "", "&4End-Game Machine", "&6Will take any Gold Ingot", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &725 J/s");
             ELECTRIC_LUCKY_BLOCK_GRINDER = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWFkNTQyNGQ5OTAzOTUzODQzNTI2YTdjNDE2ODY2ZTdkNzk1MDFjODhjZTdjZGFiZWVlNTI4NGVhMzlmIn19fQ=="), "&3Electric Lucky Block Grinder", "", "&4End-Game Machine", "&6Will almost anything Lucky or Not", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &730 J/s");
             CHARCOAL_FACTORY = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWE3ZDJhN2ZiYjRkMzdiNGQ1M2ZlODc3NTcxMjhlNWVmNjZlYzIzZDdmZjRmZTk5NDQ1NDZkYmM4Y2U3NzcifX19"), "&3Charcoal Factory", "", "&4End-Game Machine", "&6Needs: Bukkit of water", "&6Needs: Bukkit of lava", "&6Needs: Sapling", "&6Needs: Bone Meal", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &730 J/s");
