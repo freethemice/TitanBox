@@ -195,7 +195,7 @@ public class InfernalModule extends MainModule {
                         if (warts[treeIndex].getBlock().getData() >= 3) {
                             warts[treeIndex].getBlock().setData((byte) 0);
                             warts[treeIndex].getWorld().playEffect(warts[treeIndex], Effect.STEP_SOUND, warts[treeIndex].getBlock().getType());
-                            TitanBox.addItemToStorage(owner, Material.NETHER_STALK, 1);
+                            TitanBox.addItemToStorage(owner, Material.NETHER_STALK, 2);
                         }
                     }
                 }

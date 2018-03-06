@@ -671,6 +671,11 @@ public class InventoryModule extends MainModule {
             int slot = mySlot.getSlot();
             ItemStack bufferItem = this.getItemAtLocation(where, slot);
             ItemStack fillertItem = mySlot.getItem();
+            if (!TitanBox.isEmpty(bufferItem)) {
+                if (!TitanBox.isItemEqual(bufferItem, fillertItem)) {
+                    return;
+                }
+            }
             int amountMax = 64;
             if (!TitanBox.isEmpty(fillertItem)) {
                 amountMax = fillertItem.getMaxStackSize();

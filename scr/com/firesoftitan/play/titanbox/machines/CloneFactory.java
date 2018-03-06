@@ -1,13 +1,12 @@
 package com.firesoftitan.play.titanbox.machines;
 
+import com.firesoftitan.play.titanbox.TitanBox;
 import com.firesoftitan.play.titanbox.containers.BContainer;
-import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.InvUtils;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
 import me.mrCookieSlime.Slimefun.Lists.RecipeType;
 import me.mrCookieSlime.Slimefun.Objects.Category;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineHelper;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
-import me.mrCookieSlime.Slimefun.Setup.SlimefunManager;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.energy.ChargableBlock;
 import org.bukkit.Material;
@@ -20,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public abstract class CharcoalFactory extends BContainer {;
-    public CharcoalFactory(Category category, ItemStack item, String name, RecipeType recipeType, ItemStack[] recipe) {
+public abstract class CloneFactory extends BContainer {;
+    public CloneFactory(Category category, ItemStack item, String name, RecipeType recipeType, ItemStack[] recipe) {
         super(category, item, name, recipeType, recipe);
 
     }
@@ -78,15 +77,14 @@ public abstract class CharcoalFactory extends BContainer {;
             }
         }
         else {
-
             for (int slot: getInputSlots()) {
-                if (SlimefunManager.isItemSimiliar(BlockStorage.getInventory(b).getItemInSlot(slot), new ItemStack(Material.SAPLING, 1), true)) {
+                if (!TitanBox.isEmpty(BlockStorage.getInventory(b).getItemInSlot(slot))) {
+                    //BlockStorage.getInventory(b).replaceExistingItem(slot, InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(slot), 1));
                     Random number = new Random(System.currentTimeMillis());
                     ItemStack adding = new ItemStack(Material.COAL, 10 + number.nextInt(10), (short)1);
                     adding = adding.clone();
                     MachineRecipe r = new MachineRecipe(4 / getSpeed(), new ItemStack[0], new ItemStack[] {adding});
                     if (!fits(b, r.getOutput())) return;
-                    BlockStorage.getInventory(b).replaceExistingItem(slot, InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(slot), 1));
                     processing.put(b, r);
                     progress.put(b, r.getTicks());
                     break;
