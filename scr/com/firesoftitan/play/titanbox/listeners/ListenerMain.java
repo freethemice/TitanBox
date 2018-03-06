@@ -22,6 +22,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -96,6 +97,22 @@ public class ListenerMain implements Listener {
 
     }
 
+    @EventHandler
+    public void onCraftItemEvent(CraftItemEvent event)
+    {
+        ItemStack[] check  =event.getInventory().getContents();
+        for(ItemStack e: check)
+        {
+            if (!TitanBox.isEmpty(e))
+            {
+                if (TitanBox.isItemEqual(e, SlimefunItemsHolder.MINING_SLUDGE) || TitanBox.isItemEqual(e, SlimefunItemsHolder.VOID_PARTICLES) || TitanBox.isItemEqual(e, SlimefunItemsHolder.VOID_PARTICLES_NEGATIVE) || TitanBox.isItemEqual(e, SlimefunItemsHolder.VOID_PARTICLES_POSITIVE))
+                {
+                    event.setCancelled(true);
+                }
+            }
+        }
+
+    }
     @EventHandler
     public void onPlayerInteractEvent(PlayerInteractEvent event)
     {
@@ -300,6 +317,7 @@ public class ListenerMain implements Listener {
             if (key.getOwner().toString().equals(myUUDI))
             {
                 tmpOwner.add(key);
+                StorageUnit.checkPower(key);
             }
         }
         StorageUnit.StorageByOwner.put(myUUDI, tmpOwner);

@@ -8,6 +8,7 @@ public class SaverRunable implements Runnable {
         try {
             System.out.println("[TitanBox]: Saving all, running: " + TitanBox.convertToTimePasted(TitanBox.isRunning));
             TitanBox.instants.saveEveryThing();
+            System.out.println("[TitanBox]: Saving all, Done");
         }
         catch (Exception e)
         {

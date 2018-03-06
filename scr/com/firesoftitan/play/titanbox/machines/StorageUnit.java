@@ -747,12 +747,24 @@ public class StorageUnit implements InventoryHolder {
     }
     public static void checkPower(StorageUnit newHold)
     {
-
-        String ID = BlockStorage.getBlockInfo(newHold.getLocation(), "id");
-        String energy =  BlockStorage.getBlockInfo(newHold.getLocation(), "energy-capacity");
-        if (ID == null || energy == null)
+        try {
+            if (newHold != null) {
+                if (newHold.getLocation() != null) {
+                    String ID = BlockStorage.getBlockInfo(newHold.getLocation(), "id");
+                    String energy = BlockStorage.getBlockInfo(newHold.getLocation(), "energy-capacity");
+                    if (ID == null || energy == null) {
+                        addEnergy(newHold);
+                    }
+                }
+            }
+        }catch (Exception e)
         {
-            addEnergy(newHold);
+            System.out.println("----------Power Check Fail Report: Start-------");
+            e.printStackTrace();
+            System.out.println(newHold.getMyId());
+            System.out.println(newHold.getOwner());
+            System.out.println(newHold.getLocation());
+            System.out.println("----------Power Check Fail Report: End-------");
         }
     }
     public static void addEnergy(StorageUnit newHold) {
@@ -1156,9 +1168,15 @@ public class StorageUnit implements InventoryHolder {
                                         checkItem.setAmount(checkItem.getMaxStackSize());
                                         //make sure we don't go over the bigMax stack size, like arrmor, things over 64 doesn't matter...
                                         event.getWhoClicked().getInventory().setItem(i, checkItem.clone());
+                                        Long killtime = System.currentTimeMillis();
                                         while (dif > 0) {
                                             dif = dif - checkItem.getMaxStackSize();
                                             event.getWhoClicked().getInventory().addItem(checkItem.clone());
+                                            if (System.currentTimeMillis() - killtime > 1000)
+                                            {
+                                                System.out.println("[Titan Bot]: StorageUnit.java 1177: Took to long");
+                                                break;
+                                            }
                                         }
                                     }
                                 }

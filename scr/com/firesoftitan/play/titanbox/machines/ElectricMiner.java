@@ -110,12 +110,12 @@ public abstract class ElectricMiner extends MinerContainer {;
                         return;
                     }
                     checker = SlimefunItems.REACTOR_COOLANT_CELL;
-                    checker.setAmount(10);
+                    checker.setAmount(1);
                     if (!SlimefunManager.isItemSimiliar(BlockStorage.getInventory(b).getItemInSlot(37), checker, true)) {
                         return;
                     }
                     checker = new ItemStack(Material.TNT);
-                    checker.setAmount(15);
+                    checker.setAmount(1);
                     if (!SlimefunManager.isItemSimiliar(BlockStorage.getInventory(b).getItemInSlot(38), checker, true)) {
                         return;
                     }
@@ -131,8 +131,8 @@ public abstract class ElectricMiner extends MinerContainer {;
 
                     BlockStorage.getInventory(b).replaceExistingItem(10, InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(10), 40));
                     BlockStorage.getInventory(b).replaceExistingItem(11, InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(11), 1));
-                    BlockStorage.getInventory(b).replaceExistingItem(37, InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(37), 10));
-                    BlockStorage.getInventory(b).replaceExistingItem(38, InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(38), 15));
+                    BlockStorage.getInventory(b).replaceExistingItem(37, InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(37), 1));
+                    BlockStorage.getInventory(b).replaceExistingItem(38, InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(38), 1));
 
                     //for (int slot: getInputSlots()) {
                         //if (SlimefunManager.isItemSimiliar(BlockStorage.getInventory(b).getItemInSlot(slot), new ItemStack(Material.COBBLESTONE, 8), true)) {

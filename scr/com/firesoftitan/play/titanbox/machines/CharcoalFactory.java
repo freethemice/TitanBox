@@ -1,5 +1,6 @@
 package com.firesoftitan.play.titanbox.machines;
 
+import com.firesoftitan.play.titanbox.TitanBox;
 import com.firesoftitan.play.titanbox.containers.BContainer;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.InvUtils;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
@@ -78,31 +79,8 @@ public abstract class CharcoalFactory extends BContainer {;
             }
         }
         else {
-            int LB = -1;
-            int WB = -1;
             int SA = -1;
-            int BM = -1;
             for (int slot: getInputSlots()) {
-                if (SlimefunManager.isItemSimiliar(BlockStorage.getInventory(b).getItemInSlot(slot), new ItemStack(Material.LAVA_BUCKET, 1), true)) {
-                    if (LB > -1)
-                    {
-                        BlockStorage.getInventory(b).replaceExistingItem(LB, InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(LB), 1));
-                        ItemStack out =  BlockStorage.getInventory(b).getItemInSlot(slot).clone();
-                        out.setAmount(out.getAmount() + 1);
-                        BlockStorage.getInventory(b).replaceExistingItem(slot, out);
-                    }
-                    LB = slot;
-                }
-                if (SlimefunManager.isItemSimiliar(BlockStorage.getInventory(b).getItemInSlot(slot), new ItemStack(Material.WATER_BUCKET, 1), true)) {
-                    if (WB > -1)
-                    {
-                        BlockStorage.getInventory(b).replaceExistingItem(WB, InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(WB), 1));
-                        ItemStack out =  BlockStorage.getInventory(b).getItemInSlot(slot).clone();
-                        out.setAmount(out.getAmount() + 1);
-                        BlockStorage.getInventory(b).replaceExistingItem(slot, out);
-                    }
-                    WB = slot;
-                }
                 if (SlimefunManager.isItemSimiliar(BlockStorage.getInventory(b).getItemInSlot(slot), new ItemStack(Material.SAPLING, 1), true)) {
                     if (SA > -1)
                     {
@@ -113,28 +91,20 @@ public abstract class CharcoalFactory extends BContainer {;
                     }
                     SA = slot;
                 }
-                if (SlimefunManager.isItemSimiliar(BlockStorage.getInventory(b).getItemInSlot(slot), new ItemStack(Material.INK_SACK, 1, (short)15), true)) {
-                    if (BM > -1)
-                    {
-                        BlockStorage.getInventory(b).replaceExistingItem(BM, InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(BM), 1));
-                        ItemStack out =  BlockStorage.getInventory(b).getItemInSlot(slot).clone();
-                        out.setAmount(out.getAmount() + 1);
-                        BlockStorage.getInventory(b).replaceExistingItem(slot, out);
-                    }
-                    BM = slot;
-                }
             }
-            if (LB > -1 && WB > -1 && SA > -1 && BM > -1) {
+            if ( SA > -1) {
                 Random number = new Random(System.currentTimeMillis());
                 ItemStack adding = new ItemStack(Material.COAL, 10 + number.nextInt(10), (short)1);
 
                 adding = adding.clone();
 
-                MachineRecipe r = new MachineRecipe(4 / getSpeed(), new ItemStack[0], new ItemStack[] {adding, new ItemStack(Material.BUCKET, 2)});
+                MachineRecipe r = new MachineRecipe(4 / getSpeed(), new ItemStack[0], new ItemStack[] {adding});
                 if (!fits(b, r.getOutput())) return;
-                for (int slot: getInputSlots()) {
-                    BlockStorage.getInventory(b).replaceExistingItem(slot, InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(slot), 1));
+                if (!TitanBox.isEmpty(BlockStorage.getInventory(b).getItemInSlot(SA))) {
+                    BlockStorage.getInventory(b).replaceExistingItem(SA, InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(SA), 1));
+
                 }
+
                 processing.put(b, r);
                 progress.put(b, r.getTicks());
             }

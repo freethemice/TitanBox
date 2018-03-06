@@ -97,6 +97,10 @@ public class TreeHolder {
         {
             size = loc.length;
         }
+        if (type == null)
+        {
+            type = TreeTypeEnum.OAK;
+        }
         for (int i = 0; i < size; i++) {
             Location checkSides = loc[i].clone();
             if (checkSides != null) {
