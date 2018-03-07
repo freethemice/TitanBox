@@ -411,6 +411,26 @@ public class SlimefunSetup {
             }
 
         }.registerChargeableBlock(true, 150);
+        new CloneFactory(CustomCategories.ELECTRICITY, SlimefunItemsHolder.CLONE_FACTORY, "CLONE_FACTORY", RecipeType.ENHANCED_CRAFTING_TABLE,
+                new ItemStack[] {SlimefunItemsHolder.TitanIngot, SlimefunItemsHolder.TITAN_MOTOR, SlimefunItemsHolder.TitanIngot,
+                                SlimefunItemsHolder.ECLIPSE_COIL, SlimefunItemsHolder.FREE_ENERGY_III, SlimefunItemsHolder.ECLIPSE_COIL,
+                                SlimefunItems.BLISTERING_INGOT_3, SlimefunItemsHolder.TITAN_MOTOR, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.BLISTERING_INGOT_3}) {
+
+            @Override
+            public void registerDefaultRecipes() {
+            }
+
+            @Override
+            public int getEnergyConsumption() {
+                return 15;
+            }
+
+            @Override
+            public int getSpeed() {
+                return 1;
+            }
+
+        }.registerChargeableBlock(true, 50);
         new CharcoalFactory(CustomCategories.ELECTRICITY, SlimefunItemsHolder.CHARCOAL_FACTORY, "CHARCOAL_FACTORY", RecipeType.ENHANCED_CRAFTING_TABLE,
                 new ItemStack[] {SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.TITAN_MOTOR, SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.ECLIPSE_COIL, new ItemStack(Material.FURNACE), SlimefunItemsHolder.ECLIPSE_COIL, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.GILDED_IRON, SlimefunItemsHolder.TITAN_MOTOR, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.GILDED_IRON}) {
 
@@ -552,12 +572,12 @@ public class SlimefunSetup {
                                     null, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.REINFORCED_ALLOY_INGOT, null
                                 }, OutPut).register();
         OutPut =  SlimefunItemsHolder.DRILL_ROD.clone();
-        OutPut.setAmount(3);
+        OutPut.setAmount(1);
         new SlimefunItem(CustomCategories.SLIMEFUN_PARTS, SlimefunItemsHolder.DRILL_ROD, "DRILL_ROD", RecipeType.ENHANCED_CRAFTING_TABLE,
                 new ItemStack[] {
-                        null, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.REINFORCED_ALLOY_INGOT, null,
+                        null, new ItemStack(Material.IRON_INGOT, 1), null,
                         null, SlimefunItemsHolder.DRILL_ROD_BROKEN, null,
-                        null, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.REINFORCED_ALLOY_INGOT, null
+                        null, new ItemStack(Material.IRON_INGOT, 1), null
                 }, OutPut).register();
 
         new AGenerator(CustomCategories.ELECTRICITY, SlimefunItemsHolder.RAREORE_GENERATOR, "RAREORE_GENERATOR", RecipeType.ENHANCED_CRAFTING_TABLE,

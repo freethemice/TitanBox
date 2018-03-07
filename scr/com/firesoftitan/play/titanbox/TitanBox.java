@@ -711,6 +711,186 @@ public class TitanBox extends JavaPlugin
         }
         else return false;
     }
+    public static boolean isArmor(ItemStack mat)
+    {
+        return isArmor(mat.getType());
+    }
+    public static boolean isArmor(Material mat)
+    {
+        switch (mat)
+        {
+            case DIAMOND_CHESTPLATE:LATE:
+                return true;
+            case CHAINMAIL_CHESTPLATE:
+                return true;
+            case GOLD_CHESTPLATE:
+                return true;
+            case IRON_CHESTPLATE:
+                return true;
+            case LEATHER_CHESTPLATE:
+                return true;
+            case DIAMOND_HELMET:
+                return true;
+            case LEATHER_HELMET:
+                return true;
+            case IRON_HELMET:
+                return true;
+            case CHAINMAIL_HELMET:
+                return true;
+            case GOLD_HELMET:
+                return true;
+            case DIAMOND_LEGGINGS:
+                return true;
+            case CHAINMAIL_LEGGINGS:
+                return true;
+            case GOLD_LEGGINGS:
+                return true;
+            case IRON_LEGGINGS:
+                return true;
+            case LEATHER_LEGGINGS:
+                return true;
+            case DIAMOND_BOOTS:
+                return true;
+            case CHAINMAIL_BOOTS:
+                return true;
+            case GOLD_BOOTS:
+                return true;
+            case IRON_BOOTS:
+                return true;
+            case LEATHER_BOOTS:
+                return true;
+            case ELYTRA:
+                return true;
+        }
+        return false;
+    }
+    public static boolean isWeapon(ItemStack mat)
+    {
+        return isWeapon(mat.getType());
+    }
+    public static boolean isExpensive(ItemStack mat)
+    {
+        return isExpensive(mat.getType());
+    }
+    public static boolean isExpensive(Material mat)
+    {
+        switch (mat)
+        {
+            case BEDROCK:
+                return true;
+            case BEACON:
+                return true;
+            case SKULL:
+                return true;
+            case SKULL_ITEM:
+                return true;
+            case BOOKSHELF:
+                return true;
+            case BOOK:
+                return true;
+            case BOOK_AND_QUILL:
+                return true;
+            case ENCHANTED_BOOK:
+                return true;
+            case KNOWLEDGE_BOOK:
+                return true;
+            case WRITTEN_BOOK:
+                return true;
+            case ANVIL:
+                return true;
+            case POTION:
+                return true;
+            case MOB_SPAWNER:
+                return true;
+            case CHEST:
+                return true;
+            case DRAGON_EGG:
+                return true;
+            case DRAGONS_BREATH:
+                return true;
+            case ENDER_CHEST:
+                return true;
+            case NETHER_STAR:
+                return true;
+            case FURNACE:
+                return true;
+            case WORKBENCH:
+                return true;
+            case DISPENSER:
+                return true;
+            case DROPPER:
+                return true;
+            case BUCKET:
+                return true;
+            case WATER_BUCKET:
+                return true;
+            case LAVA_BUCKET:
+                return true;
+            case BREWING_STAND:
+                return true;
+            case HOPPER:
+                return true;
+            case ENCHANTMENT_TABLE:
+                return true;
+            case BED:
+                return true;
+            case EXP_BOTTLE:
+                return true;
+            case TRIPWIRE_HOOK:
+                return true;
+        }
+        if (mat.toString().contains("DOOR"))
+        {
+            return true;
+        }
+        if (mat.toString().contains("BLOCK"))
+        {
+            return true;
+        }
+        if (mat.toString().contains("ORE"))
+        {
+            return true;
+        }
+        if (mat.toString().contains("SHULKER"))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isWeapon(Material mat)
+    {
+        switch (mat)
+        {
+            case DIAMOND_SWORD:
+                return true;
+            case GOLD_SWORD:
+                return true;
+            case IRON_SWORD:
+                return true;
+            case STONE_SWORD:
+                return true;
+            case WOOD_SWORD:
+                return true;
+            case DIAMOND_AXE:
+                return true;
+            case GOLD_AXE:
+                return true;
+            case IRON_AXE:
+                return true;
+            case STONE_AXE:
+                return true;
+            case WOOD_AXE:
+                return true;
+            case SHIELD:
+                return true;
+        }
+        return false;
+    }
+    public static boolean isTool(ItemStack mat)
+    {
+        return isTool(mat.getType());
+    }
     public static boolean isTool(Material mat)
     {
         switch (mat)
@@ -744,6 +924,22 @@ public class TitanBox extends JavaPlugin
             case IRON_SPADE:
                 return true;
             case WOOD_SPADE:
+                return true;
+            case DIAMOND_HOE:
+                return true;
+            case GOLD_HOE:
+                return true;
+            case IRON_HOE:
+                return true;
+            case STONE_HOE:
+                return true;
+            case WOOD_HOE:
+                return true;
+            case SHEARS:
+                return true;
+            case FLINT_AND_STEEL:
+                return true;
+            case FISHING_ROD:
                 return true;
         }
         return false;

@@ -162,6 +162,11 @@ public abstract class ElectricMiner extends MinerContainer {;
                             }
                         }
                     }
+                    Location depthCheck  = b.getLocation().clone().add(0, -1 *y, 0);
+                    if (depthCheck.getBlockY()  <  5)
+                    {
+                        return;
+                    }
                     for(int x = -5; x < 6; x++)
                     {
                         for(int z = -5; z < 6; z++)
@@ -183,16 +188,17 @@ public abstract class ElectricMiner extends MinerContainer {;
                                     }
                                     Oreoutput.addAll(drops);
                                     block.setType(Material.AIR);
+                                    if (x == -5 || z == -5 || x == 5 || z == 5)
+                                    {
+                                        block.setType(walls.getType());
+                                    }
                                 }
                                 if (x == 0 && z == 0)
                                 {
                                     miners.setValue(block.getLocation().toString() + ".set", true);
                                     block.setType(Material.END_ROD);
                                 }
-                                if (x == -5 || z == -5 || x == 5 || z == 5)
-                                {
-                                    block.setType(walls.getType());
-                                }
+
                             }
                         }
                     }

@@ -1,10 +1,12 @@
 package com.firesoftitan.play.titanbox.machines;
 
 import com.firesoftitan.play.titanbox.TitanBox;
-import com.firesoftitan.play.titanbox.containers.BContainer;
+import com.firesoftitan.play.titanbox.holders.SlimefunItemsHolder;
+import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.InvUtils;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
 import me.mrCookieSlime.Slimefun.Lists.RecipeType;
 import me.mrCookieSlime.Slimefun.Objects.Category;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AContainer;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineHelper;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
@@ -19,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public abstract class CloneFactory extends BContainer {;
+public abstract class CloneFactory extends AContainer {;
     public CloneFactory(Category category, ItemStack item, String name, RecipeType recipeType, ItemStack[] recipe) {
         super(category, item, name, recipeType, recipe);
 
@@ -27,12 +29,12 @@ public abstract class CloneFactory extends BContainer {;
 
     @Override
     public String getInventoryTitle() {
-        return "&bCharcoal Factory";
+        return "&bClone Factory";
     }
 
     @Override
     public ItemStack getProgressBar() {
-        return new ItemStack(Material.GOLD_SPADE);
+        return new ItemStack(Material.NETHER_STAR);
     }
 
     @Override
@@ -77,25 +79,45 @@ public abstract class CloneFactory extends BContainer {;
             }
         }
         else {
-            for (int slot: getInputSlots()) {
-                if (!TitanBox.isEmpty(BlockStorage.getInventory(b).getItemInSlot(slot))) {
-                    //BlockStorage.getInventory(b).replaceExistingItem(slot, InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(slot), 1));
-                    Random number = new Random(System.currentTimeMillis());
-                    ItemStack adding = new ItemStack(Material.COAL, 10 + number.nextInt(10), (short)1);
-                    adding = adding.clone();
-                    MachineRecipe r = new MachineRecipe(4 / getSpeed(), new ItemStack[0], new ItemStack[] {adding});
-                    if (!fits(b, r.getOutput())) return;
-                    processing.put(b, r);
-                    progress.put(b, r.getTicks());
-                    break;
+            int[] inputSlots = getInputSlots();
+            int slug = -1;
+            int slot = -1;
+            if (TitanBox.isItemEqual(BlockStorage.getInventory(b).getItemInSlot(inputSlots[0]), SlimefunItemsHolder.MINING_SLUDGE))
+            {
+                slug = inputSlots[0];
+                slot = inputSlots[1];
+            } else if (TitanBox.isItemEqual(BlockStorage.getInventory(b).getItemInSlot(inputSlots[1]), SlimefunItemsHolder.MINING_SLUDGE))
+            {
+                slug = inputSlots[1];
+                slot = inputSlots[0];
+            }
+            if (slot > -1) {
+                ItemStack mySlotItem = BlockStorage.getInventory(b).getItemInSlot(slot);
+                if (!TitanBox.isEmpty(mySlotItem)) {
+                    if (!mySlotItem.hasItemMeta()) {
+                        if (!TitanBox.isTool(mySlotItem) && !TitanBox.isWeapon(mySlotItem) && !TitanBox.isArmor(mySlotItem) && !TitanBox.isExpensive(mySlotItem)) {
+                            if (mySlotItem.getMaxStackSize() > 1) {
+                                //BlockStorage.getInventory(b).replaceExistingItem(slot, InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(slot), 1));
+                                Random number = new Random(System.currentTimeMillis());
+                                ItemStack adding = new ItemStack(mySlotItem.getType(), 1 + number.nextInt(6), mySlotItem.getDurability());
+                                adding = adding.clone();
+                                MachineRecipe r = new MachineRecipe(4 / getSpeed(), new ItemStack[0], new ItemStack[]{adding});
+                                if (!fits(b, r.getOutput())) return;
+                                BlockStorage.getInventory(b).replaceExistingItem(slug, InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(slug), 1));
+                                processing.put(b, r);
+                                progress.put(b, r.getTicks());
+                            }
+                        }
+                    }
                 }
             }
+
         }
     }
 
     @Override
     public String getMachineIdentifier() {
-        return "CHARCOAL_FACTORY";
+        return "CLONE_FACTORY";
     }
 
 }
