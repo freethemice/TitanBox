@@ -329,6 +329,7 @@ public class ListenerMain implements Listener {
             if (person != null) {
                 IRRUserRunnable tmp = new IRRUserRunnable();
                 tmp.setItemRoutingRouter(person);
+                tmp.startCountDown();
                 int id = Bukkit.getScheduler().scheduleSyncRepeatingTask(TitanBox.instants, tmp, 1000, RouterHolder.speed);
                 tmp.setTimerID(id);
                 RouterHolder.bufferListT.put(myUUDI, tmp);

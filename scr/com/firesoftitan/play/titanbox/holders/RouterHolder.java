@@ -383,9 +383,10 @@ public class RouterHolder {
                                     if (person != null) {
                                         IRRUserRunnable tmp = new IRRUserRunnable();
                                         tmp.setItemRoutingRouter(person);
+                                        tmp.startCountDown();
                                         int id = Bukkit.getScheduler().scheduleSyncRepeatingTask(TitanBox.instants, tmp, 1000, RouterHolder.speed);
                                         tmp.setTimerID(id);
-                                        RouterHolder.bufferListT.put(makingme.getID(), tmp);
+                                        RouterHolder.bufferListT.put(makingme.getOwner().toString(), tmp);
                                         System.out.println("[Player Setup: " + event.getPlayer().getName() + "]: Router found, id:" + id + " will start in 1 second.");
                                     }
                                     else

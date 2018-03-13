@@ -8,6 +8,8 @@ import com.firesoftitan.play.titanbox.guis.mainGUI;
 import com.firesoftitan.play.titanbox.holders.RouterHolder;
 import com.firesoftitan.play.titanbox.interfaces.InventoryHolder;
 import com.firesoftitan.play.titanbox.modules.MainModule;
+import com.firesoftitan.play.titanbox.runnables.GUIRouterRunnable;
+import com.firesoftitan.play.titanbox.runnables.IRRUserRunnable;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -25,6 +27,7 @@ public class ItemRoutingRouter implements InventoryHolder {
     private Location location;
     private String ID = "";
     private mainGUI gui;
+    private GUIRouterRunnable guiRouterRunnable;
     private Long lastTick = Long.valueOf(0);
     private List<MainModule> buffer = new ArrayList<MainModule>();
     public ItemRoutingRouter(String ID)
@@ -73,16 +76,22 @@ public class ItemRoutingRouter implements InventoryHolder {
         }
         buildGUISlots();
         buildGUIMenu();
+
+        guiRouterRunnable = new GUIRouterRunnable();
+        guiRouterRunnable.setItemRoutingRouter(this);
+        int id = Bukkit.getScheduler().scheduleSyncRepeatingTask(TitanBox.instants, guiRouterRunnable, 1, 1);
+        guiRouterRunnable.setTimerID(id);
+
     }
     public void showGUI(Player player)
     {
         createNewGUI();
-        player.openInventory(gui.getMyGui());
+        gui.showGUI(player);
+        //player.openInventory(gui.getMyGui());
     }
     public void buildGUIMenu()
     {
         int Paget = (startIndex + 9) / 9;
-        OfflinePlayer oPlayer = Bukkit.getOfflinePlayer(owner);
         //45-53
         buttonGUIs tmp =gui.getButton(45);
         tmp.setTextureTrue("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWRhMDI3NDc3MTk3YzZmZDdhZDMzMDE0NTQ2ZGUzOTJiNGE1MWM2MzRlYTY4YzhiN2JjYzAxMzFjODNlM2YifX19");
@@ -96,11 +105,7 @@ public class ItemRoutingRouter implements InventoryHolder {
         {
             tmp.setToggle(buttonEnum.TRUE);
         }
-        tmp =gui.getButton(52);
-        tmp.setTextureFalse("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWM4OGQ2MTYzZmFiZTdjNWU2MjQ1MGViMzdhMDc0ZTJlMmM4ODYxMWM5OTg1MzZkYmQ4NDI5ZmFhMDgxOTQ1MyJ9fX0=");
-        tmp.setNameFalse("Owner: " + oPlayer.getName());
-        tmp.addLore(ChatColor.WHITE + "Ticked: " + getLastTick() + " seconds ago");
-        tmp.setToggle(buttonEnum.FALSE);
+        updateStatusButton();
 
 
         ItemStack blank = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 15);
@@ -150,6 +155,65 @@ public class ItemRoutingRouter implements InventoryHolder {
         tmp.setToggle(buttonEnum.FALSE);
 
     }
+
+    public void updateStatusButton() {
+        OfflinePlayer oPlayer = Bukkit.getOfflinePlayer(owner);
+        buttonGUIs tmp;
+        tmp =gui.getButton(52);
+        tmp.setTextureFalse("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWM4OGQ2MTYzZmFiZTdjNWU2MjQ1MGViMzdhMDc0ZTJlMmM4ODYxMWM5OTg1MzZkYmQ4NDI5ZmFhMDgxOTQ1MyJ9fX0=");
+        tmp.setNameFalse(ChatColor.GREEN + "Owner: " + ChatColor.WHITE + oPlayer.getName());
+        int ticks = getLastTick();
+        String Status = ChatColor.RED + "Offline!";
+        OfflinePlayer ownerPalyer = Bukkit.getOfflinePlayer(this.getOwner());
+        int charge = RouterHolder.getCharge(this.getLocation());
+        List<String> allLore = new ArrayList<String>();
+        boolean running = true;
+        if (ticks > 60)
+        {
+            IRRUserRunnable runnerTimer = RouterHolder.bufferListT.get(this.getOwner().toString());
+            if (runnerTimer == null)
+            {
+                allLore.add(ChatColor.RED + "Warning: " + ChatColor.YELLOW + "Log Out and Back In!");
+            } else if (runnerTimer.getCountDown() > -1) {
+                int left = 50 - runnerTimer.getCountDown();
+                if (left < 0)
+                {
+                    allLore.add(ChatColor.RED + "Warning: " + ChatColor.YELLOW + "Starting in: " + ChatColor.WHITE + "soon" + ChatColor.YELLOW + " sec!");
+                }
+                else {
+                    allLore.add(ChatColor.RED + "Warning: " + ChatColor.YELLOW + "Starting in: " + ChatColor.WHITE + left + ChatColor.YELLOW + " sec!");
+                }
+            } else {
+                allLore.add(ChatColor.RED + "Warning: " + ChatColor.YELLOW + "Server Error!");
+            }
+            running = false;
+        }
+        if (charge == 0)
+        {
+            allLore.add(ChatColor.RED + "Warning: " + ChatColor.YELLOW + "No Power!");
+            running = false;
+        }
+        if (ownerPalyer == null || !ownerPalyer.isOnline())
+        {
+            allLore.add(ChatColor.RED + "Warning: " + ChatColor.YELLOW + "Owner Offline!");
+            running = false;
+        }
+        if (!this.hasModules())
+        {
+            allLore.add(ChatColor.RED + "Warning: " + ChatColor.YELLOW + "No Modules!");
+            running = false;
+        }
+
+        if (running)
+        {
+            Status = ChatColor.GREEN +  "Running!";
+        }
+        allLore.add(0, ChatColor.WHITE + "Status: " + Status);
+        tmp.setLore(allLore);
+
+        tmp.setToggle(buttonEnum.FALSE);
+    }
+
     public void buildGUISlots()
     {
 
@@ -203,6 +267,10 @@ public class ItemRoutingRouter implements InventoryHolder {
         return ID;
     }
 
+    public void  clearGui()
+    {
+        gui = null;
+    }
     public mainGUI getGui() {
         return gui;
     }
