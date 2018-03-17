@@ -39,7 +39,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -683,6 +683,47 @@ public class TitanBox extends JavaPlugin
             }
             if (!equalsEnchants(item.getEnchantments(), SFitem.getEnchantments())) return false;
             if (item.hasItemMeta() && SFitem.hasItemMeta()) {
+                ItemMeta a = item.getItemMeta();
+                ItemMeta b = item.getItemMeta();
+                if (a instanceof BannerMeta && b instanceof BannerMeta)
+                {
+                    if(!((BannerMeta)a).getPatterns().equals(((BannerMeta)b).getPatterns())) return false;
+                    if(!((BannerMeta)a).getBaseColor().equals(((BannerMeta)b).getBaseColor())) return false;
+                }
+                if (a instanceof EnchantmentStorageMeta && b instanceof EnchantmentStorageMeta)
+                {
+                    if(!((EnchantmentStorageMeta)a).getEnchants().equals(((EnchantmentStorageMeta)b).getEnchants())) return false;
+                }
+                if (a instanceof SpawnEggMeta && b instanceof SpawnEggMeta)
+                {
+                    if(!((SpawnEggMeta)a).getSpawnedType().equals(((SpawnEggMeta)b).getSpawnedType())) return false;
+                }
+                if (a instanceof SkullMeta && b instanceof SkullMeta)
+                {
+                    if(!((SkullMeta)a).getOwningPlayer().equals(((SkullMeta)b).getOwningPlayer())) return false;
+                }
+                if (a instanceof PotionMeta && b instanceof PotionMeta)
+                {
+                    if(!((PotionMeta)a).getCustomEffects().equals(((PotionMeta)b).getCustomEffects())) return false;
+                    if(!((PotionMeta)a).getBasePotionData().equals(((PotionMeta)b).getBasePotionData())) return false;
+                    if(!((PotionMeta)a).getColor().equals(((PotionMeta)b).getColor())) return false;
+                }
+                if (a instanceof BookMeta && b instanceof BookMeta)
+                {
+                    if(!((BookMeta)a).getAuthor().equals(((BookMeta)b).getAuthor())) return false;
+                    if(!((BookMeta)a).getGeneration().equals(((BookMeta)b).getGeneration())) return false;
+                    if(!((BookMeta)a).getPages().equals(((BookMeta)b).getPages())) return false;
+                    if(!((BookMeta)a).getTitle().equals(((BookMeta)b).getTitle())) return false;
+                }
+                if (a instanceof LeatherArmorMeta && b instanceof LeatherArmorMeta)
+                {
+                    if(!((LeatherArmorMeta)a).getColor().equals(((LeatherArmorMeta)b).getColor())) return false;
+                }
+                if (a instanceof KnowledgeBookMeta && b instanceof KnowledgeBookMeta)
+                {
+                    if(!((FireworkMeta)a).getEffects().equals(((FireworkMeta)b).getEffects())) return false;
+                    if(((FireworkMeta)a).getPower() != ((FireworkMeta)b).getPower()) return false;
+                }
                 if (item.getItemMeta().hasDisplayName() && SFitem.getItemMeta().hasDisplayName()) {
                     if (item.getItemMeta().getDisplayName().equals(SFitem.getItemMeta().getDisplayName())) {
                         if (item.getItemMeta().hasLore() && !SFitem.getItemMeta().hasLore()) {
