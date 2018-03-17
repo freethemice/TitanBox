@@ -684,29 +684,53 @@ public class TitanBox extends JavaPlugin
             if (!equalsEnchants(item.getEnchantments(), SFitem.getEnchantments())) return false;
             if (item.hasItemMeta() && SFitem.hasItemMeta()) {
                 ItemMeta a = item.getItemMeta();
-                ItemMeta b = item.getItemMeta();
+                ItemMeta b = SFitem.getItemMeta();
                 if (a instanceof BannerMeta && b instanceof BannerMeta)
                 {
                     if(!((BannerMeta)a).getPatterns().equals(((BannerMeta)b).getPatterns())) return false;
-                    if(!((BannerMeta)a).getBaseColor().equals(((BannerMeta)b).getBaseColor())) return false;
+
+                    if (((BannerMeta)a).getBaseColor() == null && ((BannerMeta)b).getBaseColor() != null) return false;
+                    if (((BannerMeta)a).getBaseColor() != null && ((BannerMeta)b).getBaseColor() == null) return false;
+                    if (((BannerMeta)a).getBaseColor() != null && ((BannerMeta)b).getBaseColor() != null) {
+                        if (!((BannerMeta) a).getBaseColor().equals(((BannerMeta) b).getBaseColor())) return false;
+                    }
                 }
                 if (a instanceof EnchantmentStorageMeta && b instanceof EnchantmentStorageMeta)
                 {
-                    if(!((EnchantmentStorageMeta)a).getEnchants().equals(((EnchantmentStorageMeta)b).getEnchants())) return false;
+                    if (((EnchantmentStorageMeta)a).getEnchants() !=null && ((EnchantmentStorageMeta)b).getEnchants() ==null) return false;
+                    if (((EnchantmentStorageMeta)a).getEnchants() ==null && ((EnchantmentStorageMeta)b).getEnchants() !=null) return false;
+                    if (((EnchantmentStorageMeta)a).getEnchants() !=null && ((EnchantmentStorageMeta)b).getEnchants() !=null) {
+                        if (!((EnchantmentStorageMeta) a).getEnchants().equals(((EnchantmentStorageMeta) b).getEnchants()))
+                            return false;
+                    }
                 }
                 if (a instanceof SpawnEggMeta && b instanceof SpawnEggMeta)
                 {
-                    if(!((SpawnEggMeta)a).getSpawnedType().equals(((SpawnEggMeta)b).getSpawnedType())) return false;
+                    if (((SpawnEggMeta)a).getSpawnedType() !=null && ((SpawnEggMeta)b).getSpawnedType() ==null) return false;
+                    if (((SpawnEggMeta)a).getSpawnedType() ==null && ((SpawnEggMeta)b).getSpawnedType() !=null) return false;
+                    if (((SpawnEggMeta)a).getSpawnedType() !=null && ((SpawnEggMeta)b).getSpawnedType() !=null) {
+                        if (!((SpawnEggMeta) a).getSpawnedType().equals(((SpawnEggMeta) b).getSpawnedType()))
+                            return false;
+                    }
                 }
                 if (a instanceof SkullMeta && b instanceof SkullMeta)
                 {
-                    if(!((SkullMeta)a).getOwningPlayer().equals(((SkullMeta)b).getOwningPlayer())) return false;
+                    if (((SkullMeta)a).getOwningPlayer() != null && ((SkullMeta)b).getOwningPlayer() ==null) return false;
+                    if (((SkullMeta)a).getOwningPlayer() == null && ((SkullMeta)b).getOwningPlayer() !=null) return false;
+                    if (((SkullMeta)a).getOwningPlayer() != null && ((SkullMeta)b).getOwningPlayer() !=null) {
+                        if (!((SkullMeta) a).getOwningPlayer().equals(((SkullMeta) b).getOwningPlayer())) return false;
+                    }
                 }
                 if (a instanceof PotionMeta && b instanceof PotionMeta)
                 {
                     if(!((PotionMeta)a).getCustomEffects().equals(((PotionMeta)b).getCustomEffects())) return false;
                     if(!((PotionMeta)a).getBasePotionData().equals(((PotionMeta)b).getBasePotionData())) return false;
-                    if(!((PotionMeta)a).getColor().equals(((PotionMeta)b).getColor())) return false;
+                    if (((PotionMeta)a).getColor() !=null && ((PotionMeta)b).getColor() ==null) return false;
+                    if (((PotionMeta)a).getColor() ==null && ((PotionMeta)b).getColor() !=null) return false;
+                    if (((PotionMeta)a).getColor() !=null && ((PotionMeta)b).getColor() !=null) {
+                        if (!((PotionMeta) a).getColor().equals(((PotionMeta) b).getColor())) return false;
+                    }
+
                 }
                 if (a instanceof BookMeta && b instanceof BookMeta)
                 {
