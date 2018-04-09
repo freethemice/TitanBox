@@ -345,8 +345,9 @@ public class TitanBox extends JavaPlugin
         return toInsert.clone();
     }
     public static void pickupItem(UUID owner, Location checkSapling, Material mat, int size) {
-        Entity pickupBat = checkSapling.getWorld().spawnEntity(checkSapling.add(0 , -2, 0), EntityType.BAT);
+        Entity pickupBat = null;
         try {
+            pickupBat = checkSapling.getWorld().spawnEntity(checkSapling.add(0 , -2, 0), EntityType.BAT);
             List<Entity> listnear = pickupBat.getNearbyEntities(size, size, size);
             for (Entity e : listnear) {
                 if (!e.isDead()) {
@@ -378,7 +379,9 @@ public class TitanBox extends JavaPlugin
 
         }
         finally {
-            pickupBat.remove();
+            if (pickupBat != null) {
+                pickupBat.remove();
+            }
         }
     }
     public static ItemStack getItem(UUID owner, Material typeBucket, short data) {
