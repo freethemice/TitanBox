@@ -1,13 +1,18 @@
 package com.firesoftitan.play.titanbox.machines;
 
 import com.firesoftitan.play.titanbox.TitanBox;
+import com.firesoftitan.play.titanbox.Utilities;
 import com.firesoftitan.play.titanbox.enums.buttonEnum;
 import com.firesoftitan.play.titanbox.guis.buttonGUIs;
 import com.firesoftitan.play.titanbox.guis.mainGUI;
 import com.firesoftitan.play.titanbox.holders.ItemHolder;
 import com.firesoftitan.play.titanbox.interfaces.InventoryHolder;
+import com.firesoftitan.play.titanbox.modules.MainModule;
 import com.firesoftitan.play.titanbox.runnables.StorageGuiRunnable;
-import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
+import com.firesoftitan.play.titansql.CallbackResults;
+import com.firesoftitan.play.titansql.DataTypeEnum;
+import com.firesoftitan.play.titansql.ResultData;
+import com.firesoftitan.play.titansql.Table;
 import me.mrCookieSlime.Slimefun.Lists.SlimefunItems;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
@@ -22,7 +27,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.io.File;
 import java.util.*;
 
 public class StorageUnit implements InventoryHolder {
@@ -41,18 +45,20 @@ public class StorageUnit implements InventoryHolder {
     //private Inventory myGui;
     private mainGUI gui;
     public static String guiname = "Storage Unit";
+    private boolean needsaving = false;
     private boolean remember = true;
     private boolean locked = false;
     private boolean moving = false;
     private int from = -1;
     public static HashMap<String, StorageUnit> StorageById = new HashMap<String, StorageUnit>();
     public static HashMap<String, StorageUnit>  StorageByLocation = new HashMap<String, StorageUnit>();
-    public static HashMap<String, List<StorageUnit>>  StorageByOwner = new HashMap<String, List<StorageUnit>>();
-    public static Config storage = new Config("data-storage" + File.separator + "TitanBox" + File.separator  + "storage.yml");
+    public static HashMap<UUID, List<StorageUnit>>  StorageByOwner = new HashMap<UUID, List<StorageUnit>>();
+    //public static Config storage = new Config("data-storage" + File.separator + "TitanBox" + File.separator  + "storage.yml");
+    public static Table storageSQL = new Table("tb_storage");
+
     public StorageUnit(String MynewId)
     {
         MyId = MynewId;
-        loadMe();
     }
     public ItemStack viewSlot(int slot)
     {
@@ -66,6 +72,11 @@ public class StorageUnit implements InventoryHolder {
 
     public void setMoving(boolean moving) {
         this.moving = moving;
+    }
+
+    public void saveMeNext()
+    {
+        needsaving = true;
     }
 
     public void setCharge(int amount)
@@ -153,14 +164,8 @@ public class StorageUnit implements InventoryHolder {
                 ItemStack interfaceItem = storageItems[i].clone();
                 interfaceItem.setAmount(1);
                 String type = "";
-                if (!interfaceItem.hasItemMeta())
-                {
-                    type = ChatColor.WHITE + interfaceItem.getType().name();
-                }
-                else
-                {
-                    type = ChatColor.WHITE + interfaceItem.getItemMeta().getDisplayName();
-                }
+                type = ChatColor.WHITE + TitanBox.getName(interfaceItem);
+
                 Double per = Double.valueOf(storageCount[i]) / Double.valueOf(Long.MAX_VALUE);
                 per = per *100;
                 int perc = (int) Math.round(per);
@@ -351,6 +356,7 @@ public class StorageUnit implements InventoryHolder {
         MyId = MynewId;
         lastAccessed =System.currentTimeMillis();
         this.owner = owner.getUniqueId();
+        this.saveMeNext();
     }
 
     public boolean isRemember() {
@@ -371,10 +377,54 @@ public class StorageUnit implements InventoryHolder {
             }
         }
     }
-
-    public void saveMe()
+    public static void setupTable()
     {
 
+        storageSQL.addDataType("id", DataTypeEnum.CHARARRAY, true, false, true);
+        storageSQL.addDataType("owner", DataTypeEnum.UUID, false, false, false);
+        storageSQL.addDataType("size", DataTypeEnum.INTEGER, false, false, false);
+        storageSQL.addDataType("accessed", DataTypeEnum.LONG, false, false, false);
+        storageSQL.addDataType("me", DataTypeEnum.STRING, false, false, false);
+        storageSQL.addDataType("location", DataTypeEnum.LOCATION, false, false, false);
+        storageSQL.addDataType("remember", DataTypeEnum.BOOLEAN, false, false, false);
+        storageSQL.addDataType("locked", DataTypeEnum.BOOLEAN, false, false, false);
+        storageSQL.addDataType("battery", DataTypeEnum.INTEGER, false, false, false);
+        storageSQL.addDataType("items", DataTypeEnum.ITEMLIST, false, false, false);
+        storageSQL.addDataType("counts", DataTypeEnum.STRINGLIST, false, false, false);
+        storageSQL.createTable();
+    }
+    public void saveMe()
+    {
+        if (needsaving) {
+            storageSQL.setDataField("id", getMyId());
+            storageSQL.setDataField("owner", getOwner());
+            storageSQL.setDataField("size", getSize());
+            storageSQL.setDataField("accessed", getLastAccessed());
+            storageSQL.setDataField("me", me.toString());
+            storageSQL.setDataField("location", getLocation());
+            storageSQL.setDataField("remember", isRemember());
+            storageSQL.setDataField("locked", isLocked());
+            storageSQL.setDataField("battery", battery);
+
+            List<ItemStack> itemList = new ArrayList<ItemStack>();
+            List<String> countList = new ArrayList<String>();
+            for (int i = 0; i < storageItems.length; i++) {
+                if (storageItems[i] != null) {
+                    if (!storageItems[i].getType().equals(Material.AIR)) {
+                        itemList.add(storageItems[i].clone());
+                        countList.add(storageCount[i] + "");
+                    }
+                }
+            }
+
+
+            storageSQL.setDataField("items", itemList);
+            storageSQL.setDataField("counts", countList);
+            storageSQL.insertData();
+            needsaving = false;
+        }
+
+        /*
         StorageUnit.storage.setValue(getMyId() + ".id", getMyId());
         StorageUnit.storage.setValue(getMyId() + ".owner", getOwner());
         StorageUnit.storage.setValue(getMyId() + ".size", getSize());
@@ -397,49 +447,36 @@ public class StorageUnit implements InventoryHolder {
             }
         }
         StorageUnit.storage.setValue(getMyId() + ".items",  itemList);
-        StorageUnit.storage.setValue(getMyId() + ".counts",  countList);
+        StorageUnit.storage.setValue(getMyId() + ".counts",  countList);*/
     }
-    public void loadMe()
+    public void loadMe(HashMap<String, ResultData> result)
     {
-        battery = 0;
-        if (StorageUnit.storage.contains(getMyId() + ".battery")) {
-            battery = StorageUnit.storage.getInt(getMyId() + ".battery");
-        }
-       size = StorageUnit.storage.getInt(getMyId() + ".size");
-       owner = StorageUnit.storage.getUUID(getMyId() + ".owner");
-       storageItems = new ItemStack[size];
-       storageCount = new Long[size];
-       List<ItemStack> itemList = new ArrayList<ItemStack>();
-       List<String> itemLongs = new ArrayList<String>();
-       location = null;
-       locked = StorageUnit.storage.getBoolean(getMyId() + ".locked");
-       remember = StorageUnit.storage.getBoolean(getMyId() + ".remember");
-       lastAccessed = StorageUnit.storage.getLong(getMyId() + ".accessed");
-       if (StorageUnit.storage.contains(getMyId() + ".items")) {
-           itemList = TitanBox.loadListItemStack(StorageUnit.storage, getMyId() + ".items");
-       }
-       if (StorageUnit.storage.contains(getMyId() + ".counts")) {
-           try {
-               itemLongs = StorageUnit.storage.getStringList(getMyId() + ".counts");
-           }
-           catch (Exception e)
-           {
-               e.printStackTrace();
-           }
-       }
-       for(int i = 0; i < storageItems.length; i++)
-       {
-           if (itemList.size() > i) {
-               storageItems[i] = itemList.get(i).clone();
-               storageItems[i].setAmount(1);
-               storageCount[i] = Long.valueOf(itemLongs.get(i));
-           }
-       }
-       me = ItemHolder.valueOf(StorageUnit.storage.getString(getMyId() + ".me"));
-       if (StorageUnit.storage.contains(getMyId() + ".location")) {
-           location = StorageUnit.storage.getLocation(getMyId() + ".location");
-       }
+        battery = result.get("battery").getInteger();
+        size = result.get("size").getInteger();
+        owner = result.get("owner").getUUID();
 
+        storageItems = new ItemStack[size];
+        storageCount = new Long[size];
+        List<ItemStack> itemList = result.get("items").getItemList();
+        List<String> itemLongs = result.get("counts").getStringList();
+        location = null;
+
+        locked =  result.get("locked").getBoolean();
+        remember =  result.get("remember").getBoolean();
+        lastAccessed =  result.get("accessed").getLong();
+
+        for (int i = 0; i < storageItems.length; i++) {
+            if (itemList != null) {
+                if (itemList.size() > i) {
+                    storageItems[i] = itemList.get(i).clone();
+                    storageItems[i].setAmount(1);
+                    storageCount[i] = Long.valueOf(itemLongs.get(i));
+                }
+            }
+        }
+
+        me = ItemHolder.valueOf(result.get("me").getString());
+        location = result.get("location").getLocation();
     }
     public String getMyId() {
         return MyId;
@@ -486,6 +523,7 @@ public class StorageUnit implements InventoryHolder {
 
     public void setLocation(Location location) {
         this.location = location;
+        this.saveMeNext();
     }
     public ItemStack getMeAsDrop()
     {
@@ -582,19 +620,31 @@ public class StorageUnit implements InventoryHolder {
 
     public ItemStack getItem(int Slot, int count)
     {
+        return  getItem(Slot, count, false);
+    }
+    public ItemStack getItem(int Slot, int count, boolean byPassPower)
+    {
         try {
             if (count > 0) {
-                if (getCharge() < 1) {
-                    return null;
+                if (!byPassPower) {
+                    if (getCharge() < 1) {
+                        return null;
+                    }
+                    checkPower(this);
                 }
-                checkPower(this);
                 if (storageItems[Slot] != null) {
-                    int charge = this.getCharge();
-                    charge--;
-                    this.setCharge(charge);
+                    if (!byPassPower) {
+                        int charge = this.getCharge();
+                        charge--;
+                        this.setCharge(charge);
+                    }
                     if (count <= storageCount[Slot]) {
                         lastAccessed = System.currentTimeMillis();
                         ItemStack gettting = storageItems[Slot].clone();
+                        if (!TitanBox.isArmor(gettting) && !TitanBox.isWeapon(gettting))
+                        {
+                            gettting.setDurability((short) 0);
+                        }
                         gettting.setAmount(count);
                         storageCount[Slot] = storageCount[Slot] - count;
                         if (storageCount[Slot].equals(Long.valueOf(0))) {
@@ -607,7 +657,7 @@ public class StorageUnit implements InventoryHolder {
                                 }
                             }
                         }
-                        saveMe();
+                        saveMeNext();
                         return gettting.clone();
                     } else {
                         lastAccessed = System.currentTimeMillis();
@@ -623,12 +673,12 @@ public class StorageUnit implements InventoryHolder {
                                 storageItems[Slot] = null;
                             }
                         }
-                        saveMe();
+                        saveMeNext();
                         return gettting.clone();
                     }
                 }
             }
-            saveMe();
+            saveMeNext();
             return null;
         }
         catch (Exception e)
@@ -657,7 +707,7 @@ public class StorageUnit implements InventoryHolder {
                 if (canPlace >= placing.getAmount())
                 {
                     storageCount[i] = storageCount[i] + Long.valueOf(placingClone.getAmount());
-                    saveMe();
+                    saveMeNext();
                     return null;
                 }
                 else {
@@ -665,7 +715,7 @@ public class StorageUnit implements InventoryHolder {
                     Long OutValue = placingClone.getAmount() - canPlace;
                     placingClone.setAmount(Math.toIntExact(OutValue));
                     lastAccessed =System.currentTimeMillis();
-                    saveMe();
+                    saveMeNext();
                     return placingClone;
                 }
 
@@ -685,7 +735,7 @@ public class StorageUnit implements InventoryHolder {
                 if (canPlace >= placing.getAmount())
                 {
                     storageCount[i] = storageCount[i] + Amount;
-                    saveMe();
+                    saveMeNext();
                     return true;
                 }
                 else {
@@ -693,7 +743,7 @@ public class StorageUnit implements InventoryHolder {
                     Long OutValue = Amount - canPlace;
                     placingClone.setAmount(Math.toIntExact(OutValue));
                     lastAccessed =System.currentTimeMillis();
-                    saveMe();
+                    saveMeNext();
                     return true;
                 }
 
@@ -709,7 +759,7 @@ public class StorageUnit implements InventoryHolder {
                     placingClone.setAmount(1);
                     storageItems[i] = placingClone;
                     lastAccessed = System.currentTimeMillis();
-                    saveMe();
+                    saveMeNext();
                     return true;
                 }
             }
@@ -724,7 +774,7 @@ public class StorageUnit implements InventoryHolder {
                     placingClone.setAmount(1);
                     storageItems[i] = placingClone;
                     lastAccessed = System.currentTimeMillis();
-                    saveMe();
+                    saveMeNext();
                     return true;
                 }
             }
@@ -742,8 +792,17 @@ public class StorageUnit implements InventoryHolder {
     public void setSize(int size)
     {
         this.size = size;
-        this.saveMe();
-        this.loadMe();
+        ItemStack[] temp = storageItems.clone();
+        Long[] tempL = storageCount.clone();
+        storageItems = new ItemStack[size];
+        storageCount = new Long[size];
+        for (int i = 0; i <temp.length; i++)
+        {
+            if (temp[i] != null) storageItems[i] = temp[i].clone();
+            storageCount[i] = tempL[i];
+
+        }
+        this.saveMeNext();
     }
     public static void checkPower(StorageUnit newHold)
     {
@@ -786,9 +845,9 @@ public class StorageUnit implements InventoryHolder {
                                 newHold.setLocation(event.getBlock().getLocation());
                                 StorageUnit.StorageById.put(newHold.getMyId(), newHold);
                                 StorageUnit.StorageByLocation.put(newHold.getLocation().toString(), newHold);
-                                List<StorageUnit> tmp = StorageUnit.StorageByOwner.get(newHold.getOwner().toString());
+                                List<StorageUnit> tmp = StorageUnit.StorageByOwner.get(newHold.getOwner());
                                 tmp.add(newHold);
-                                StorageUnit.StorageByOwner.put(newHold.getOwner().toString(), tmp);
+                                StorageUnit.StorageByOwner.put(newHold.getOwner(), tmp);
 
                                 Bukkit.getScheduler().scheduleSyncDelayedTask(TitanBox.instants, new Runnable() {
                                     @Override
@@ -975,12 +1034,11 @@ public class StorageUnit implements InventoryHolder {
     }
     public static void onInventoryCloseEvent(InventoryCloseEvent event)
     {
-
         if (event.getInventory().getTitle().startsWith(StorageUnit.guiname)) {
             String id = event.getInventory().getTitle().replace(StorageUnit.guiname + " ", "");
             StorageUnit tmp = StorageUnit.StorageById.get(id);
             tmp.wipeGUI();
-            tmp.saveMe();
+            tmp.saveMeNext();
         }
     }
     public static String getNewIDString() {
@@ -1000,45 +1058,72 @@ public class StorageUnit implements InventoryHolder {
 
     }
     public static void saveStorage() {
-        for(StorageUnit key: StorageUnit.StorageById.values())
+
+        for(StorageUnit SU: StorageUnit.StorageById.values())
+        {
+            SU.saveMe();
+        }
+       /* for(StorageUnit key: StorageUnit.StorageById.values())
         {
             key.saveMe();
         }
-        StorageUnit.storage.save();
+        StorageUnit.storage.save();*/
     }
-    public static void loadStorage()
+
+    public static void loadStorage() {
+        setupTable();
+        loadStorageB();
+    }
+    public static void loadStorageB()
     {
+
         int count = 0;
         int removedcount = 0;
-        Set<String> keys = StorageUnit.storage.getKeys();
-        for(String key: keys)
-        {
-            String id = StorageUnit.storage.getString(key + ".id");
-            StorageUnit newHolder = new StorageUnit(id);
+        Utilities.reTryLoad(storageSQL, StorageUnit.class,"loadStorageB", "Storage");
+        storageSQL.search(new CallbackResults() {
+            @Override
+            public void onResult(List<HashMap<String, ResultData>> results) {
+                int count = 0;
+                int removedcount = 0;
+                if (results != null && results.size() > 0) {
+                    for (HashMap<String, ResultData> result : results) {
+                        String id = result.get("id").getString();
+                        StorageUnit newHolder = new StorageUnit(id);
+                        newHolder.loadMe(result);
 
-            Long Month = Long.valueOf("2592000000");
-            Month = System.currentTimeMillis() - Month;
-            if (newHolder.getLastAccessed() > Month) {
-                StorageUnit.StorageById.put(id, newHolder);
-                if (newHolder.getLocation() != null) {
-                    StorageUnit.StorageByLocation.put(newHolder.getLocation().toString(), newHolder);
+                        Long Month = Long.valueOf("2592000000") * 4;
+                        Month = System.currentTimeMillis() - Month;
+                        if (newHolder.getLastAccessed() > Month) {
+                            StorageUnit.StorageById.put(id, newHolder);
+                            if (newHolder.getLocation() != null) {
+                                StorageUnit.StorageByLocation.put(newHolder.getLocation().toString(), newHolder);
+                            }
+                            List<StorageUnit> tmp = StorageUnit.StorageByOwner.get(newHolder.getOwner());
+                            if (tmp == null)
+                            {
+                                tmp = new ArrayList<StorageUnit>();
+                            }
+                            tmp.add(newHolder);
+                            StorageUnit.StorageByOwner.put(newHolder.getOwner(), tmp);
+                            count++;
+                        } else {
+                            removedcount++;
+                        }
+
+                    }
+                    System.out.println("[TitanBox]: Storage loaded: " + count + ", removed out of date: " + removedcount + ", owners online: " + StorageUnit.StorageByOwner.size());
                 }
-                count++;
+                Utilities.doneTryLoading(storageSQL);
+                MainModule.loadAllModules();
             }
-            else
-            {
-                removedcount++;
-            }
-        }
-
-        System.out.println("[TitanBox]: loaded: " + count + ", removed out of date: " + removedcount);
+        });
 
 
 
     }
     public static List<StorageUnit> getStorageFromOwner(UUID uuid)
     {
-        List<StorageUnit> tmp = StorageUnit.StorageByOwner.get(uuid.toString());
+        List<StorageUnit> tmp = StorageUnit.StorageByOwner.get(uuid);
         if (tmp ==null)
         {
             tmp = new ArrayList<StorageUnit>();
@@ -1068,21 +1153,21 @@ public class StorageUnit implements InventoryHolder {
                         event.getWhoClicked().getInventory().setItem(i, left);
                     }
                 }
-                saveMe();
+                saveMeNext();
                 return;
             }
             if (slot == 46)
             {
                 this.setRemember(!this.isRemember());
                 button.setToggle(buttonEnum.getType(this.isRemember()));
-                saveMe();
+                saveMeNext();
                 return;
             }
             if (slot == 47)
             {
                 this.setLocked(!this.isLocked());
                 button.setToggle(buttonEnum.getType(this.isLocked()));
-                saveMe();
+                saveMeNext();
                 return;
             }
             if (slot == 48)
@@ -1118,7 +1203,7 @@ public class StorageUnit implements InventoryHolder {
                     powerA = powerA + 40;
                     BlockStorage.addBlockInfo(this.getLocation(), "energy-charge", powerA + "");
                 }
-                saveMe();
+                saveMeNext();
                 reBuildMenu();
                 return;
             }
@@ -1126,7 +1211,7 @@ public class StorageUnit implements InventoryHolder {
             {
                 this.setMoving(!this.isMoving());
                 button.setToggle(buttonEnum.getType(this.isMoving()));
-                saveMe();
+                saveMeNext();
                 reBuildMenu();
                 return;
             }
@@ -1151,14 +1236,25 @@ public class StorageUnit implements InventoryHolder {
                 if (storageCount[slot] == 0)
                 {
                     storageItems[slot] = null;
-                    saveMe();
+                    saveMeNext();
                 }
             }
             if (BlockStorage.getBlockInfo(this.getLocation()) != null) {
                 if (!this.isMoving()) {
                     if (!superStorage) {
                         ItemStack IS = this.getItem(slot, Amount);
-                        if (IS != null) {
+                        if (!TitanBox.isEmpty(IS))
+                        {
+                            ItemStack leftOver = TitanBox.addItemsToPlayer((Player) event.getWhoClicked(), IS);
+                            if (!TitanBox.isEmpty(leftOver))
+                            {
+                                event.getWhoClicked().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Your Inventory is full placing back in storage!");
+                                TitanBox.addItemToStorage(event.getWhoClicked().getUniqueId(), leftOver);
+                            }
+                        }
+                        saveMeNext();
+
+                      /*  if (IS != null) {
                             event.getWhoClicked().getInventory().addItem(IS);
                             for (int i = 0; i < 36; i++) {
                                 ItemStack checkItem = event.getWhoClicked().getInventory().getItem(i);
@@ -1182,8 +1278,8 @@ public class StorageUnit implements InventoryHolder {
                                 }
                             }
 
-                            saveMe();
-                        }
+                            saveMeNext();
+                        }*/
                     }
                     else
                     {
@@ -1199,7 +1295,7 @@ public class StorageUnit implements InventoryHolder {
                                 }
                             }
                         }
-                        saveMe();
+                        saveMeNext();
                     }
                 }
                 else
@@ -1214,7 +1310,7 @@ public class StorageUnit implements InventoryHolder {
                         this.moveSlot(this.from, event.getRawSlot());
                         this.from = -1;
                     }
-                    saveMe();
+                    saveMeNext();
                 }
             }
 
@@ -1259,7 +1355,7 @@ public class StorageUnit implements InventoryHolder {
 
                     event.getWhoClicked().getInventory().setItem(event.getSlot(), left);
 
-                    saveMe();
+                    saveMeNext();
                 }
             }
         }

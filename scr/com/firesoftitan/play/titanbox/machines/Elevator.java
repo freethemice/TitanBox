@@ -58,6 +58,7 @@ public class Elevator {
                 elevatorByLocation.put(key, myList);
             }
         }
+        System.out.println("[TitanBox]: All Elevators Loaded: " + elevatorByLocation.size());
     }
     public static void onPlayerMoveEvent(PlayerMoveEvent event) {
         Location to = event.getTo();
@@ -201,7 +202,7 @@ public class Elevator {
     }
     public static ItemStack getMeAsDrop()
     {
-        ItemStack elevator = new ItemStack(Material.SILVER_GLAZED_TERRACOTTA);
+        ItemStack elevator = new ItemStack(Material.LIGHT_GRAY_GLAZED_TERRACOTTA);
         elevator = TitanBox.changeName(elevator, ChatColor.YELLOW + "Elevator");
         elevator = TitanBox.addLore(elevator, ChatColor.WHITE + "Links to other elevators",  ChatColor.WHITE + "Directly above or below", ChatColor.WHITE + "Jump to go up", ChatColor.WHITE + "Sneak to go down");
         return elevator;

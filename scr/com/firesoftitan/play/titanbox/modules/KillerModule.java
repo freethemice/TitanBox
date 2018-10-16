@@ -1,19 +1,22 @@
 package com.firesoftitan.play.titanbox.modules;
 
 import com.firesoftitan.play.titanbox.TitanBox;
+import com.firesoftitan.play.titanbox.Utilities;
 import com.firesoftitan.play.titanbox.enums.ModuleTypeEnum;
 import com.firesoftitan.play.titanbox.machines.Pumps;
-import net.minecraft.server.v1_12_R1.EntityPlayer;
+import com.firesoftitan.play.titansql.ResultData;
+import net.minecraft.server.v1_13_R2.EntityPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,6 +39,10 @@ public class KillerModule extends MainModule {
         else
         {
             Location from = killerPump;
+            if (killerPump == null || from == null || from.getWorld() == null)
+            {
+                return ChatColor.WHITE  + "not set.";
+            }
             return ChatColor.WHITE + from.getWorld().getName() + ": " + from.getBlockX() + ": " + from.getBlockY() + ": " + from.getBlockZ();
         }
     }
@@ -45,7 +52,15 @@ public class KillerModule extends MainModule {
 
     }
     @Override
+    public void unLinkAll()
+    {
+        this.link = null;
+        this.killerPump = null;
+        saveInfo();
+    }
+    @Override
     public boolean setLink(Location link, Player player) {
+        super.setLink(link, player);
         String pump = Pumps.getPumpType(link);
         this.link = null;
         if (pump != null)
@@ -64,18 +79,24 @@ public class KillerModule extends MainModule {
         return false;
     }
     @Override
-    public void loadInfo() {
-        super.loadInfo();
+    public void loadInfo(HashMap<String, ResultData> result)
+    {
+        super.loadInfo(result);
         killerPump = null;
-        if (modules.contains("modules." + moduleid + ".slots.killerpump")) {
-            killerPump = modules.getLocation("modules." + moduleid + ".slots.killerpump");
+        if (result.get("pump_a") != null) {
+            if (result.get("pump_a").getLocation() != null) {
+                killerPump = result.get("pump_a").getLocation().clone();
+            }
         }
     }
 
     @Override
     public void saveInfo() {
         super.saveInfo();
-        modules.setValue("modules." + moduleid + ".slots.killerpump", killerPump);
+        modulesSQL.setDataField("pump_a", killerPump);
+        this.sendDate();
+
+        //modules.setValue("modules." + moduleid + ".slots.killerpump", killerPump);
     }
 
     @Override
@@ -87,13 +108,21 @@ public class KillerModule extends MainModule {
     @Override
     public ItemStack getMeAsIcon()
     {
-        return new ItemStack(Material.DIAMOND_SWORD, 1);
+        if (isLoaded()) {
+            if (Pumps.getLiquid(killerPump, "Killer")) {
+                return new ItemStack(Material.DIAMOND_SWORD, 1);
+            }
+        }
+        return new ItemStack(Material.BARRIER, 1);
+
     }
     @Override
     public boolean isLoaded()
     {
         if (killerPump != null) {
-            return killerPump.getChunk().isLoaded();
+            if (killerPump.getChunk() != null) {
+                return Utilities.isLoaded(killerPump);
+            }
         }
         return false;
     }

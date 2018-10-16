@@ -3,6 +3,7 @@ package com.firesoftitan.play.titanbox.machines;
 import com.firesoftitan.play.titanbox.TitanBox;
 import com.firesoftitan.play.titanbox.holders.ItemHolder;
 import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
+import me.mrCookieSlime.CSCoreLibPlugin.general.World.CustomSkull;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -31,7 +32,7 @@ public class Pumps {
     private static Block findTopLiquidBlock(Block clicked, Material liquid)
     {
 
-        if (liquid == Material.STATIONARY_WATER || liquid == Material.STATIONARY_LAVA) {
+        if (liquid == Material.WATER || liquid == Material.LAVA) {
             int topMostWaterAt = -1;
             for (int y = 0; y < 10; y++) {
                 Location soUp = clicked.getLocation().clone();
@@ -66,14 +67,30 @@ public class Pumps {
         {
             return false;
         }
-        if (loc.getBlock().getType() != Material.SKULL)
+        if (loc.getBlock().getType() == Material.PLAYER_WALL_HEAD)
+        {
+            Block block = loc.getBlock();
+            String texture ="";
+            try {
+                texture = CustomSkull.getTexture(block);
+            } catch (Exception e) {
+
+            }
+            block.setType(Material.PLAYER_HEAD);
+            try {
+                CustomSkull.setSkull(block, texture);
+            } catch (Exception e) {
+
+            }
+        }
+        if (loc.getBlock().getType() != Material.PLAYER_HEAD)
         {
             return false;
         }
-        Material typeOfMat = Material.STATIONARY_WATER;
+        Material typeOfMat = Material.WATER;
         if (Type.equals("Lava"))
         {
-            typeOfMat = Material.STATIONARY_LAVA;
+            typeOfMat = Material.LAVA;
         }
         if (Type.equals("Ice"))
         {
@@ -153,11 +170,11 @@ public class Pumps {
     public static void checkPumpPlacement(BlockPlaceEvent event, String typeOf) {
         Player player = event.getPlayer();
         ItemStack mainHand = player.getInventory().getItemInMainHand();
-        Material typeOfMat = Material.STATIONARY_WATER;
+        Material typeOfMat = Material.WATER;
         String typeOfPump = ItemHolder.WATERPUMP.getTexute();
         if (typeOf.equals("Lava"))
         {
-            typeOfMat = Material.STATIONARY_LAVA;
+            typeOfMat = Material.LAVA;
             typeOfPump = ItemHolder.LAVAPUMP.getTexute();
         }
         if (typeOf.equals("Ice"))

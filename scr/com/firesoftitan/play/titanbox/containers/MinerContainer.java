@@ -166,7 +166,7 @@ public abstract class MinerContainer extends SlimefunItem {
         int i;
         for(var4 = 0; var4 < var3; ++var4) {
             i = var2[var4];
-            preset.addItem(i, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte)7), " ", new String[0]), new MenuClickHandler() {
+            preset.addItem(i, new CustomItem(new MaterialData(Material.GRAY_STAINED_GLASS_PANE), " ", new String[0]), new MenuClickHandler() {
                 public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
                     return false;
                 }
@@ -178,34 +178,34 @@ public abstract class MinerContainer extends SlimefunItem {
 
         for(var4 = 0; var4 < var3; ++var4) {
             i = var2[var4];
-            preset.addItem(i, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte)9), " ", new String[0]), new MenuClickHandler() {
+            preset.addItem(i, new CustomItem(new MaterialData(Material.CYAN_STAINED_GLASS_PANE), " ", new String[0]), new MenuClickHandler() {
                 public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
                     return false;
                 }
             });
         }
 
-        preset.addItem(1, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte)12), "Material Used For Walls", new String[0]), new MenuClickHandler() {
+        preset.addItem(1, new CustomItem(new MaterialData(Material.BROWN_STAINED_GLASS_PANE), "Material Used For Walls", new String[0]), new MenuClickHandler() {
             public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
                 return false;
             }
         });
-        preset.addItem(2, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte)10), "Drill Rods", new String[0]), new MenuClickHandler() {
+        preset.addItem(2, new CustomItem(new MaterialData(Material.PURPLE_STAINED_GLASS_PANE), "Drill Rods", new String[0]), new MenuClickHandler() {
             public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
                 return false;
             }
         });
-        preset.addItem(28, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte)0), "Reactor Coolant", new String[0]), new MenuClickHandler() {
+        preset.addItem(28, new CustomItem(new MaterialData(Material.WHITE_STAINED_GLASS_PANE), "Reactor Coolant", new String[0]), new MenuClickHandler() {
             public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
                 return false;
             }
         });
-        preset.addItem(29, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte)14), "TNT", new String[0]), new MenuClickHandler() {
+        preset.addItem(29, new CustomItem(new MaterialData(Material.RED_STAINED_GLASS_PANE), "TNT", new String[0]), new MenuClickHandler() {
             public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
                 return false;
             }
         });
-        preset.addItem(40, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte)13), "Pickaxe to Simulate", new String[0]), new MenuClickHandler() {
+        preset.addItem(40, new CustomItem(new MaterialData(Material.GREEN_STAINED_GLASS_PANE), "Pickaxe to Simulate", new String[0]), new MenuClickHandler() {
             public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
                 return false;
             }
@@ -215,14 +215,14 @@ public abstract class MinerContainer extends SlimefunItem {
 
         for(var4 = 0; var4 < var3; ++var4) {
             i = var2[var4];
-            preset.addItem(i, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte)1), " ", new String[0]), new MenuClickHandler() {
+            preset.addItem(i, new CustomItem(new MaterialData(Material.ORANGE_STAINED_GLASS_PANE), " ", new String[0]), new MenuClickHandler() {
                 public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
                     return false;
                 }
             });
         }
 
-        preset.addItem(22, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte)15), " ", new String[0]), new MenuClickHandler() {
+        preset.addItem(22, new CustomItem(new MaterialData(Material.BLACK_STAINED_GLASS_PANE), " ", new String[0]), new MenuClickHandler() {
             public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
                 return false;
             }
@@ -287,7 +287,7 @@ public abstract class MinerContainer extends SlimefunItem {
         Inventory inv = Bukkit.createInventory((InventoryHolder)null, size);
 
         for(int i = 0; i < size; ++i) {
-            inv.setItem(i, new CustomItem(Material.COMMAND, " &4ALL YOUR PLACEHOLDERS ARE BELONG TO US", 0));
+            inv.setItem(i, new CustomItem(Material.COMMAND_BLOCK, " &4ALL YOUR PLACEHOLDERS ARE BELONG TO US", 0));
         }
 
         int[] var8 = this.getOutputSlots();
@@ -360,7 +360,7 @@ public abstract class MinerContainer extends SlimefunItem {
                     progress.put(b, timeleft - 1);
                 }
             } else {
-                BlockStorage.getInventory(b).replaceExistingItem(22, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte)15), " ", new String[0]));
+                BlockStorage.getInventory(b).replaceExistingItem(22, new CustomItem(new MaterialData(Material.BLACK_STAINED_GLASS_PANE), " ", new String[0]));
                 this.pushItems(b, (ItemStack[])((MachineRecipe)processing.get(b)).getOutput().clone());
                 progress.remove(b);
                 processing.remove(b);

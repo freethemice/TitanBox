@@ -1,13 +1,12 @@
 package com.firesoftitan.play.titanbox.machines;
 
-import com.firesoftitan.play.titanbox.containers.FreeContainer;
+import com.firesoftitan.play.titanbox.containers.FreeEnergyContainer;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
 import me.mrCookieSlime.Slimefun.Lists.RecipeType;
 import me.mrCookieSlime.Slimefun.Objects.Category;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineHelper;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
-import me.mrCookieSlime.Slimefun.api.energy.ChargableBlock;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
@@ -16,32 +15,34 @@ import org.bukkit.material.MaterialData;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
-public abstract class FreeFactory extends FreeContainer {;
-    private ItemStack freeType = null;
-    public FreeFactory(Category category, ItemStack item, String name, RecipeType recipeType, ItemStack[] recipe, Material freeType) {
+public class FreeEnergy extends FreeEnergyContainer {;
+    public double poweroutput = 0;
+    public FreeEnergy(Category category, ItemStack item, String name, RecipeType recipeType, ItemStack[] recipe, double poweroutput) {
         super(category, item, name, recipeType, recipe);
-        this.freeType = new ItemStack(freeType, 1, (short)0);
-    }
-    public FreeFactory(Category category, ItemStack item, String name, RecipeType recipeType, ItemStack[] recipe, ItemStack freeType) {
-        super(category, item, name, recipeType, recipe);
-        this.freeType = freeType.clone();
+        this.poweroutput = poweroutput;
     }
     @Override
     public String getInventoryTitle() {
-        return "&bFree Factory";
+        return "&bFree Energy";
     }
 
     @Override
     public ItemStack getProgressBar() {
-        return new ItemStack(Material.GOLDEN_SHOVEL);
+        return new ItemStack(Material.ANVIL);
     }
 
     @Override
     public void registerDefaultRecipes() {}
 
-    public abstract int getSpeed();
+    @Override
+    public int getEnergyConsumption() {
+        return 0;
+    }
+
+    public int getSpeed() {
+        return 0;
+    }
 
     @SuppressWarnings("deprecation")
     protected void tick(Block b) {
@@ -49,31 +50,24 @@ public abstract class FreeFactory extends FreeContainer {;
             int timeleft = progress.get(b);
             if (timeleft > 0 && getSpeed() < 10) {
                 ItemStack item = getProgressBar().clone();
-                item.setDurability(MachineHelper.getDurability(item, timeleft, processing.get(b).getTicks()));
+                item.setDurability(MachineHelper.getDurability(item, timeleft, (int) poweroutput));
                 ItemMeta im = item.getItemMeta();
                 im.setDisplayName(" ");
                 List<String> lore = new ArrayList<String>();
-                lore.add(MachineHelper.getProgress(timeleft, processing.get(b).getTicks()));
-                lore.add("");
+                lore.add(MachineHelper.getProgress(timeleft, (int) poweroutput));
+                lore.add("Generating: " + poweroutput + "J/s");
                 lore.add(MachineHelper.getTimeLeft(timeleft / 2));
                 im.setLore(lore);
                 item.setItemMeta(im);
 
                 BlockStorage.getInventory(b).replaceExistingItem(22, item);
 
-                if (ChargableBlock.isChargable(b)) {
-                    if (ChargableBlock.getCharge(b) < getEnergyConsumption()) return;
-                    ChargableBlock.addCharge(b, -getEnergyConsumption());
-                    progress.put(b, timeleft - 1);
-                }
-                else progress.put(b, timeleft - 1);
+                 progress.put(b, timeleft - 1);
             }
-            else if (ChargableBlock.isChargable(b)) {
-                if (ChargableBlock.getCharge(b) < getEnergyConsumption()) return;
-                ChargableBlock.addCharge(b, -getEnergyConsumption());
+            else
+            {
 
                 BlockStorage.getInventory(b).replaceExistingItem(22, new CustomItem(new MaterialData(Material.BLACK_STAINED_GLASS_PANE), " "));
-                pushItems(b, processing.get(b).getOutput());
 
                 progress.remove(b);
                 processing.remove(b);
@@ -81,24 +75,20 @@ public abstract class FreeFactory extends FreeContainer {;
         }
         else {
 
-            Random number = new Random(System.currentTimeMillis());
-            ItemStack adding = freeType.clone();
-            adding.setAmount( 1 + number.nextInt(10));
-
-            MachineRecipe r = new MachineRecipe(4 / getSpeed(), new ItemStack[0], new ItemStack[] {adding});
+            MachineRecipe r = new MachineRecipe(4, new ItemStack[0], new ItemStack[] {new ItemStack(Material.LIME_TERRACOTTA)});
             /*if (!fits(b, r.getOutput())) return;
             for (int slot: getInputSlots()) {
                 BlockStorage.getInventory(b).replaceExistingItem(slot, InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(slot), 1));
             }*/
             processing.put(b, r);
-            progress.put(b, r.getTicks());
+            progress.put(b, (int) poweroutput);
 
         }
     }
 
     @Override
     public String getMachineIdentifier() {
-        return "CHARCOAL_FACTORY";
+        return "FREE_ENERGY";
     }
 
 }

@@ -1,9 +1,13 @@
 package com.firesoftitan.play.titanbox.modules;
 
 import com.firesoftitan.play.titanbox.TitanBox;
+import com.firesoftitan.play.titanbox.Utilities;
 import com.firesoftitan.play.titanbox.enums.ModuleTypeEnum;
 import com.firesoftitan.play.titanbox.holders.RouterHolder;
-import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
+import com.firesoftitan.play.titansql.CallbackResults;
+import com.firesoftitan.play.titansql.DataTypeEnum;
+import com.firesoftitan.play.titansql.ResultData;
+import com.firesoftitan.play.titansql.Table;
 import me.mrCookieSlime.CSCoreLibPlugin.general.World.CustomSkull;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
@@ -19,14 +23,14 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.io.File;
 import java.util.*;
 
 public class MainModule {
     protected ModuleTypeEnum type = null;
     protected Location link = null;
     protected String moduleid = null;
-    public static Config modules = new Config("data-storage" + File.separator + "TitanBox" + File.separator  + "modules.yml");
+    //public static Config modules = new Config("data-storage" + File.separator + "TitanBox" + File.separator  + "modules.yml");
+    public static Table modulesSQL = new Table("tb_modules");
     public static HashMap<String, MainModule> moduleByID = new HashMap<String, MainModule>();
 
     public MainModule()
@@ -38,49 +42,75 @@ public class MainModule {
         return type;
     }
 
-    public static void loadAllModules()
+    public static void setupTable()
     {
-        if (modules.contains("modules")) {
-            Set<String> keys = modules.getKeys("modules");
-            for (String key : keys) {
-                ModuleTypeEnum type = null;
-                if (modules.contains("modules." + key + ".slots.type")) {
-                    String tmpType = modules.getString("modules." + key + ".slots.type");
-                    type = ModuleTypeEnum.valueOf(tmpType);
+        modulesSQL.addDataType("id", DataTypeEnum.CHARARRAY, true, false, true);
+        modulesSQL.addDataType("type", DataTypeEnum.STRING, true, false, false);
+        modulesSQL.addDataType("link", DataTypeEnum.LOCATION, false, false, false);
+        modulesSQL.addDataType("pump_a", DataTypeEnum.LOCATION, false, false, false);
+        modulesSQL.addDataType("pump_b", DataTypeEnum.LOCATION, false, false, false);
+        modulesSQL.addDataType("locations", DataTypeEnum.STRINGLIST, false, false, false);
+        modulesSQL.addDataType("items", DataTypeEnum.ITEMLIST, false, false, false);
+        modulesSQL.addDataType("items_slots", DataTypeEnum.INTLIST, false, false, false);
+        modulesSQL.addDataType("hide", DataTypeEnum.BOOLEAN, false, false, false);
+        modulesSQL.addDataType("slots", DataTypeEnum.INTLIST, false, false, false);
+        modulesSQL.addDataType("mode", DataTypeEnum.STRING, false, false, false);
+        modulesSQL.addDataType("selection", DataTypeEnum.INTEGER, false, false, false);
+        modulesSQL.addDataType("keep", DataTypeEnum.INTLIST, false, false, false);
+        modulesSQL.addDataType("keep_slots", DataTypeEnum.INTLIST, false, false, false);
+        modulesSQL.addDataType("max", DataTypeEnum.INTLIST, false, false, false);
+        modulesSQL.addDataType("max_slots", DataTypeEnum.INTLIST, false, false, false);
+        modulesSQL.createTable();
+    }
+    public static void loadAllModules() {
+        setupTable();
+        loadModules();
+    }
+    public static void loadModules()
+    {
+        Utilities.reTryLoad(modulesSQL, MainModule.class, "loadModules", "Modules");
+        modulesSQL.search(new CallbackResults() {
+            @Override
+            public void onResult(List<HashMap<String, ResultData>> results) {
+                if (results != null && results.size() >0) {
+                    for (HashMap<String, ResultData> result : results) {
+                        ModuleTypeEnum type = null;
+                        String tmpType = result.get("type").getString();
+                        String key = result.get("id").getString();
+                        type = ModuleTypeEnum.valueOf(tmpType);
+                        if (type == null)
+                        {
+                            type = ModuleTypeEnum.Inventory;
+                        }
+                        MainModule mh = type.getNew();
+                        mh.setModuleid(key);
+                        mh.loadInfo(result);
+                        moduleByID.put(key, mh);
+                    }
+                    Utilities.doneTryLoading(modulesSQL);
                 }
-                if (type == null)
-                {
-                    type = ModuleTypeEnum.Inventory;
-                }
-                MainModule mh = type.getNew();
-                mh.setModuleid(key);
-                mh.loadInfo();
-                moduleByID.put(key, mh);
+                RouterHolder.loadAllRouters();
             }
-        }
+        });
+
     }
     public boolean isLoaded()
     {
         if (link != null)
         {
-            return link.getChunk().isLoaded();
+            if (link.getChunk() != null) {
+                return Utilities.isLoaded(link);
+            }
         }
         return false;
     }
-    public boolean isIdSaved()
+    public void loadInfo(HashMap<String, ResultData> result)
     {
-        return  modules.contains("modules." + moduleid);
-    }
-    public static void saveModules()
-    {
-        modules.save();
-    }
-    public void loadInfo()
-    {
-        if (modules.contains("modules." + moduleid + ".slots.link")) {
-            link = modules.getLocation("modules." + moduleid + ".slots.link");
+        if (result.get("link") != null) {
+            if (result.get("link").getLocation() != null) {
+                link = result.get("link").getLocation().clone();
+            }
         }
-
     }
 
     public void saveInfo()
@@ -89,8 +119,20 @@ public class MainModule {
         {
             type = ModuleTypeEnum.Inventory;
         }
-        modules.setValue("modules." + moduleid + ".slots.link", link);
-        modules.setValue("modules." + moduleid + ".slots.type", type.getType());
+
+        modulesSQL.setDataField("id", moduleid);
+        modulesSQL.setDataField("type", type.getType());
+        modulesSQL.setDataField("link", link);
+
+
+        //modules.setValue("modules." + moduleid + ".slots.link", link);
+        //modules.setValue("modules." + moduleid + ".slots.type", type.getType());
+    }
+    protected void sendDate()
+    {
+        if (moduleid != null) {
+            modulesSQL.insertData();
+        }
     }
     public void clearInfo()
     {
@@ -125,11 +167,8 @@ public class MainModule {
             if (from.getLink().getBlock().getType() != Material.AIR) {
                 short blockDate = from.getLink().getBlock().getData();
                 Material type = from.getLink().getBlock().getType();
-                if (from.getLink().getBlock().getType() == Material.BURNING_FURNACE) {
-                    type = Material.FURNACE;
-                }
                 block = new ItemStack(type, 1, blockDate);
-                if (block.getType() == Material.SKULL) {
+                if (block.getType() == Material.PLAYER_HEAD) {
                     String texture = "";
                     try {
                         texture = CustomSkull.getTexture(from.getLink().getBlock());
@@ -139,7 +178,7 @@ public class MainModule {
                     }
                 }
                 if (from.getLink().getBlock().getType() == Material.BREWING_STAND) {
-                    block = new ItemStack(Material.BREWING_STAND_ITEM);
+                    block = new ItemStack(Material.BREWING_STAND);
                 }
                 if (BlockStorage.getBlockInfo(from.getLink().getBlock()).contains("id")) {
                     SLIMEFUNname = BlockStorage.getBlockInfo(from.getLink().getBlock()).getString("id");
@@ -252,8 +291,8 @@ public class MainModule {
                         if (moduleID != null) {
                             printing.setModuleid(moduleID);
                         }
-                        if (printing.isIdSaved()) {
-                            printing.loadInfo();
+                        if (moduleByID.containsKey(moduleID)) {
+                            printing = moduleByID.get(moduleID);
                         }
 
                     }
@@ -282,8 +321,25 @@ public class MainModule {
     }
 
     public boolean setLink(Location link, Player player) {
-        if (player != null) {
-            player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Default Mode Error!");
+        if (link !=null)
+        {
+            if (link.getBlock().getType() == Material.PLAYER_WALL_HEAD)
+            {
+
+                String texture = "";
+                try {
+                    texture = CustomSkull.getTexture(getLink().getBlock());
+                } catch (Exception e) {
+
+                }
+                Block block = link.getBlock();
+                block.setType(Material.PLAYER_HEAD);
+                try {
+                    CustomSkull.setSkull(block, texture);
+                } catch (Exception e) {
+
+                }
+            }
         }
         return false;
     }
@@ -302,7 +358,7 @@ public class MainModule {
         }
         String saltStr = salt.toString();
 
-        if (modules.contains("items." + saltStr))
+        if (moduleByID.containsKey(SALTCHARS))
         {
             return getNewIDString();
         }
@@ -330,6 +386,10 @@ public class MainModule {
             }
         }
     }
+    public void unLinkAll()
+    {
+
+    }
     public static void onPlayerInteractEvent(PlayerInteractEvent event)
     {
         ItemStack mainHand = event.getPlayer().getInventory().getItemInMainHand();
@@ -337,8 +397,20 @@ public class MainModule {
             MainModule mh = MainModule.getModulefromItem(mainHand);
             if (mh != null) {
                 if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_AIR) {
-                    mh.OpenGui(event.getPlayer());
-                    event.setCancelled(true);
+                    if (event.getPlayer().isSneaking())
+                    {
+                        mh.unLinkAll();
+                        mh.clearInfo();
+                        mh.preLoadSlots();
+                        updateGUIClicked(event.getPlayer(), mh, false);
+                        event.setCancelled(true);
+                        event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: Device(s) unlinked!");
+                    }
+                    else {
+                        mh.OpenGui(event.getPlayer());
+                        event.setCancelled(true);
+                        event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: you can clear all link devices by Shift-Clicking air!");
+                    }
                 }
 
                 if (event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
@@ -379,7 +451,7 @@ public class MainModule {
     }
     public void runMe(UUID owner)
     {
-
+        System.out.println("Wrong one!");
     }
 
     public static void updateGUIClicked(Player who, MainModule mh, boolean showgui) {

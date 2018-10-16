@@ -7,9 +7,12 @@ import me.mrCookieSlime.Slimefun.Lists.RecipeType;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunItem;
 import me.mrCookieSlime.Slimefun.SlimefunStartup;
 import me.mrCookieSlime.Slimefun.api.Slimefun;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 
@@ -20,6 +23,7 @@ public class TitanTalisman extends SlimefunItem {
     PotionEffect[] effects;
     String suffix;
     int chance;
+    private static BukkitRunnable checkTimer = null;
 
     public TitanTalisman(ItemStack item, String name, ItemStack[] recipe, boolean consumable, boolean cancelEvent, String messageSuffix, PotionEffect... effects) {
         super(CustomCategories.SLIMEFUN_TITAN_TALISMAN, item, name, RecipeType.MAGIC_WORKBENCH, recipe, new CustomItem(item, consumable ? 4: 1));
@@ -28,6 +32,7 @@ public class TitanTalisman extends SlimefunItem {
         this.suffix = messageSuffix;
         this.effects = effects;
         this.chance = 100;
+        greatCheckTimer();
     }
 
     public TitanTalisman(ItemStack item, String name, ItemStack[] recipe, boolean consumable, boolean cancelEvent, String messageSuffix, int chance, PotionEffect... effects) {
@@ -37,6 +42,7 @@ public class TitanTalisman extends SlimefunItem {
         this.suffix = messageSuffix;
         this.effects = effects;
         this.chance = chance;
+        greatCheckTimer();
     }
 
     public TitanTalisman(ItemStack item, String name, ItemStack[] recipe, String messageSuffix, int chance, PotionEffect... effects) {
@@ -46,6 +52,48 @@ public class TitanTalisman extends SlimefunItem {
         this.suffix = messageSuffix;
         this.effects = effects;
         this.chance = chance;
+        greatCheckTimer();
+    }
+    private void greatCheckTimer()
+    {
+        if (checkTimer != null) return;
+        checkTimer = new BukkitRunnable()
+        {
+
+            @Override
+            public void run() {
+                try {
+                    for(Player player: Bukkit.getOnlinePlayers())
+                    {
+                        HashMap<Integer,ItemStack> findTally = TitanTalisman.checkFor(player, SlimefunItem.getByName("TALISMAN_VOID"));
+                        if (findTally != null)
+                        {
+                            if (findTally.size() > 0)
+                            {
+                                Inventory playerinv =  player.getInventory();
+                                for(int i = 0; i < 36; i++)
+                                {
+                                    ItemStack item = playerinv.getItem(i);
+                                    if (!TitanBox.isEmpty(item)) {
+                                        ItemStack leftOver = TitanBox.addItemToStorage(player.getUniqueId(), item);
+                                        if (leftOver != null) {
+                                            if (leftOver.getAmount() != playerinv.getItem(i).getAmount()) {
+                                                playerinv.setItem(i, leftOver.clone());
+                                            }
+                                        } else {
+                                            playerinv.setItem(i, null);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+
+                }
+            }
+        };
+        checkTimer.runTaskTimer(TitanBox.instants, 5*20, 5*20);
     }
 
     public PotionEffect[] getEffects()	{		return this.effects;	}

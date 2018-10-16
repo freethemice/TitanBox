@@ -1,19 +1,20 @@
 package com.firesoftitan.play.titanbox.holders;
 
 import com.firesoftitan.play.titanbox.TitanBox;
+import com.firesoftitan.play.titanbox.Utilities;
 import com.firesoftitan.play.titanbox.guis.buttonGUIs;
 import com.firesoftitan.play.titanbox.machines.ItemRoutingRouter;
 import com.firesoftitan.play.titanbox.modules.MainModule;
 import com.firesoftitan.play.titanbox.runnables.IRRUserRunnable;
+import com.firesoftitan.play.titansql.CallbackResults;
+import com.firesoftitan.play.titansql.DataTypeEnum;
+import com.firesoftitan.play.titansql.ResultData;
+import com.firesoftitan.play.titansql.Table;
 import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
-import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -25,10 +26,11 @@ import java.io.File;
 import java.util.*;
 
 public class RouterHolder {
-    public static Config routing = new Config("data-storage" + File.separator + "TitanBox" + File.separator  + "routing.yml");
-    public static HashMap<String, ItemRoutingRouter> routersByLocation = new HashMap<String, ItemRoutingRouter>();
+    //public static Config routing = new Config("data-storage" + File.separator + "TitanBox" + File.separator  + "routing.yml");
+    public static Table routingSQL = new Table("tb_routing");
+    public static HashMap<String, Location> routersByLocation = new HashMap<String, Location>();
     public static HashMap<String, ItemRoutingRouter> routersByID = new HashMap<String, ItemRoutingRouter>();
-    public static HashMap<String, ItemRoutingRouter> routersByOwner = new HashMap<String, ItemRoutingRouter>();
+    public static HashMap<UUID, ItemRoutingRouter> routersByOwner = new HashMap<UUID, ItemRoutingRouter>();
     public static List<String> bufferList = new ArrayList<String>();
     public static int bufferSize = 10;
     public static int speed = 1;
@@ -37,17 +39,32 @@ public class RouterHolder {
     public static long lastTime = 0;
     public static long lagTime = 250;
     public static String name = "Item Routing Router";
-    public static HashMap<String, IRRUserRunnable> bufferListT = new HashMap<String, IRRUserRunnable>();
+    public static HashMap<UUID, IRRUserRunnable> bufferListT = new HashMap<UUID, IRRUserRunnable>();
+    private static Config locations = new Config("data-storage" + File.separator + "TitanBox" + File.separator  + "irrloc.yml");
 
     public RouterHolder()
     {
 
     }
+    public static void addRouterLocation(Location location)
+    {
+        routersByLocation.put(location.toString(), location);
+        String key = location.getWorld().getName() + "-" + location.getBlockX() + "-" + location.getBlockY() + "-" + location.getBlockZ();
+        locations.setValue(key, Utilities.encode(location));
+        locations.save();
+    }
+    public static void removeRouterLocation(Location location) {
+        routersByLocation.remove(location.toString());
+        String key = location.getWorld().getName() + "-" + location.getBlockX() + "-" + location.getBlockY() + "-" + location.getBlockZ();
+        locations.setValue(key, null);
+        locations.save();
+    }
+
     public static void tick()
     {
 
     }
-    public static void tickold()
+    /*public static void tickold()
     {
         if (bufferList.size() == 0)
         {
@@ -122,86 +139,15 @@ public class RouterHolder {
                 lastTime = System.currentTimeMillis() + 300000;
             }
         }
-    }
-    public static  void setCharge(Location location, int amount)
-    {
-        BlockStorage.addBlockInfo(location, "energy-charge", amount + "");
-    }
-    public static  void setCapacity(Location location, int amount)
-    {
-        BlockStorage.addBlockInfo(location, "energy-capacity", amount + "");
-    }
-    public static void reDrawRouter(Player player)
-    {
-        try {
-            ItemRoutingRouter tmp = RouterHolder.routersByOwner.get(player.getUniqueId().toString());
-            if (tmp != null) {
-                if (tmp.getLocation() != null) {
-                    TitanBox.placeSkull(tmp.getLocation().getBlock(), ItemHolder.ROUTER.getTexute());
-                }
-            }
-        }
-        catch (Exception e)
-        {
+    }*/
 
-        }
-    }
-    public static int getCharge(Location location)
-    {
-        int c = 0;
-        if (location == null)
-        {
-            return  c;
-        }
-        try {
-            c = Integer.parseInt(BlockStorage.getBlockInfo(location).getString("energy-charge"));
-        }
-        catch (Exception e)
-        {
-
-        }
-        return c;
-
-    }
-    public static int getCapacity(Location location)
-    {
-        int c = 0;
-        if (location == null)
-        {
-            return  c;
-        }
-        try {
-            c = Integer.parseInt(BlockStorage.getBlockInfo(location).getString("energy-capacity"));
-        }
-        catch (Exception e)
-        {
-
-        }
-        return c;
-
-    }
-    public static void checkPower(Location location)
-    {
-
-        String ID = BlockStorage.getBlockInfo(location, "id");
-        String energy =  BlockStorage.getBlockInfo(location, "energy-capacity");
-        if (ID == null || energy == null)
-        {
-            addEnergy(location);
-        }
-    }
-    public static void addEnergy(Location location) {
-        BlockStorage.addBlockInfo(location, "id", "FOTStorageUnti");
-        BlockStorage.addBlockInfo(location, "energy-capacity", "45");
-    }
     public static void onPlayerInteractEvent(PlayerInteractEvent event) {
 
 
         if (event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             String location = event.getClickedBlock().getLocation().toString();
             if (RouterHolder.routersByLocation.containsKey(location)) {
-                ItemRoutingRouter tmpRL = RouterHolder.routersByLocation.get(location);
-                checkPower(tmpRL.getLocation());
+                ItemRoutingRouter tmpRL = RouterHolder.routersByOwner.get(event.getPlayer().getUniqueId());
                 ItemStack mainHand = event.getPlayer().getInventory().getItemInMainHand();
                 if (!TitanBox.isEmpty(mainHand)) {
                     MainModule mh = MainModule.getModulefromItem(mainHand);
@@ -218,7 +164,7 @@ public class RouterHolder {
                                     return;
                                 }
                             }
-                            int max = Math.min(bigMax, RouterHolder.routersByLocation.get(location).getMax());
+                            int max = Math.min(bigMax, tmpRL.getMax());
                             if (tmp.size() >= max) {
                                 event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.RED + "Only " + ChatColor.WHITE + max + ChatColor.RED + " is allowed in this unit.");
                                 event.setCancelled(true);
@@ -328,29 +274,62 @@ public class RouterHolder {
         speed = TitanBox.config.getInt("settings.router.speed");
         bufferSize = TitanBox.config.getInt("settings.router.bufferSize");
         lagTime = TitanBox.config.getLong("settings.router.lagtime");
+
+
+        for (String loc: RouterHolder.locations.getKeys()) {
+            Location location = Utilities.decodeLocation(RouterHolder.locations.getString(loc));
+            RouterHolder.routersByLocation.put(location.toString(), location);
+        }
     }
-    public static void loadAllRouters()
+    public static void setupTable()
     {
+        routingSQL.addDataType("id", DataTypeEnum.CHARARRAY, true, false, true);
+        routingSQL.addDataType("modules", DataTypeEnum.STRINGLIST, false, false, false);
+        routingSQL.addDataType("owner", DataTypeEnum.UUID, false, false, false);
+        routingSQL.addDataType("size", DataTypeEnum.INTEGER, false, false, false);
+        routingSQL.addDataType("location", DataTypeEnum.LOCATION, false, false, false);
+        routingSQL.createTable();
+
+    }
+    public static void loadAllRouters() {
         loadConfig();
 
+        setupTable();
+
         RouterHolder.routersByID.clear();
-        RouterHolder.routersByLocation.clear();
         RouterHolder.routersByOwner.clear();
-        if (RouterHolder.routing.contains("router")) {
-            Set<String> keys = RouterHolder.routing.getKeys("router");
-            for (String key : keys) {
-                ItemRoutingRouter.loadRRH(key);
+
+        loadRouters();
+    }
+    public static void loadRouters()
+    {
+
+        Utilities.reTryLoad(routingSQL, RouterHolder.class, "loadRouters", "Routers");
+        routingSQL.search(new CallbackResults() {
+            @Override
+            public void onResult(List<HashMap<String, ResultData>> results) {
+                if (results != null && results.size() >0) {
+                    for (HashMap<String, ResultData> result : results) {
+                        ItemRoutingRouter.loadRRH(result);
+                    }
+                }
+                System.out.println("[TitanBox: Routers Loaded: " + results.size());
+                Utilities.doneTryLoading(routingSQL);
+                //Elevator.loadAllElevators();
             }
-        }
+        });
+
+
         //System.out.println(RouterHolder.routersByID.size() + "," + RouterHolder.routersByLocation.size() + "," + RouterHolder.routersByOwner.size());
-        RouterHolder.routing.save();
+        //RouterHolder.routing.save();
+
     }
     public static void onBlockPlaceEvent(BlockPlaceEvent event) {
         ItemStack item = event.getItemInHand();
         if (item != null) {
             if (item.hasItemMeta()) {
                 if (item.getItemMeta().hasDisplayName()) {
-                    String key = RouterHolder.getNewIDString();
+
                     if (item.getItemMeta().getDisplayName().startsWith(ChatColor.YELLOW + "Upgrade Device"))
                     {
                         event.setCancelled(true);
@@ -358,53 +337,8 @@ public class RouterHolder {
                     }
                     if (item.getItemMeta().getDisplayName().startsWith(ChatColor.YELLOW + name)) {
                         if ((GriefPrevention.instance.allowBuild(event.getPlayer(), event.getBlockPlaced().getLocation()) == null) || event.getPlayer().hasPermission("titanbox.admin")) {
-                            ItemRoutingRouter makingme = new ItemRoutingRouter(key);
-                            makingme.setOwner(event.getPlayer().getUniqueId());
-                            makingme.setLocation(event.getBlockPlaced().getLocation().clone());
-                            if (RouterHolder.routersByOwner.containsKey(makingme.getOwner().toString())) {
-                                makingme = RouterHolder.routersByOwner.get(makingme.getOwner().toString());
-                            }
-                            if (!RouterHolder.routersByLocation.containsKey(makingme.getLocation().toString())) {
-                                makingme.setLocation(event.getBlockPlaced().getLocation().clone());
-                                RouterHolder.routersByID.put(makingme.getID(), makingme);
-                                RouterHolder.routersByLocation.put(makingme.getLocation().toString(), makingme);
-                                RouterHolder.routersByOwner.put(makingme.getOwner().toString(), makingme);
-                                makingme.SaveMe();
-                                Bukkit.getScheduler().scheduleSyncDelayedTask(TitanBox.instants, new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        addEnergy(event.getBlock().getLocation());
-                                    }
-                                }, 1);
+                            addRouterLocation(event.getBlockPlaced().getLocation());
 
-                                if (RouterHolder.routersByOwner.containsKey(makingme.getID()))
-                                {
-                                    ItemRoutingRouter person = RouterHolder.routersByOwner.get(makingme.getID());
-                                    if (person != null) {
-                                        IRRUserRunnable tmp = new IRRUserRunnable();
-                                        tmp.setItemRoutingRouter(person);
-                                        tmp.startCountDown();
-                                        int id = Bukkit.getScheduler().scheduleSyncRepeatingTask(TitanBox.instants, tmp, 1000, RouterHolder.speed);
-                                        tmp.setTimerID(id);
-                                        RouterHolder.bufferListT.put(makingme.getOwner().toString(), tmp);
-                                        System.out.println("[Player Setup: " + event.getPlayer().getName() + "]: Router found, id:" + id + " will start in 1 second.");
-                                    }
-                                    else
-                                    {
-                                        System.out.println("[Player Setup: " + event.getPlayer().getName() + "]: Router found, loading error.");
-                                    }
-                                }
-                                else
-                                {
-                                    System.out.println("[Player Setup: " + event.getPlayer().getName() + "]: Player doesn't have a router to load.");
-                                }
-                            } else {
-                                event.setCancelled(true);
-                                ItemRoutingRouter tmpL = RouterHolder.routersByOwner.get(makingme.getOwner().toString());
-                                TitanBox.placeSkull(tmpL.getLocation().getBlock(), ItemHolder.ROUTER.getTexute());
-                                event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.RED + "Only 1 Item Routing Router Allowed Per Player. Your Router Is At " + ChatColor.WHITE + tmpL.getLocation().getWorld().getName() + ", " + tmpL.getLocation().getBlockX() + ", " + tmpL.getLocation().getBlockY() + ", " + tmpL.getLocation().getBlockZ());
-
-                            }
                         }
                     }
                 }
@@ -440,30 +374,17 @@ public class RouterHolder {
             if ((GriefPrevention.instance.allowBreak(event.getPlayer(), event.getBlock(), event.getBlock().getLocation()) == null) || event.getPlayer().hasPermission("titanbox.admin")) {
                 String location = event.getBlock().getLocation().toString();
                 if (RouterHolder.routersByLocation.containsKey(location)) {
-                    ItemRoutingRouter tmpRRH = RouterHolder.routersByLocation.get(location);
-                    if (tmpRRH.getModules().size() == 0) {
+                    removeRouterLocation(event.getBlock().getLocation());
+                    /*
+                    ItemHolder me = ItemHolder.ROUTER;
+                    if (me != null) {
+                        ItemStack drop = me.getItem();
+                        drop = TitanBox.changeName(drop, ChatColor.YELLOW + "Item Routing Router");
+                        drop = TitanBox.addLore(drop, "Links: " + ChatColor.WHITE + "Slimefun, Chest, and Storage units", ChatColor.WHITE + "45 J/s");
                         event.setDropItems(false);
-                        RouterHolder.routersByLocation.remove(location);
-                        //RouterHolder.routersByID.remove(tmpRRH.getID());
-                        //RouterHolder.routersByOwner.remove(tmpRRH.getOwner().toString());
-                        //RouterHolder.routing.setValue("router." + tmpRRH.getID(), null);
-                        BlockStorage._integrated_removeBlockInfo(event.getBlock().getLocation(), true);
-
-                        ItemHolder me = ItemHolder.ROUTER;
-                        if (me != null) {
-                            ItemStack drop = me.getItem();
-                            drop = TitanBox.changeName(drop, ChatColor.YELLOW + "Item Routing Router");
-                            drop = TitanBox.addLore(drop, "Links: " + ChatColor.WHITE + "Slimefun, Chest, and Storage units", ChatColor.WHITE + "45 J/s");
-                            event.setDropItems(false);
-                            event.getBlock().getLocation().getWorld().dropItem(event.getBlock().getLocation(), drop);
-                            event.getPlayer().closeInventory();
-                        }
-
-
-                    } else {
-                        event.setCancelled(true);
-                        event.getPlayer().sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.RED + "You must remove all modules before removing this!");
-                    }
+                        event.getBlock().getLocation().getWorld().dropItem(event.getBlock().getLocation(), drop);
+                        event.getPlayer().closeInventory();
+                    }*/
                 }
             }
         }
@@ -471,9 +392,5 @@ public class RouterHolder {
         {
             e.printStackTrace();
         }
-    }
-    public static void saveRoutes()
-    {
-        routing.save();
     }
 }

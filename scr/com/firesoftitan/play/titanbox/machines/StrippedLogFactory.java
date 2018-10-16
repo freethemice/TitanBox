@@ -1,15 +1,14 @@
 package com.firesoftitan.play.titanbox.machines;
 
-import com.firesoftitan.play.titanbox.holders.SlimefunItemsHolder;
+import com.firesoftitan.play.titanbox.TitanBox;
+import com.firesoftitan.play.titanbox.containers.BContainer;
+import com.firesoftitan.play.titanbox.enums.TreeTypeEnum;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.InvUtils;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
 import me.mrCookieSlime.Slimefun.Lists.RecipeType;
 import me.mrCookieSlime.Slimefun.Objects.Category;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AContainer;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineHelper;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
-import me.mrCookieSlime.Slimefun.Setup.SlimefunManager;
-import me.mrCookieSlime.Slimefun.SlimefunStartup;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.energy.ChargableBlock;
 import org.bukkit.Material;
@@ -20,21 +19,22 @@ import org.bukkit.material.MaterialData;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
-public abstract class ElectricCobbletoDust extends AContainer {;
-    public ElectricCobbletoDust(Category category, ItemStack item, String name, RecipeType recipeType, ItemStack[] recipe) {
+public abstract class StrippedLogFactory extends BContainer {;
+    public StrippedLogFactory(Category category, ItemStack item, String name, RecipeType recipeType, ItemStack[] recipe) {
         super(category, item, name, recipeType, recipe);
 
     }
 
     @Override
     public String getInventoryTitle() {
-        return "&bElectric Cobble to Dust";
+        return "&bStripped Log Factory";
     }
 
     @Override
     public ItemStack getProgressBar() {
-        return new ItemStack(Material.GOLDEN_SHOVEL);
+        return new ItemStack(Material.GOLDEN_AXE);
     }
 
     @Override
@@ -69,11 +69,6 @@ public abstract class ElectricCobbletoDust extends AContainer {;
             }
             else if (ChargableBlock.isChargable(b)) {
                 if (ChargableBlock.getCharge(b) < getEnergyConsumption()) return;
-                if (processing.get(b).getOutput() == null)
-                {
-                    progress.remove(b);
-                    return;
-                }
                 ChargableBlock.addCharge(b, -getEnergyConsumption());
 
                 BlockStorage.getInventory(b).replaceExistingItem(22, new CustomItem(new MaterialData(Material.BLACK_STAINED_GLASS_PANE), " "));
@@ -84,36 +79,26 @@ public abstract class ElectricCobbletoDust extends AContainer {;
             }
         }
         else {
-            for (int slot: getInputSlots()) {
-                if (SlimefunManager.isItemSimiliar(BlockStorage.getInventory(b).getItemInSlot(slot), new ItemStack(Material.COBBLESTONE, 8), true)) {
 
-                    ItemStack adding = me.mrCookieSlime.Slimefun.Lists.SlimefunItems.IRON_DUST;
-                    if (SlimefunStartup.chance(100, 25)) adding = me.mrCookieSlime.Slimefun.Lists.SlimefunItems.GOLD_DUST;
-                    else if (SlimefunStartup.chance(100, 25)) adding = me.mrCookieSlime.Slimefun.Lists.SlimefunItems.ALUMINUM_DUST;
-                    else if (SlimefunStartup.chance(100, 25)) adding = me.mrCookieSlime.Slimefun.Lists.SlimefunItems.COPPER_DUST;
-                    else if (SlimefunStartup.chance(100, 25)) adding = me.mrCookieSlime.Slimefun.Lists.SlimefunItems.ZINC_DUST;
-                    else if (SlimefunStartup.chance(100, 25)) adding = me.mrCookieSlime.Slimefun.Lists.SlimefunItems.TIN_DUST;
-                    else if (SlimefunStartup.chance(100, 25)) adding = me.mrCookieSlime.Slimefun.Lists.SlimefunItems.MAGNESIUM_DUST;
-                    else if (SlimefunStartup.chance(100, 25)) adding = me.mrCookieSlime.Slimefun.Lists.SlimefunItems.LEAD_DUST;
-                    else if (SlimefunStartup.chance(100, 25)) adding = me.mrCookieSlime.Slimefun.Lists.SlimefunItems.SILVER_DUST;
-                    else if (SlimefunStartup.chance(500, 1)) adding = SlimefunItemsHolder.EclipseNugget;
-                    else if (SlimefunStartup.chance(200, 10)) adding = SlimefunItemsHolder.LuckyNugget;
-                    adding = adding.clone();
-                    adding.setAmount(1);
-                    if (getSpeed() > 9)
-                    {
-                        adding.setAmount(3);
+            for (int slot: getInputSlots()) {
+                if (!TitanBox.isEmpty(BlockStorage.getInventory(b).getItemInSlot(slot))) {
+                    if (BlockStorage.getInventory(b).getItemInSlot(slot).getType().name().toLowerCase().endsWith("_sapling") || BlockStorage.getInventory(b).getItemInSlot(slot).getType().name().toLowerCase().endsWith("_log")) {
+                        Random number = new Random(System.currentTimeMillis());
+                        Material saplingType = BlockStorage.getInventory(b).getItemInSlot(slot).getType();
+                        ItemStack adding = new ItemStack(Material.STRIPPED_OAK_LOG, 10 + number.nextInt(10));
+                        for (TreeTypeEnum treeTypeEnum : TreeTypeEnum.values()) {
+                            if (treeTypeEnum.getSapling().equals(saplingType) || treeTypeEnum.getLog().equals(saplingType)) {
+                                adding = new ItemStack(treeTypeEnum.getStripped(), 1);
+                            }
+                        }
+                        adding = adding.clone();
+                        MachineRecipe r = new MachineRecipe(4 / getSpeed(), new ItemStack[0], new ItemStack[]{adding});
+                        if (!fits(b, r.getOutput())) return;
+                        BlockStorage.getInventory(b).replaceExistingItem(slot, InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(slot), 1));
+                        processing.put(b, r);
+                        progress.put(b, r.getTicks());
+                        break;
                     }
-                    if (getSpeed() > 19)
-                    {
-                        adding.setAmount(5);
-                    }
-                    MachineRecipe r = new MachineRecipe(4 / getSpeed(), new ItemStack[0], new ItemStack[] {adding});
-                    if (!fits(b, r.getOutput())) return;
-                    BlockStorage.getInventory(b).replaceExistingItem(slot, InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(slot), 8));
-                    processing.put(b, r);
-                    progress.put(b, r.getTicks());
-                    break;
                 }
             }
         }
@@ -121,7 +106,7 @@ public abstract class ElectricCobbletoDust extends AContainer {;
 
     @Override
     public String getMachineIdentifier() {
-        return "ELECTRIC_COBBLE_TO_DUST";
+        return "STRIPPED_LOG_FACTORY";
     }
 
 }

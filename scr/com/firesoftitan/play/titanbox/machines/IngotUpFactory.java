@@ -43,7 +43,7 @@ public abstract class IngotUpFactory extends AContainer {
 
     @Override
     public ItemStack getProgressBar() {
-        return new ItemStack(Material.GOLD_SPADE);
+        return new ItemStack(Material.GOLDEN_SHOVEL);
     }
 
     @Override
@@ -59,7 +59,7 @@ public abstract class IngotUpFactory extends AContainer {
         int i;
         for(var4 = 0; var4 < var3; ++var4) {
             i = var2[var4];
-            preset.addItem(i, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte)7), " ", new String[0]), new ChestMenu.MenuClickHandler() {
+            preset.addItem(i, new CustomItem(new MaterialData(Material.GRAY_STAINED_GLASS_PANE), " ", new String[0]), new ChestMenu.MenuClickHandler() {
                 public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
                     return false;
                 }
@@ -71,7 +71,7 @@ public abstract class IngotUpFactory extends AContainer {
 
         for(var4 = 0; var4 < var3; ++var4) {
             i = var2[var4];
-            preset.addItem(i, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte)4), " ", new String[0]), new ChestMenu.MenuClickHandler() {
+            preset.addItem(i, new CustomItem(new MaterialData(Material.YELLOW_STAINED_GLASS_PANE), " ", new String[0]), new ChestMenu.MenuClickHandler() {
                 public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
                     return false;
                 }
@@ -83,7 +83,7 @@ public abstract class IngotUpFactory extends AContainer {
 
         for(var4 = 0; var4 < var3; ++var4) {
             i = var2[var4];
-            preset.addItem(i, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte)14), " ", new String[0]), new ChestMenu.MenuClickHandler() {
+            preset.addItem(i, new CustomItem(new MaterialData(Material.YELLOW_STAINED_GLASS_PANE), " ", new String[0]), new ChestMenu.MenuClickHandler() {
                 public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
                     return false;
                 }
@@ -95,14 +95,14 @@ public abstract class IngotUpFactory extends AContainer {
 
         for(var4 = 0; var4 < var3; ++var4) {
             i = var2[var4];
-            preset.addItem(i, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte)1), " ", new String[0]), new ChestMenu.MenuClickHandler() {
+            preset.addItem(i, new CustomItem(new MaterialData(Material.ORANGE_STAINED_GLASS_PANE), " ", new String[0]), new ChestMenu.MenuClickHandler() {
                 public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
                     return false;
                 }
             });
         }
 
-        preset.addItem(22, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte)15), " ", new String[0]), new ChestMenu.MenuClickHandler() {
+        preset.addItem(22, new CustomItem(new MaterialData(Material.BLACK_STAINED_GLASS_PANE), " ", new String[0]), new ChestMenu.MenuClickHandler() {
             public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
                 return false;
             }
@@ -161,7 +161,7 @@ public abstract class IngotUpFactory extends AContainer {
                 }
                 ChargableBlock.addCharge(b, -getEnergyConsumption());
 
-                BlockStorage.getInventory(b).replaceExistingItem(22, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 15), " "));
+                BlockStorage.getInventory(b).replaceExistingItem(22, new CustomItem(new MaterialData(Material.BLACK_STAINED_GLASS_PANE), " "));
                 pushItems(b, processing.get(b).getOutput());
 
                 progress.remove(b);

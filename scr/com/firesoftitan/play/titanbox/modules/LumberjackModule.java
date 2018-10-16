@@ -1,14 +1,20 @@
 package com.firesoftitan.play.titanbox.modules;
 
+import com.firesoftitan.play.titanbox.Utilities;
 import com.firesoftitan.play.titanbox.enums.ModuleTypeEnum;
 import com.firesoftitan.play.titanbox.enums.TreeTypeEnum;
 import com.firesoftitan.play.titanbox.holders.TreeHolder;
+import com.firesoftitan.play.titansql.ResultData;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public class LumberjackModule extends MainModule {
@@ -81,7 +87,18 @@ public class LumberjackModule extends MainModule {
         }
     }
     @Override
+    public void unLinkAll()
+    {
+        this.link = null;
+        for(int i = 0; i < trees.length;i++)
+        {
+            trees[i] = null;
+        }
+        saveInfo();
+    }
+    @Override
     public boolean setLink(Location link, Player player) {
+        super.setLink(link, player);
         this.link = null;
         ereasme = Long.valueOf(-1);
         if (TreeHolder.isTree(link))
@@ -136,23 +153,34 @@ public class LumberjackModule extends MainModule {
         return false;
     }
 
-
     @Override
-    public void loadInfo() {
-        super.loadInfo();
+    public void loadInfo(HashMap<String, ResultData> result)
+    {
+        super.loadInfo(result);
+        if (result.get("locations") != null && result.get("items") != null)
+        {
+            List<ItemStack> tmpTrees = result.get("items").getItemList();
+            List<String>  tmpLocation = result.get("locations").getStringList();
+            if (tmpTrees != null) {
+                for (int i = 0; i < tmpTrees.size(); i++) {
+                    TreeHolder tmpTH = new TreeHolder();
+                    String[] tmpLoc = tmpLocation.get(i).split(",");
+                    for (int j = 0; j < tmpLoc.length; j++) {
+                        if (tmpLoc[j].length() > 3) {
+                            String tmpL = tmpLoc[j];
+                            String[] info = tmpL.split("~");
+                            if (info.length > 3) {
+                                Location tree = new Location(Bukkit.getWorld(info[0]), Integer.parseInt(info[1]), Integer.parseInt(info[2]), Integer.parseInt(info[3]));
+                                tmpTH.setLoc(j, tree.clone());
+                            }
+                        }
 
-        for(int i = 0; i < trees.length;i++) {
-            if (modules.contains("modules." + moduleid + ".slots.tree." + i) && modules.contains("modules." + moduleid + ".slots.treetype." + i)) {
-                TreeHolder tmpTH = new TreeHolder();
-                for (int j= 0; j < 4; j++) {
-                    if (modules.contains("modules." + moduleid + ".slots.tree." + i + "." + j)) {
-                        tmpTH.setLoc(j, modules.getLocation("modules." + moduleid + ".slots.tree." + i + "." + j));
                     }
-                }
-                ItemStack tmp = modules.getItem("modules." + moduleid + ".slots.treetype." + i);
-                tmpTH.setType(TreeTypeEnum.getFromMaterial(tmp.getType(), tmp.getDurability()));
-                trees[i] = tmpTH;
 
+                    ItemStack tmp = tmpTrees.get(i);
+                    tmpTH.setType(TreeTypeEnum.getFromMaterial(tmp.getType(), tmp.getDurability()));
+                    trees[i] = tmpTH;
+                }
             }
         }
     }
@@ -160,6 +188,33 @@ public class LumberjackModule extends MainModule {
     @Override
     public void saveInfo() {
         super.saveInfo();
+
+        List<String> saveLocations = new ArrayList<String>();
+        List<ItemStack> saveTress = new ArrayList<ItemStack>();
+
+        for(int i = 0; i < trees.length;i++) {
+            int size = 1;
+            if (trees[i] != null) {
+                if (trees[i].getType() != null) {
+                    if (trees[i].isBig()) {
+                        size = 4;
+                    }
+                    String adding = "";
+                    for (int j = 0; j < size; j++) {
+                        Location tree = trees[i].getLoc(j).clone();
+                        if (tree != null && tree.getWorld() != null) {
+                            adding = adding + tree.getWorld().getName() + "~" + tree.getBlockX() + "~" + tree.getBlockY() + "~" + tree.getBlockZ() + ",";
+                        }
+                    }
+                    saveLocations.add(adding);
+                    saveTress.add(trees[i].getType().getItemStack());
+                }
+            }
+        }
+        modulesSQL.setDataField("locations", saveLocations);
+        modulesSQL.setDataField("items", saveTress);
+        this.sendDate();
+/*
         for(int i = 0; i < trees.length;i++) {
             int size = 1;
             if (trees[i] != null) {
@@ -183,7 +238,7 @@ public class LumberjackModule extends MainModule {
                 modules.setValue("modules." + moduleid + ".slots.tree." + i, null);
                 modules.setValue("modules." + moduleid + ".slots.treetype." + i, null);
             }
-        }
+        }*/
     }
 
     @Override
@@ -217,7 +272,7 @@ public class LumberjackModule extends MainModule {
     @Override
     public ItemStack getMeAsIcon()
     {
-        return new ItemStack(Material.SAPLING, 1);
+        return new ItemStack(Material.OAK_SAPLING, 1);
     }
     @Override
     public void runMe(UUID owner)
@@ -228,10 +283,14 @@ public class LumberjackModule extends MainModule {
             getNextTree();
 
             if (trees[treeIndex] != null) {
-                if (trees[treeIndex].getLocMain().getChunk().isLoaded()) {
-                    if (trees[treeIndex].growMe(owner)) return;
-                    if (trees[treeIndex].plantSapling(owner)) return;
-                    trees[treeIndex].chopDownMe(owner);
+                if (trees[treeIndex].getLocMain() != null) {
+                    if (trees[treeIndex].getLocMain().getChunk() != null) {
+                        if (Utilities.isLoaded(trees[treeIndex].getLocMain())) {
+                            if (trees[treeIndex].growMe(owner)) return;
+                            if (trees[treeIndex].plantSapling(owner)) return;
+                            trees[treeIndex].chopDownMe(owner);
+                        }
+                    }
                 }
             }
 

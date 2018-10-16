@@ -10,12 +10,14 @@ import com.firesoftitan.play.titanbox.interfaces.InventoryHolder;
 import com.firesoftitan.play.titanbox.modules.MainModule;
 import com.firesoftitan.play.titanbox.runnables.GUIRouterRunnable;
 import com.firesoftitan.play.titanbox.runnables.IRRUserRunnable;
+import com.firesoftitan.play.titansql.ResultData;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,17 +26,18 @@ public class ItemRoutingRouter implements InventoryHolder {
     private int startIndex = 0;
     private List<MainModule> modules;
     private UUID owner;
-    private Location location;
     private String ID = "";
     private mainGUI gui;
     private GUIRouterRunnable guiRouterRunnable;
     private Long lastTick = Long.valueOf(0);
+
     private List<MainModule> buffer = new ArrayList<MainModule>();
+
+
     public ItemRoutingRouter(String ID)
     {
         this.ID = ID;
         modules = new ArrayList<MainModule>();
-
     }
 
     public int getLastTick() {
@@ -108,7 +111,7 @@ public class ItemRoutingRouter implements InventoryHolder {
         updateStatusButton();
 
 
-        ItemStack blank = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 15);
+        ItemStack blank = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
         blank = TitanBox.changeName(blank, "-");
         for (int i = 46; i < 52; i++)
         {
@@ -132,7 +135,7 @@ public class ItemRoutingRouter implements InventoryHolder {
             tmp.setToggle(buttonEnum.TRUE);
         }
 
-        tmp =gui.getButton(49);
+        /*tmp =gui.getButton(49);
         String bTexture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGQyYzE5YjQ0MjU0MTM1MWE2YjgxZWViNmNiZWY0MTk2NmZmYjdkYmU0YzEzNmI4N2Y1YmFmOWQxNGEifX19";
         double percent = (double)RouterHolder.getCharge(this.getLocation()) / (double)RouterHolder.getCapacity(this.getLocation());
         percent = percent *100;
@@ -152,7 +155,7 @@ public class ItemRoutingRouter implements InventoryHolder {
         }
         tmp.setNameFalse(bName);
         tmp.setTextureFalse(bTexture);
-        tmp.setToggle(buttonEnum.FALSE);
+        tmp.setToggle(buttonEnum.FALSE);*/
 
     }
 
@@ -165,12 +168,12 @@ public class ItemRoutingRouter implements InventoryHolder {
         int ticks = getLastTick();
         String Status = ChatColor.RED + "Offline!";
         OfflinePlayer ownerPalyer = Bukkit.getOfflinePlayer(this.getOwner());
-        int charge = RouterHolder.getCharge(this.getLocation());
+        //int charge = RouterHolder.getCharge(this.getLocation());
         List<String> allLore = new ArrayList<String>();
         boolean running = true;
         if (ticks > 60)
         {
-            IRRUserRunnable runnerTimer = RouterHolder.bufferListT.get(this.getOwner().toString());
+            IRRUserRunnable runnerTimer = RouterHolder.bufferListT.get(this.getOwner());
             if (runnerTimer == null)
             {
                 allLore.add(ChatColor.RED + "Warning: " + ChatColor.YELLOW + "Log Out and Back In!");
@@ -188,11 +191,12 @@ public class ItemRoutingRouter implements InventoryHolder {
             }
             running = false;
         }
+        /*
         if (charge == 0)
         {
             allLore.add(ChatColor.RED + "Warning: " + ChatColor.YELLOW + "No Power!");
             running = false;
-        }
+        }*/
         if (ownerPalyer == null || !ownerPalyer.isOnline())
         {
             allLore.add(ChatColor.RED + "Warning: " + ChatColor.YELLOW + "Owner Offline!");
@@ -222,16 +226,25 @@ public class ItemRoutingRouter implements InventoryHolder {
         int max = Math.min(startIndex + 45, modules.size());
         for(int i = startIndex; i<max;i++)
         {
-            buttonGUIs tmp = gui.getButton(slot);
-            ItemStack copyMe = MainModule.getItemfromModule(modules.get(i));//MainModule.getItemfromModule(modules.get(i));
-            tmp.setMaterialTrue(copyMe);
-            tmp.setNameTrue(copyMe.getItemMeta().getDisplayName());
-            tmp.setLore(copyMe.getItemMeta().getLore());
-            tmp.setToggle(buttonEnum.TRUE);
-            slot++;
+            try {
+                buttonGUIs tmp = gui.getButton(slot);
+                ItemStack copyMe = new ItemStack(Material.BARRIER, 1);//MainModule.getItemfromModule(modules.get(i));
+                try {
+                    copyMe = MainModule.getItemfromModule(modules.get(i));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                tmp.setMaterialTrue(copyMe);
+                tmp.setNameTrue(copyMe.getItemMeta().getDisplayName());
+                tmp.setLore(copyMe.getItemMeta().getLore());
+                tmp.setToggle(buttonEnum.TRUE);
+                slot++;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
-        ItemStack blank = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 5);
+        ItemStack blank = new ItemStack(Material.LIME_STAINED_GLASS_PANE);
         blank = TitanBox.changeName(blank, "Click Module To Add it Here!");
         max = Math.min(startIndex + 45, this.getMax());
         for (int i = startIndex + slot; i<max;i++)
@@ -241,7 +254,7 @@ public class ItemRoutingRouter implements InventoryHolder {
             tmp.setToggle(buttonEnum.FALSE);
             slot++;
         }
-        blank = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 14);
+        blank = new ItemStack(Material.RED_STAINED_GLASS_PANE);
         blank = TitanBox.changeName(blank, "You can add more slots here!");
         max = Math.min(startIndex + 45, RouterHolder.bigMax);
         for (int i = startIndex + slot; i<max;i++)
@@ -253,7 +266,7 @@ public class ItemRoutingRouter implements InventoryHolder {
             slot++;
 
         }
-        blank = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 15);
+        blank = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
         blank = TitanBox.changeName(blank, "-");
         for (int i = slot; i < 45; i++)
         {
@@ -275,13 +288,6 @@ public class ItemRoutingRouter implements InventoryHolder {
         return gui;
     }
 
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
-    }
 
     public int getMax() {
         return max;
@@ -317,33 +323,32 @@ public class ItemRoutingRouter implements InventoryHolder {
         return owner;
     }
 
-    public static void loadRRH(String key)
+    public static void loadRRH(HashMap<String, ResultData> result)
     {
-
-        if (RouterHolder.routing.contains("router." + key + ".owner")) {
-            List<String> tmp = RouterHolder.routing.getStringList("router." + key + ".modules");
-            UUID owner = RouterHolder.routing.getUUID("router." + key + ".owner");
-            int size = RouterHolder.routing.getInt("router." + key + ".size");
-            Location location = RouterHolder.routing.getLocation("router." + key + ".location");
-            ItemRoutingRouter tmpRouter = new ItemRoutingRouter(key);
-            tmpRouter.setOwner(owner);
-            tmpRouter.setMax(size);
-            tmpRouter.setLocation(location);
-            List<MainModule> tmpMH = tmpRouter.getModules();
+        String key = result.get("id").getString();
+        List<String> tmp = result.get("modules").getStringList();
+        UUID owner = result.get("owner").getUUID();
+        int size = result.get("size").getInteger();
+        //Location location = result.get("location").getLocation();
+        ItemRoutingRouter tmpRouter = new ItemRoutingRouter(key);
+        tmpRouter.setOwner(owner);
+        tmpRouter.setMax(size);
+        List<MainModule> tmpMH = new ArrayList<MainModule>();
+        if (tmp != null) {
             for (String tmpKey : tmp) {
                 if (MainModule.getModulefromID(tmpKey) != null) {
                     tmpMH.add(MainModule.getModulefromID(tmpKey));
                 }
             }
-            RouterHolder.routersByID.put(key, tmpRouter);
-            RouterHolder.routersByLocation.put(tmpRouter.getLocation().toString(), tmpRouter);
-            RouterHolder.routersByOwner.put(tmpRouter.getOwner().toString(), tmpRouter);
         }
-        else
+        tmpRouter.setModules(tmpMH);
+        RouterHolder.routersByID.put(key, tmpRouter);
+        RouterHolder.routersByOwner.put(tmpRouter.getOwner(), tmpRouter);
+        if (result.containsKey("location") && result.get("location") != null && result.get("location").getLocation() != null)
         {
-            RouterHolder.routing.setValue("router." + key, null);
-            RouterHolder.routing.save();
+            RouterHolder.addRouterLocation(result.get("location").getLocation());
         }
+
     }
     public void SaveMe()
     {
@@ -352,10 +357,18 @@ public class ItemRoutingRouter implements InventoryHolder {
         {
             keys.add(mm.getModuleid());
         }
+        RouterHolder.routingSQL.setDataField("id", this.getID());
+        RouterHolder.routingSQL.setDataField("modules", keys);
+        RouterHolder.routingSQL.setDataField("owner", this.getOwner());
+        RouterHolder.routingSQL.setDataField("size", this.getMax());
+        RouterHolder.routingSQL.setDataField("location", new Location(Bukkit.getWorlds().get(0), 0, 0, 0));
+        RouterHolder.routingSQL.insertData();
+
+        /*
         RouterHolder.routing.setValue("router." + this.getID() + ".modules", keys);
         RouterHolder.routing.setValue("router." + this.getID() + ".owner", this.getOwner());
         RouterHolder.routing.setValue("router." + this.getID() + ".size", this.getMax());
-        RouterHolder.routing.setValue("router." + this.getID() + ".location", this.getLocation());
+        RouterHolder.routing.setValue("router." + this.getID() + ".location", this.getLocation());*/
     }
     @Override
     public void onInventoryClickEvent(InventoryClickEvent event, buttonGUIs button) {

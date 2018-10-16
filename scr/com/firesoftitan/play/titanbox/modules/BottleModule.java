@@ -4,6 +4,7 @@ import com.firesoftitan.play.titanbox.TitanBox;
 import com.firesoftitan.play.titanbox.enums.ModuleTypeEnum;
 import com.firesoftitan.play.titanbox.machines.Pumps;
 import com.firesoftitan.play.titanbox.machines.StorageUnit;
+import com.firesoftitan.play.titansql.ResultData;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionType;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 public class BottleModule extends MainModule {
@@ -26,9 +28,14 @@ public class BottleModule extends MainModule {
     public Location getLink() {
         return link;
     }
-
+    @Override
+    public void unLinkAll() {
+        this.link = null;
+        saveInfo();
+    }
     @Override
     public boolean setLink(Location link, Player player) {
+        super.setLink(link, player);
         String pump = Pumps.getPumpType(link);
         this.link = null;
         if (pump != null)
@@ -49,12 +56,21 @@ public class BottleModule extends MainModule {
     @Override
     public ItemStack getMeAsIcon()
     {
-        return new ItemStack(Material.BUCKET, 1);
+        if (isLoaded()) {
+            if (Pumps.getLiquid(link, "Water")) {
+                return new ItemStack(Material.GLASS_BOTTLE, 1);
+            }
+        }
+        return new ItemStack(Material.BARRIER, 1);
+
     }
+
     @Override
-    public void loadInfo() {
-        super.loadInfo();
+    public void loadInfo(HashMap<String, ResultData> result)
+    {
+        super.loadInfo(result);
     }
+
 
     @Override
     public void saveInfo() {

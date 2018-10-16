@@ -5,6 +5,8 @@ import com.firesoftitan.play.titanbox.enums.ModuleTypeEnum;
 import com.firesoftitan.play.titanbox.holders.RouterHolder;
 import com.firesoftitan.play.titanbox.holders.SendingSlotHolder;
 import com.firesoftitan.play.titanbox.machines.StorageUnit;
+import com.firesoftitan.play.titansql.ResultData;
+import com.firesoftitan.play.titansql.TitanSQL;
 import me.mrCookieSlime.CSCoreLibPlugin.general.World.CustomSkull;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
@@ -13,6 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -28,6 +31,8 @@ public class InventoryModule extends MainModule {
     private String mode = "pulling";
     private boolean hidebar = false;
     private Inventory myGui = null;
+    private HashMap<Integer, Integer> max = new HashMap<Integer, Integer>();
+    private HashMap<Integer, Integer> keep = new HashMap<Integer, Integer>();
     public List<Integer> bufferSlotsPulling = new ArrayList<Integer>();
     public List<SendingSlotHolder> bufferSlotsSending = new ArrayList<SendingSlotHolder>();
     private int tmpSlot = -1;
@@ -51,53 +56,75 @@ public class InventoryModule extends MainModule {
         secondrySize = TitanBox.config.getInt("settings.module.linking.secondarysize");
     }
     @Override
-    public void loadInfo()
+    public void loadInfo(HashMap<String, ResultData> result)
     {
-        super.loadInfo();
-
+        super.loadInfo(result);
         slotsPulling.clear();
         slotsSending.clear();
         bufferSlotsPulling.clear();
         bufferSlotsSending.clear();
-
+        max.clear();
+        keep.clear();
         secondary = new Location[secondrySize];
 
-        if (modules.contains("modules." + moduleid + ".slots.hide")) {
-            hidebar = modules.getBoolean("modules." + moduleid + ".slots.hide");
+        if (result.get("hide").getBoolean() != null)
+        {
+            hidebar = result.get("hide").getBoolean();
         }
-        if (modules.contains("modules." + moduleid + ".slots.pulling")) {
-            slotsPulling = modules.getIntList("modules." + moduleid + ".slots.pulling");
+        if (result.get("slots").getIntList() != null)
+        {
+            slotsPulling = result.get("slots").getIntList();
         }
-        if (modules.contains("modules." + moduleid + ".slots.mode")) {
-            mode = modules.getString("modules." + moduleid + ".slots.mode");
+        if (result.get("mode").getString() != null)
+        {
+            mode = result.get("mode").getString();
         }
-        if (modules.contains("modules." + moduleid + ".slots.editing")) {
-            tmpSlot = modules.getInt("modules." + moduleid + ".slots.editing");
+        if (result.get("selection").getInteger() != null)
+        {
+            tmpSlot = result.get("selection").getInteger();
         }
-        if (modules.contains("modules." + moduleid + ".slots.filter")) {
-            Set<String> keys = modules.getKeys("modules." + moduleid + ".slots.filter");
-            for (String key : keys) {
-                try {
-                    int tmp = Integer.parseInt(key);
-                    ItemStack tmp2 = modules.getItem("modules." + moduleid + ".slots.filter." + key);
-                    slotsSending.add(new SendingSlotHolder(tmp, tmp2.clone()));
-                }
-                catch (Exception e)
-                {
-                    System.out.println("[TitanBox]: Bad Filter!");
-                    modules.setValue("modules." + moduleid + ".slots.filter." + key, null);
-                }
+        if (result.get("keep").getIntList() != null) {
+            List<Integer> tmpKeep =  result.get("keep").getIntList();
+            List<Integer> tmpKeep_slots =  result.get("keep_slots").getIntList();
+            for(int i = 0; i < tmpKeep.size(); i++)
+            {
+                keep.put(tmpKeep_slots.get(i), tmpKeep.get(i));
             }
         }
-        for (int i =0; i < secondary.length; i++)
+        if (result.get("max").getIntList() != null) {
+            List<Integer> tmpKeep =  result.get("max").getIntList();
+            List<Integer> tmpKeep_slots =  result.get("max_slots").getIntList();
+            for(int i = 0; i < tmpKeep.size(); i++)
+            {
+                max.put(tmpKeep_slots.get(i), tmpKeep.get(i));
+            }
+        }
+        if (result.get("items").getItemList() != null)
         {
-            Location loc = secondary[i];
-            if (modules.contains("modules." + moduleid + ".slots.secondary." + i)) {
-                secondary[i] = modules.getLocation("modules." + moduleid + ".slots.secondary." + i);
+            List<ItemStack> items = result.get("items").getItemList();
+            List<Integer> items_slots = result.get("items_slots").getIntList();
+            if (items != null) {
+                for (int i = 0; i < items.size(); i++) {
+                    slotsSending.add(new SendingSlotHolder(items_slots.get(i), items.get(i).clone()));
+                }
             }
 
         }
+        if (result.get("locations").getStringList() != null) {
+            List<String> tmpLoc = result.get("locations").getStringList();
+            if (tmpLoc != null) {
+                for (int i = 0; i < tmpLoc.size(); i++) {
+
+                    if (tmpLoc.get(i) != null) {
+                        Location adding = TitanSQL.decodeLocation(tmpLoc.get(i));
+                        secondary[i] = adding.clone();
+                    }
+
+                }
+            }
+        }
     }
+
 
     public int getEditingSlot() {
         return editingSlot;
@@ -120,6 +147,57 @@ public class InventoryModule extends MainModule {
     {
         super.saveInfo();
         Collections.sort(slotsPulling);
+
+        modulesSQL.setDataField("slots", slotsPulling);
+        modulesSQL.setDataField("mode", mode);
+        modulesSQL.setDataField("selection", tmpSlot);
+        modulesSQL.setDataField("hide", hidebar);
+        List<ItemStack> savingItems = new ArrayList<ItemStack>();
+        List<Integer> savingItemsSlots = new ArrayList<Integer>();
+        for(SendingSlotHolder i: slotsSending) {
+            savingItemsSlots.add(i.getSlot());
+            if (i.getItem() == null) {
+                savingItems.add(new ItemStack(Material.AIR));
+            } else {
+                savingItems.add(i.getItem());
+            }
+        }
+        modulesSQL.setDataField("items", savingItems);
+        modulesSQL.setDataField("items_slots", savingItemsSlots);
+        List<String> savingLocation = new ArrayList<String>();
+        if (secondary == null)
+        {
+            secondary = new Location[secondrySize];
+        }
+        for (int i =0; i < secondary.length; i++) {
+            Location loc = secondary[i];
+            if (loc != null) {
+                savingLocation.add(TitanSQL.encode(loc.clone()));
+            }
+        }
+        modulesSQL.setDataField("locations", savingLocation);
+        List<Integer> tmpkeep = new ArrayList<Integer>();
+        List<Integer> tmpkeep_slots = new ArrayList<Integer>();
+        for(Integer key: keep.keySet())
+        {
+            tmpkeep_slots.add(key);
+            tmpkeep.add(keep.get(key));
+        }
+        modulesSQL.setDataField("keep", tmpkeep);
+        modulesSQL.setDataField("keep_slots", tmpkeep_slots);
+
+        List<Integer> tmpmax = new ArrayList<Integer>();
+        List<Integer> tmpmax_slots = new ArrayList<Integer>();
+        for(Integer key: max.keySet())
+        {
+            tmpmax_slots.add(key);
+            tmpmax.add(max.get(key));
+        }
+        modulesSQL.setDataField("max", tmpmax);
+        modulesSQL.setDataField("max_slots", tmpmax_slots);
+        this.sendDate();
+        /*
+
         modules.setValue("modules." + moduleid + ".slots.pulling", slotsPulling);
         modules.setValue("modules." + moduleid + ".slots.mode", mode);
         modules.setValue("modules." + moduleid + ".slots.editing", tmpSlot);
@@ -146,7 +224,7 @@ public class InventoryModule extends MainModule {
             {
                 modules.setValue("modules." + moduleid + ".slots.secondary." + i, loc);
             }
-        }
+        }*/
     }
     @Override
     public void clearInfo()
@@ -157,6 +235,8 @@ public class InventoryModule extends MainModule {
             slotsSending.clear();
             bufferSlotsPulling.clear();
             bufferSlotsSending.clear();
+            keep.clear();
+            max.clear();
             //modules.setValue("modules." + moduleid , null);
         }
     }
@@ -170,7 +250,7 @@ public class InventoryModule extends MainModule {
 
     private void makeGui(Player player) {
         myGui = Bukkit.createInventory(null, 54, this.type.getTitle());
-        ItemStack blank = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 12);
+        ItemStack blank = new ItemStack(Material.BROWN_STAINED_GLASS_PANE);
         blank.getItemMeta().setDisplayName("-");
         String pushpull = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjg0ZjU5NzEzMWJiZTI1ZGMwNThhZjg4OGNiMjk4MzFmNzk1OTliYzY3Yzk1YzgwMjkyNWNlNGFmYmEzMzJmYyJ9fX0=";
         String namepp = "sending to";
@@ -189,25 +269,36 @@ public class InventoryModule extends MainModule {
         ItemStack editMode = new ItemStack(Material.SIGN, 1);
         editMode = TitanBox.changeName(editMode, "Edit Mode");
 
-        ItemStack block = new ItemStack(Material.BARRIER, 1);
+        ItemStack itemStack_block = new ItemStack(Material.BARRIER, 1);
         ItemStack hideBlock =TitanBox.getSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjNjNjZjNDJjZGUxZGQxZjVmOTUxNDNlNDcyMjU0ZjdmYWU4ZWNjZmY0ZGM5NDNiMDg2YTk0NGIyN2JkZmIifX19");
         hideBlock = TitanBox.changeName(hideBlock, "Hide Menu Bar");
         hideBlock = TitanBox.addLore(hideBlock, ChatColor.WHITE + "-Shift Click Any Item to Show bar Again");
         if (getLink() != null) {
-            block = new ItemStack(getLink().getBlock().getType(), 1, getLink().getBlock().getData());
-            if (block.getType() == Material.SKULL) {
+            itemStack_block = new ItemStack(getLink().getBlock().getType(), 1);
+            if (itemStack_block.getType() == Material.PLAYER_WALL_HEAD)
+            {
+                Block block = getLink().getBlock();
+                block.setType(Material.PLAYER_HEAD);
+                itemStack_block = new ItemStack(Material.PLAYER_HEAD, 1);
+
+            }
+            if (itemStack_block.getType() == Material.PLAYER_HEAD) {
                 String texture = "";
                 try {
                     texture = CustomSkull.getTexture(getLink().getBlock());
-                    block = CustomSkull.getItem(texture);
+                    itemStack_block = CustomSkull.getItem(texture);
                 } catch (Exception e) {
 
                 }
             }
-            if (block == null || !TitanBox.isInventory(getLink().getBlock())) {
-                setLink(null, player);
+            if (itemStack_block == null)
+            {
+                itemStack_block = new ItemStack(Material.PAPER, 1);
+            }
+            if (itemStack_block == null || !TitanBox.isInventory(getLink().getBlock())) {
+                //setLink(null, player);
                 updateGUIClicked(player, this, false);
-                block = new ItemStack(Material.BARRIER, 1);
+                itemStack_block = new ItemStack(Material.BARRIER, 1);
             }
             else
             {
@@ -280,10 +371,11 @@ public class InventoryModule extends MainModule {
             else {
 
                 ItemStack filterItem = getItemNSlotSending(editingSlot);
+                InventoryModule IVM = (InventoryModule) moduleByID.get(moduleid);
                 if (!TitanBox.isEmpty(filterItem)) {
                     int amount = filterItem.getMaxStackSize();
-                    if (modules.contains("modules." + moduleid + ".slots.advance." + editingSlot + ".max")) {
-                        amount = modules.getInt("modules." + moduleid + ".slots.advance." + editingSlot + ".max");
+                    if (IVM.max.containsKey(editingSlot)) {
+                        amount = IVM.max.get(editingSlot);
                     }
                     ItemStack slot46 = filterItem.clone();
                     slot46 = TitanBox.changeName(slot46, "Number To Send At A Time: " + amount);
@@ -293,8 +385,8 @@ public class InventoryModule extends MainModule {
 
 
                     int keep = 0;
-                    if (modules.contains("modules." + moduleid + ".slots.advance." + editingSlot + ".keep")) {
-                        keep = modules.getInt("modules." + moduleid + ".slots.advance." + editingSlot + ".keep");
+                    if (IVM.keep.containsKey(editingSlot)) {
+                        keep = IVM.keep.get(editingSlot);
                     }
 
                     ItemStack slot47 = TitanBox.instants.getItem("e").clone();
@@ -346,17 +438,17 @@ public class InventoryModule extends MainModule {
             }
             if (getLink() != null) {
                 if (getLink().getBlock().getType() == Material.BREWING_STAND) {
-                    block = new ItemStack(Material.BREWING_STAND_ITEM);
+                    itemStack_block = new ItemStack(Material.BREWING_STAND);
                 }
             }
-            block = TitanBox.changeName(block, "Linked Object");
+            itemStack_block = TitanBox.changeName(itemStack_block, "Linked Object");
             if (getLink() == null) {
-                TitanBox.addLore(block, ChatColor.YELLOW + "Location: " + ChatColor.WHITE + "not set");
+                TitanBox.addLore(itemStack_block, ChatColor.YELLOW + "Location: " + ChatColor.WHITE + "not set");
             } else {
-                block = TitanBox.addLore(block, ChatColor.YELLOW + "Location: " + ChatColor.WHITE + getLink().getWorld().getName() + ", " + getLink().getBlockX() + ", " + getLink().getBlockY() + ", " + getLink().getBlockZ());
+                itemStack_block = TitanBox.addLore(itemStack_block, ChatColor.YELLOW + "Location: " + ChatColor.WHITE + getLink().getWorld().getName() + ", " + getLink().getBlockX() + ", " + getLink().getBlockY() + ", " + getLink().getBlockZ());
             }
 
-            myGui.setItem(45, block);
+            myGui.setItem(45, itemStack_block);
         }
 
 
@@ -466,9 +558,9 @@ public class InventoryModule extends MainModule {
                         return true;
                     }
                 }
-                if (mat == Material.FURNACE || mat == Material.BURNING_FURNACE)
+                if (mat == Material.FURNACE)
                 {
-                    if (checkMat == Material.FURNACE || checkMat == Material.BURNING_FURNACE)
+                    if (checkMat == Material.FURNACE )
                     {
                         return true;
                     }
@@ -519,7 +611,7 @@ public class InventoryModule extends MainModule {
                         slotsSending.add(new SendingSlotHolder(i, null));
                     }
                 }
-                if (mat == Material.FURNACE || mat == Material.BURNING_FURNACE) {
+                if (mat == Material.FURNACE ) {
                     for (int i = 0; i < 2; i++) {
                         slotsSending.add(new SendingSlotHolder(i, null));
 
@@ -577,9 +669,11 @@ public class InventoryModule extends MainModule {
             if (storage.hasInventory(where)) {
                 BlockMenu menu = BlockStorage.getInventory(where);
                 ItemStack tmp = menu.getItemInSlot(slot);
+                if (tmp == null) return null;
                 return tmp.clone();
             } else {
                 Inventory tmp = TitanBox.getVanillaInventoryFor(where.getBlock());
+                if (tmp.getItem(slot) == null) return null;
                 return tmp.getItem(slot).clone();
 
             }
@@ -615,11 +709,8 @@ public class InventoryModule extends MainModule {
     public void runMe(UUID owner)
     {
         startSendingPulling(owner);
-
         tickPulling(getLink().clone(), owner);
-
         tickSending(getLink().clone(), owner);
-
         int Found = 0;
         for(int i = 0; i < secondary.length; i++)
         {
@@ -633,7 +724,6 @@ public class InventoryModule extends MainModule {
 
             }
         }
-
         endSendingPulling(owner);
 
     }
@@ -680,12 +770,14 @@ public class InventoryModule extends MainModule {
             if (!TitanBox.isEmpty(fillertItem)) {
                 amountMax = fillertItem.getMaxStackSize();
             }
-            if (modules.contains("modules." + getModuleid() + ".slots.advance." + slot + ".max")) {
-                amountMax = modules.getInt("modules." + getModuleid() + ".slots.advance." +slot + ".max");
+            if (this.max.containsKey(slot))
+            {
+                amountMax = this.max.get(slot);
             }
             int amountKeep = 0;
-            if (modules.contains("modules." + getModuleid() + ".slots.advance." + slot + ".keep")) {
-                amountKeep = modules.getInt("modules." + getModuleid() + ".slots.advance." +slot + ".keep");
+            if (this.keep.containsKey(slot))
+            {
+                amountKeep = this.keep.get(slot);
             }
             if (!TitanBox.isEmpty(fillertItem)) {
                 for (StorageUnit stH : StorageUnit.getStorageFromOwner(owner)) {
@@ -730,7 +822,15 @@ public class InventoryModule extends MainModule {
         }
     }
     @Override
+    public void unLinkAll()
+    {
+        this.link = null;
+        secondary = new Location[secondrySize];
+        saveInfo();
+    }
+    @Override
     public boolean setLink(Location link, Player player) {
+        super.setLink(link, player);
         if (link != null && this.link != null)
         {
             if (link.toString().equals(this.link.toString())) {
@@ -819,7 +919,6 @@ public class InventoryModule extends MainModule {
     {
         if (bufferSlotsPulling.size() != 0) {
             int slot = bufferSlotsPulling.get(0);
-
             ItemStack bufferItem = this.getItemAtLocation(where, slot);
             if (!TitanBox.isEmpty(bufferItem)) {
                 for (StorageUnit stH : StorageUnit.getStorageFromOwner(owner)) {
@@ -884,9 +983,9 @@ public class InventoryModule extends MainModule {
                         ItemStack filterItem = mh.getItemNSlotSending(mh.getEditingSlot());
                         if (!TitanBox.isEmpty(filterItem)) {
                             int amount = filterItem.getMaxStackSize();
-
-                            if (modules.contains("modules." + mh.getModuleid() + ".slots.advance." + mh.getEditingSlot() + ".max")) {
-                                amount = modules.getInt("modules." + mh.getModuleid() + ".slots.advance." + mh.getEditingSlot() + ".max");
+                            if (mh.max.containsKey(mh.getEditingSlot()))
+                            {
+                                amount = mh.max.get(mh.editingSlot);
                             }
                             if (event.getClick() == ClickType.LEFT || event.getClick() == ClickType.SHIFT_LEFT) {
                                 if (event.isShiftClick())
@@ -912,7 +1011,8 @@ public class InventoryModule extends MainModule {
                                     amount = 1;
                                 }
                             }
-                            modules.setValue("modules." + mh.getModuleid() + ".slots.advance." + mh.getEditingSlot() + ".max", amount);
+                            mh.max.put(mh.getEditingSlot(), amount);
+                            mh.saveInfo();
                         }
                         updateGUIClicked((Player) event.getWhoClicked(), mh, true);
                     }
@@ -927,9 +1027,9 @@ public class InventoryModule extends MainModule {
                         ItemStack filterItem = mh.getItemNSlotSending(mh.getEditingSlot());
                         if (!TitanBox.isEmpty(filterItem)) {
                             int  amount = 0;
-
-                            if (modules.contains("modules." + mh.getModuleid() + ".slots.advance." + mh.getEditingSlot() + ".keep")) {
-                                amount = modules.getInt("modules." + mh.getModuleid() + ".slots.advance." + mh.getEditingSlot() + ".keep");
+                            if (mh.keep.containsKey(mh.getEditingSlot()))
+                            {
+                                amount = mh.keep.get(mh.getEditingSlot());
                             }
                             if (event.getClick() == ClickType.LEFT || event.getClick() == ClickType.SHIFT_LEFT) {
                                 if (event.isShiftClick())
@@ -955,7 +1055,8 @@ public class InventoryModule extends MainModule {
                                     amount = 0;
                                 }
                             }
-                            modules.setValue("modules." + mh.getModuleid() + ".slots.advance." + mh.getEditingSlot() + ".keep", amount);
+                            mh.keep.put(mh.editingSlot, amount);
+                            mh.saveInfo();
                         }
                         updateGUIClicked((Player) event.getWhoClicked(), mh, true);
                     }

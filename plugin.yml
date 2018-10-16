@@ -3,11 +3,18 @@ main: com.firesoftitan.play.titanbox.TitanBox
 version: 1.0.0
 author: [freethemice]
 depend: [CS-CoreLib, Slimefun, GriefPrevention, Vault, FoTXRay]
+api-version: 1.13
 commands:
    titanbox:
       description: titanbox
       usage: /<command>
    tb:
+      description: fotb
+      usage: /<command>
+   shop:
+      description: fotb
+      usage: /<command>
+   shops:
       description: fotb
       usage: /<command>
 permissions:

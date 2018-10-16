@@ -29,11 +29,11 @@ public class SlimefunItemsHolder {
 
     public static ItemStack LuckyIngot = new CustomItem(Material.GOLD_INGOT, "&e&lLucky Ingot", new String[] { "DAMAGE_ALL-2"}, 0);
     public static ItemStack EclipseIngot = new CustomItem(Material.IRON_INGOT, "&b&lEclipse Ingot", new String[] { "DAMAGE_ALL-6"}, 0);
-    public static ItemStack TitanIngot = new CustomItem(Material.CLAY_BRICK, "&4&lTitan Ingot", new String[] { "DAMAGE_ALL-10"}, 0);
+    public static ItemStack TitanIngot = new CustomItem(Material.BRICK, "&4&lTitan Ingot", new String[] { "DAMAGE_ALL-10"}, 0);
 
-    public static ItemStack LuckySword = new CustomItem(Material.GOLD_SWORD, "&e&lLucky Sword", new String[] { "DAMAGE_ALL-10", "LOOT_BONUS_MOBS-10", "FIRE_ASPECT-5", "DURABILITY-10" }, 0);
-    public static ItemStack LuckyPickaxe = new CustomItem(Material.GOLD_PICKAXE, "&e&lLucky Pickaxe", new String[] { "DIG_SPEED-10", "LOOT_BONUS_BLOCKS-10", "DURABILITY-10" }, 0);
-    public static ItemStack LuckyAxe = new CustomItem(Material.GOLD_AXE, "&e&lLucky Axe", new String[] { "DAMAGE_ALL-10", "DIG_SPEED-10", "LOOT_BONUS_BLOCKS-10", "DURABILITY-10" }, 0);
+    public static ItemStack LuckySword = new CustomItem(Material.GOLDEN_SWORD, "&e&lLucky Sword", new String[] { "DAMAGE_ALL-10", "LOOT_BONUS_MOBS-10", "FIRE_ASPECT-5", "DURABILITY-10" }, 0);
+    public static ItemStack LuckyPickaxe = new CustomItem(Material.GOLDEN_PICKAXE, "&e&lLucky Pickaxe", new String[] { "DIG_SPEED-10", "LOOT_BONUS_BLOCKS-10", "DURABILITY-10" }, 0);
+    public static ItemStack LuckyAxe = new CustomItem(Material.GOLDEN_AXE, "&e&lLucky Axe", new String[] { "DAMAGE_ALL-10", "DIG_SPEED-10", "LOOT_BONUS_BLOCKS-10", "DURABILITY-10" }, 0);
     public static ItemStack LuckyHelmet = new CustomItem(Material.DIAMOND_HELMET, "&e&lLucky Helmet", new String[] { "PROTECTION_ENVIRONMENTAL-10", "PROTECTION_PROJECTILE-10", "PROTECTION_EXPLOSIONS-10", "THORNS-10", "DURABILITY-10" }, 0);
     public static ItemStack LuckyChestplate = new CustomItem(Material.DIAMOND_CHESTPLATE, "&e&lLucky Chestplate", new String[] { "PROTECTION_ENVIRONMENTAL-10", "PROTECTION_PROJECTILE-10", "PROTECTION_EXPLOSIONS-10", "THORNS-10", "DURABILITY-10" }, 0);
     public static ItemStack LuckyLeggings = new CustomItem(Material.DIAMOND_LEGGINGS, "&e&lLucky Leggings", new String[] { "PROTECTION_ENVIRONMENTAL-10", "PROTECTION_PROJECTILE-10", "PROTECTION_EXPLOSIONS-10", "THORNS-10", "DURABILITY-10" }, 0);
@@ -61,9 +61,9 @@ public class SlimefunItemsHolder {
     public static ItemStack TitanBoots = new CustomItem(Material.DIAMOND_BOOTS, "&4&lTitan Boots", new String[] { "PROTECTION_ENVIRONMENTAL-23", "PROTECTION_PROJECTILE-23", "PROTECTION_EXPLOSIONS-23", "THORNS-23", "DURABILITY-23" }, 0);
 
     public static ItemStack ANCIENT_ALTAR_CRAFTER_BLOCK = TitanBox.getHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWZkMDE2NzY4OTcxNWRmMWFhNTA1NWE2M2VhNmI4YmE2NTZlMmI0YjgxZmNjYWI1M2MzZTIxMDhkODBiODFjIn19fQ==");
-    public static ItemStack AUTOMATED_VANILLA_CRAFTING_CHAMBER = new CustomItem(new MaterialData(Material.WORKBENCH), "&eAutomated Vanilla Crafting Chamber", "", "&6Advanced Machine", "&8\u21E8 &e\u26A1 &710 J/Item");
+    public static ItemStack AUTOMATED_VANILLA_CRAFTING_CHAMBER = new CustomItem(new MaterialData(Material.CRAFTING_TABLE), "&eAutomated Vanilla Crafting Chamber", "", "&6Advanced Machine", "&8\u21E8 &e\u26A1 &710 J/Item");
     public static ItemStack ANCIENT_ALTAR_CRAFTER = new CustomItem(ANCIENT_ALTAR_CRAFTER_BLOCK, "&6Ancient Altar Crafter", "", "&6Advanced Machine", "&8\u21E8 &e\u26A1 &750 J/Item");
-    public static ItemStack AUTOMATED_ANCIENT_ALTAR_CRAFTER = new CustomItem(new MaterialData(Material.WORKBENCH), "&6Automated Ancient Altar Crafter", "", "&6Advanced Machine", "&8\u21E8 &e\u26A1 &750 J/Item");
+    public static ItemStack AUTOMATED_ANCIENT_ALTAR_CRAFTER = new CustomItem(new MaterialData(Material.CRAFTING_TABLE), "&6Automated Ancient Altar Crafter", "", "&6Advanced Machine", "&8\u21E8 &e\u26A1 &750 J/Item");
     public static ItemStack THERMAL_GENERATOR;
     public static ItemStack FREE_ENERGY_I;
     public static ItemStack FREE_ENERGY_II;
@@ -92,6 +92,16 @@ public class SlimefunItemsHolder {
     public static ItemStack CHARCOAL_FACTORY;
     public static ItemStack CHARCOAL_FACTORY_2;
     public static ItemStack CHARCOAL_FACTORY_3;
+    public static ItemStack LOG_FACTORY;
+    public static ItemStack LOG_FACTORY_2;
+    public static ItemStack LOG_FACTORY_3;
+    public static ItemStack STRIPPED_LOG_FACTORY;
+    public static ItemStack STRIPPED_LOG_FACTORY_2;
+    public static ItemStack STRIPPED_LOG_FACTORY_3;
+    public static ItemStack SAPLING_FACTORY;
+    public static ItemStack SAPLING_FACTORY_2;
+    public static ItemStack SAPLING_FACTORY_3;
+
 
     public static ItemStack ECLIPSE_COIL;
     public static ItemStack TITAN_MOTOR;
@@ -112,17 +122,17 @@ public class SlimefunItemsHolder {
     public static ItemStack REPAIRED_SPAWNER_ENDERMAN;
     public static ItemStack REPAIRED_SPAWNER_WITHER;
 
-    public static ItemStack AUTO_ENCHANTER_2 = new CustomItem(new ItemStack(Material.ENCHANTMENT_TABLE, 1), "&5Auto Enchanter II",  new String[] {"", "&4End Game Machine", "&8\u21E8 &e\u26A1 &7500 J/s"});
-    public static ItemStack AUTO_DISENCHANTER_2 = new CustomItem(new ItemStack(Material.ENCHANTMENT_TABLE, 1), "&5Auto Disenchanter II",  new String[] {"", "&4End Game Machine", "&8\u21E8 &e\u26A1 &7500 J/s"});
+    public static ItemStack AUTO_ENCHANTER_2 = new CustomItem(new ItemStack(Material.ENCHANTING_TABLE, 1), "&5Auto Enchanter II",  new String[] {"", "&4End Game Machine", "&8\u21E8 &e\u26A1 &7500 J/s"});
+    public static ItemStack AUTO_DISENCHANTER_2 = new CustomItem(new ItemStack(Material.ENCHANTING_TABLE, 1), "&5Auto Disenchanter II",  new String[] {"", "&4End Game Machine", "&8\u21E8 &e\u26A1 &7500 J/s"});
 
-    public static ItemStack XPPLATE = new CustomItem(new ItemStack(Material.CARPET, 1, (short) 7), "&bXP Plate", new String[] {"&f-Stand on plate to get XP", "&8\u21E8 &e\u26A1 &730 J/s"});
-    public static ItemStack DIAMOND_WRITING_PLATE  = new CustomItem(new ItemStack(Material.CARPET, 1, (short) 3), "&bDiamond Writing Plate", new String[] {"&f-A Strong plate for writing complex codes"});
-    public static ItemStack EMERALD_WRITING_PLATE  = new CustomItem(new ItemStack(Material.CARPET, 1, (short) 5), "&eEmerald Writing Plate", new String[] {"&f-A Strong plate for writing complex codes"});
-    public static ItemStack ENDER_WRITING_PLATE  = new CustomItem(new ItemStack(Material.CARPET, 1, (short) 9), "&3Ender Writing Plate", new String[] {"&f-A plate for writing teleporting codes"});
+    public static ItemStack XPPLATE = new CustomItem(new ItemStack(Material.CYAN_CARPET, 1), "&bXP Plate", new String[] {"&f-Stand on plate to get XP", "&8\u21E8 &e\u26A1 &730 J/s"});
+    public static ItemStack DIAMOND_WRITING_PLATE  = new CustomItem(new ItemStack(Material.LIGHT_BLUE_CARPET, 1), "&bDiamond Writing Plate", new String[] {"&f-A Strong plate for writing complex codes"});
+    public static ItemStack EMERALD_WRITING_PLATE  = new CustomItem(new ItemStack(Material.LIME_CARPET, 1), "&eEmerald Writing Plate", new String[] {"&f-A Strong plate for writing complex codes"});
+    public static ItemStack ENDER_WRITING_PLATE  = new CustomItem(new ItemStack(Material.CYAN_CARPET, 1), "&3Ender Writing Plate", new String[] {"&f-A plate for writing teleporting codes"});
 
-    public static ItemStack BEDROCK_DUST = new CustomItem(new ItemStack(Material.SULPHUR, 1), "&8Bedrock Dust");
-    public static ItemStack VOID_PARTICLES = new CustomItem(new ItemStack(Material.SULPHUR, 1), "&8Void Particles");
-    public static ItemStack MINING_SLUDGE = new CustomItem(new ItemStack(Material.SULPHUR, 1), "&7Mining Sludge");
+    public static ItemStack BEDROCK_DUST = new CustomItem(new ItemStack(Material.GUNPOWDER, 1), "&8Bedrock Dust");
+    public static ItemStack VOID_PARTICLES = new CustomItem(new ItemStack(Material.GUNPOWDER, 1), "&8Void Particles");
+    public static ItemStack MINING_SLUDGE = new CustomItem(new ItemStack(Material.GUNPOWDER, 1), "&7Mining Sludge");
     public static ItemStack DRILL_ROD = new CustomItem(new ItemStack(Material.END_ROD, 1), "&2Drill Rod");
     public static ItemStack DRILL_ROD_BROKEN = new CustomItem(new ItemStack(Material.END_ROD, 1), "&4Broken Drill Rod");
     public static ItemStack VOID_PARTICLES_POSITIVE = new CustomItem(new ItemStack(Material.REDSTONE, 1), "&8Void Particles");
@@ -157,6 +167,17 @@ public class SlimefunItemsHolder {
             CHARCOAL_FACTORY = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWE3ZDJhN2ZiYjRkMzdiNGQ1M2ZlODc3NTcxMjhlNWVmNjZlYzIzZDdmZjRmZTk5NDQ1NDZkYmM4Y2U3NzcifX19"), "&3Charcoal Factory", "", "&4End-Game Machine", "&6Needs: Sapling", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &730 J/s");
             CHARCOAL_FACTORY_2 = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWE3ZDJhN2ZiYjRkMzdiNGQ1M2ZlODc3NTcxMjhlNWVmNjZlYzIzZDdmZjRmZTk5NDQ1NDZkYmM4Y2U3NzcifX19"), "&3Charcoal Factory II", "", "&4End-Game Machine", "&6Needs: Sapling", "&8\u21E8 &7Speed: 10x", "&8\u21E8 &e\u26A1 &730 J/s");
             CHARCOAL_FACTORY_3 = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWE3ZDJhN2ZiYjRkMzdiNGQ1M2ZlODc3NTcxMjhlNWVmNjZlYzIzZDdmZjRmZTk5NDQ1NDZkYmM4Y2U3NzcifX19"), "&3Charcoal Factory III", "", "&4End-Game Machine", "&6Needs: Sapling", "&8\u21E8 &7Speed: 20x", "&8\u21E8 &e\u26A1 &730 J/s");
+            LOG_FACTORY = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODg4YzQ3MzllMjI4M2FhYTYyODE5NTk0ODZkMTQ5ZjMwNmI2ZTY3MjlhNmExYjNiZjljODUzYTIyYTkifX19="), "&3Log Factory", "", "&4End-Game Machine", "&6Needs: Sapling", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &730 J/s");
+            LOG_FACTORY_2 = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODg4YzQ3MzllMjI4M2FhYTYyODE5NTk0ODZkMTQ5ZjMwNmI2ZTY3MjlhNmExYjNiZjljODUzYTIyYTkifX19="), "&3Log Factory II", "", "&4End-Game Machine", "&6Needs: Sapling", "&8\u21E8 &7Speed: 10x", "&8\u21E8 &e\u26A1 &730 J/s");
+            LOG_FACTORY_3 = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODg4YzQ3MzllMjI4M2FhYTYyODE5NTk0ODZkMTQ5ZjMwNmI2ZTY3MjlhNmExYjNiZjljODUzYTIyYTkifX19="), "&3Log Factory III", "", "&4End-Game Machine", "&6Needs: Sapling", "&8\u21E8 &7Speed: 20x", "&8\u21E8 &e\u26A1 &730 J/s");
+            STRIPPED_LOG_FACTORY = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTk2M2EyZmY3MDBkZDc0ZjI5NzlhNzU4ZWM1ZDNkODE5MGM1YWJlMTU1Yjc4NTIwNmYzZDMyNjk5NTE3YTMzYSJ9fX0="), "&3Stripped Log Factory", "", "&4End-Game Machine", "&6Needs: Sapling or Logs", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &730 J/s");
+            STRIPPED_LOG_FACTORY_2 = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTk2M2EyZmY3MDBkZDc0ZjI5NzlhNzU4ZWM1ZDNkODE5MGM1YWJlMTU1Yjc4NTIwNmYzZDMyNjk5NTE3YTMzYSJ9fX0="), "&3Stripped Log Factory II", "", "&4End-Game Machine", "&6Needs: Sapling or Logs", "&8\u21E8 &7Speed: 10x", "&8\u21E8 &e\u26A1 &730 J/s");
+            STRIPPED_LOG_FACTORY_3 = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTk2M2EyZmY3MDBkZDc0ZjI5NzlhNzU4ZWM1ZDNkODE5MGM1YWJlMTU1Yjc4NTIwNmYzZDMyNjk5NTE3YTMzYSJ9fX0="), "&3Stripped Log Factory III", "", "&4End-Game Machine", "&6Needs: Sapling or Logs", "&8\u21E8 &7Speed: 20x", "&8\u21E8 &e\u26A1 &730 J/s");
+            SAPLING_FACTORY = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzNmMWQxNTMyODNhZmMxNTE4ZDdhYTZjMDliNmVlYzQyZmNlNmY0MGJhODZiYWEzY2U0NmIyNmI2NTdlOWY5ZiJ9fX0="), "&3Sapling Factory", "", "&4End-Game Machine", "&6Needs: Bone Meal", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &730 J/s");
+            SAPLING_FACTORY_2 = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzNmMWQxNTMyODNhZmMxNTE4ZDdhYTZjMDliNmVlYzQyZmNlNmY0MGJhODZiYWEzY2U0NmIyNmI2NTdlOWY5ZiJ9fX0="), "&3Sapling Factory II", "", "&4End-Game Machine", "&6Needs: Bone Meal", "&8\u21E8 &7Speed: 10x", "&8\u21E8 &e\u26A1 &730 J/s");
+            SAPLING_FACTORY_3 = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzNmMWQxNTMyODNhZmMxNTE4ZDdhYTZjMDliNmVlYzQyZmNlNmY0MGJhODZiYWEzY2U0NmIyNmI2NTdlOWY5ZiJ9fX0="), "&3Sapling Factory III", "", "&4End-Game Machine", "&6Needs: Bone Meal", "&8\u21E8 &7Speed: 20x", "&8\u21E8 &e\u26A1 &730 J/s");
+
+
             NUGGETTOINGOT = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2RmZmQ5NWM4ZmNkYmFlZDllOWU5YmU0N2VhMWE0MWVlMTIyOWQ4OWI1YzZkNDJhMWY3YjJmN2YxMWJkMTEyMiJ9fX0="), "&3Nugget to Ingot", "", "&4End-Game Machine", "&6Works with Lucky, Eclipse, Titan", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &730 J/s");
             INGOTUP = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDViZTRiYTgyODYxZWZmY2Q4ZGNjNWMyNDY5YjllZThkNGUwMjFiMDYwZGFhZjM0ODMxOWUwMjAxMTgyOCJ9fX0="), "&3Ingot Up", "", "&4End-Game Machine", "&6Works with Lucky, Eclipse", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &730 J/s");
             BEDROCKDRILL = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDNiOGEzMjM1NmQxYWQ5OWUzMTc5OWRiOGQ2OWQ1NTg4ZTlhZmY5MjkwYTA0NGNhOWIyMzU5Yjc1MjNlYTM5YyJ9fX0="), "&bBedrock Drill", "", "&4End-Game Machine", "&6Place on top of bedrock", "&6Uses: &cDrill Head, &cLaser Charge, &bReactor Coolant Cell", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &7400 J/s");
@@ -165,13 +186,13 @@ public class SlimefunItemsHolder {
             LASER_CHARGE_OLD = new CustomItem(CustomSkull.getItem("eyJ0aW1lc3RhbXAiOjE0NjM1ODgyNjYwMTgsInByb2ZpbGVJZCI6ImQ2MmI1MjJkMTVjZjQyNWE4NTFlNmNjNDRkOGJlMDg5IiwicHJvZmlsZU5hbWUiOiJKb2huMDAwNzA4IiwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzI3OWY1N2M2OGI3YTkwZTBkODg1MGU3OTRhZGU1YjhlODEwZDMzOGUyNDU5ZWVlZjliYWJkNjgzMmNhMTY5YSJ9fX0="), "&cLaser Charge", new String[] { "&fThis item is necessary for a", "&4Deep Depth Miner &fto mine Ores.", "", "&7Durability: 1024/1024" });
             BEDROCK_DRILL = new CustomItem(CustomSkull.getItem("eyJ0aW1lc3RhbXAiOjE0NjMzNDA3NTkyNDksInByb2ZpbGVJZCI6ImQ2MmI1MjJkMTVjZjQyNWE4NTFlNmNjNDRkOGJlMDg5IiwicHJvZmlsZU5hbWUiOiJKb2huMDAwNzA4IiwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzQ5MjFmODhiMzViZjFlNTMxZWE0ZDUzYmU4M2ExYmE1ZGNhODgzNzQzZDE2ZDliMWVmYzY5NDQ2YjYyODk0ZDQifX19"), "&cDrill Head", new String[] { "&fA special drill which is used in a &bBedrock Drill", "&fto break bedrock into dust.", "", "&7Durability: 1024/1024" });
             LASER_CHARGE = new CustomItem(CustomSkull.getItem("eyJ0aW1lc3RhbXAiOjE0NjM1ODgyNjYwMTgsInByb2ZpbGVJZCI6ImQ2MmI1MjJkMTVjZjQyNWE4NTFlNmNjNDRkOGJlMDg5IiwicHJvZmlsZU5hbWUiOiJKb2huMDAwNzA4IiwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzI3OWY1N2M2OGI3YTkwZTBkODg1MGU3OTRhZGU1YjhlODEwZDMzOGUyNDU5ZWVlZjliYWJkNjgzMmNhMTY5YSJ9fX0="), "&cLaser Charge", new String[] { "&fThis item is necessary for a", "&bBedrock Drill &fto mine Ores.", "", "&7Durability: 1024/1024" });
-            REPAIRED_SPAWNER_SKELETON = new CustomItem(Material.MOB_SPAWNER, "&bReinforced Spawner", 0, new String[]{"&7Type: &bSkeleton"});
-            REPAIRED_SPAWNER_BLAZE = new CustomItem(Material.MOB_SPAWNER, "&bReinforced Spawner", 0, new String[]{"&7Type: &bBlaze"});
-            REPAIRED_SPAWNER_VILLAGER = new CustomItem(Material.MOB_SPAWNER, "&bReinforced Spawner", 0, new String[]{"&7Type: &bVillager"});
-            REPAIRED_SPAWNER_PIG = new CustomItem(Material.MOB_SPAWNER, "&bReinforced Spawner", 0, new String[]{"&7Type: &bPig"});
-            REPAIRED_SPAWNER_SLIME = new CustomItem(Material.MOB_SPAWNER, "&bReinforced Spawner", 0, new String[]{"&7Type: &bSlime"});
-            REPAIRED_SPAWNER_ENDERMAN = new CustomItem(Material.MOB_SPAWNER, "&bReinforced Spawner", 0, new String[]{"&7Type: &bEnderman"});
-            REPAIRED_SPAWNER_WITHER = new CustomItem(Material.MOB_SPAWNER, "&bReinforced Spawner", 0, new String[]{"&7Type: &bWither Skeleton"});
+            REPAIRED_SPAWNER_SKELETON = new CustomItem(Material.SPAWNER, "&bReinforced Spawner", 0, new String[]{"&7Type: &bSkeleton"});
+            REPAIRED_SPAWNER_BLAZE = new CustomItem(Material.SPAWNER, "&bReinforced Spawner", 0, new String[]{"&7Type: &bBlaze"});
+            REPAIRED_SPAWNER_VILLAGER = new CustomItem(Material.SPAWNER, "&bReinforced Spawner", 0, new String[]{"&7Type: &bVillager"});
+            REPAIRED_SPAWNER_PIG = new CustomItem(Material.SPAWNER, "&bReinforced Spawner", 0, new String[]{"&7Type: &bPig"});
+            REPAIRED_SPAWNER_SLIME = new CustomItem(Material.SPAWNER, "&bReinforced Spawner", 0, new String[]{"&7Type: &bSlime"});
+            REPAIRED_SPAWNER_ENDERMAN = new CustomItem(Material.SPAWNER, "&bReinforced Spawner", 0, new String[]{"&7Type: &bEnderman"});
+            REPAIRED_SPAWNER_WITHER = new CustomItem(Material.SPAWNER, "&bReinforced Spawner", 0, new String[]{"&7Type: &bWither Skeleton"});
             BONE_FACTORY = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWJiNDMzOTFhOWRiZmY5ZWFkYWUwN2I2ODYyNTk1YzkxZDA0YzU5MzhlMjNjMjg1YWM2MGM0Yjg3NjliMjQifX19"), "&3Bone Factory", "", "&4End-Game Machine", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &730 J/s");
             IRON_FACTORY = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjEzMWEzNmU3MGZmYWE3Y2E3ZTY3MmFlNmFjMjBiN2ZjMWU0NTdjNDNhOGUxMDY5ZTdiMTRlY2RiODU3NiJ9fX0="), "&3Iron Factory", "", "&4End-Game Machine", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &730 J/s");
             XP_FACTORY = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGU5YTI3ODE3YWJmODhhMmY2ZjIzMDEyYzc1ODY5MmNkOWJjZmY5OGE4ZGZjMGVmNjk1NzljNDQyZjZhYTZkZiJ9fX0="), "&3XP Factory", "", "&4End-Game Machine", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &730 J/s");

@@ -64,12 +64,12 @@ public abstract class VoidMiner extends AContainer {
 
 
         try {
-            if (block.getType() != Material.SKULL) {
-                block.setType(Material.SKULL);
+            if (block.getType() != Material.PLAYER_HEAD) {
+                block.setType(Material.PLAYER_HEAD);
             }
-            if (block.getData() != (byte) 0x1) {
+            /*if (block.getData() != (byte) 0x1) {
                 block.setData((byte) 0x1); // Floor
-            }
+            }*/
             Skull skullE = ((Skull) block.getState());
             if (skullE.getRotation() != BlockFace.NORTH) {
                 skullE.setRotation(BlockFace.NORTH);

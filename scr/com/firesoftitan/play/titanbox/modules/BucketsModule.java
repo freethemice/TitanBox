@@ -4,12 +4,14 @@ import com.firesoftitan.play.titanbox.TitanBox;
 import com.firesoftitan.play.titanbox.enums.ModuleTypeEnum;
 import com.firesoftitan.play.titanbox.machines.Pumps;
 import com.firesoftitan.play.titanbox.machines.StorageUnit;
+import com.firesoftitan.play.titansql.ResultData;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 public class BucketsModule extends MainModule {
@@ -26,7 +28,13 @@ public class BucketsModule extends MainModule {
     }
 
     @Override
+    public void unLinkAll() {
+        this.link = null;
+        saveInfo();
+    }
+    @Override
     public boolean setLink(Location link, Player player) {
+        super.setLink(link, player);
         String pump = Pumps.getPumpType(link);
         this.link = null;
         if (pump != null)
@@ -56,11 +64,19 @@ public class BucketsModule extends MainModule {
     @Override
     public ItemStack getMeAsIcon()
     {
-        return new ItemStack(Material.BUCKET, 1);
+        if (isLoaded()) {
+            if (Pumps.getLiquid(link, "Water") || Pumps.getLiquid(link, "Lava"))
+            {
+                return new ItemStack(Material.BUCKET, 1);
+            }
+        }
+        return new ItemStack(Material.BARRIER, 1);
+
     }
     @Override
-    public void loadInfo() {
-        super.loadInfo();
+    public void loadInfo(HashMap<String, ResultData> result)
+    {
+        super.loadInfo(result);
     }
 
     @Override

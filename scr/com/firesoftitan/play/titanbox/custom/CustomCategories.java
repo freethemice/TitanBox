@@ -22,7 +22,7 @@ public class CustomCategories
     public static final Category SLIMEFUN_RESOURCES = new Category(new CustomItem(new ItemStack(Material.GOLD_INGOT), "&5Resources", new String[] { "", "&a >Click to open" }), 5);
     public static final Category SLIMEFUN_PARTS = new Category(new CustomItem(new ItemStack(Material.ANVIL), "&5Parts", new String[] { "", "&a >Click to open" }), 5);
     public static final SeasonCategory SLIMEFUN_BLANK = new SeasonCategory(18, 0, new MenuItem(Material.NETHER_STAR, "TRASH", 0, ChatColor.translateAlternateColorCodes('&', "&chelp &aSanta")));
-    public static final Category SLIMEFUN_LUCKY = new Category(new CustomItem(new ItemStack(Material.ENCHANTMENT_TABLE), "&5Lucky Gear", new String[] { "", "&a >Click to open" }), 5);
+    public static final Category SLIMEFUN_LUCKY = new Category(new CustomItem(new ItemStack(Material.ENCHANTING_TABLE), "&5Lucky Gear", new String[] { "", "&a >Click to open" }), 5);
     public static final Category SLIMEFUN_ECLIPSE = new Category(new CustomItem(new ItemStack(Material.IRON_HELMET), "&bEclipse Gear", new String[] { "", "&a >Click to open" }), 5);
     public static final Category SLIMEFUN_TITAN_GEAR = new Category(new CustomItem(new ItemStack(Material.DIAMOND_CHESTPLATE), "&4Titan Gear", new String[] { "", "&a >Click to open" }), 5);
     public static final Category SLIMEFUN_TITAN_TALISMAN = new Category(new CustomItem(new ItemStack(Material.EMERALD), "&4Titan Talisman", new String[] { "", "&a >Click to open" }), 5);

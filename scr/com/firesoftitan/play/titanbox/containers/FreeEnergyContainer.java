@@ -41,19 +41,19 @@ import org.bukkit.material.MaterialData;
 import java.util.*;
 import java.util.Map.Entry;
 
-public abstract class BContainer extends SlimefunItem {
+public abstract class FreeEnergyContainer extends SlimefunItem {
     public static Map<Block, MachineRecipe> processing = new HashMap();
     public static Map<Block, Integer> progress = new HashMap();
     protected List<MachineRecipe> recipes = new ArrayList();
-    private static final int[] border = {4, 5, 6, 7, 8, 13, 31, 36, 37, 38, 39, 40, 41, 42, 43, 44};
-    private static final int[] border_in = {0, 1, 2, 3, 9, 12, 18, 21, 27, 28, 29, 30};
-    private static final int[] border_out = {14, 15, 16, 17, 23, 26, 32, 33, 34, 35};
+    private static final int[] border = {0, 1, 2, 3, 4, 5, 6, 7, 8, 13, 31, 36, 37, 38, 39, 40, 41, 42, 43, 44};
+    private static final int[] border_in = {9, 10, 11, 12, 18, 19, 20, 21, 27, 28, 29, 30};
+    private static final int[] border_out = {14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34, 35};
 
-    public BContainer(Category category, ItemStack item, final String name, RecipeType recipeType, ItemStack[] recipe) {
+    public FreeEnergyContainer(Category category, ItemStack item, final String name, RecipeType recipeType, ItemStack[] recipe) {
         super(category, item, name, recipeType, recipe);
         BlockMenuPreset var10001 = new BlockMenuPreset(name, this.getInventoryTitle()) {
             public void init() {
-                BContainer.this.constructMenu(this);
+                FreeEnergyContainer.this.constructMenu(this);
             }
 
             public void newInstance(BlockMenu menu, Block b) {
@@ -64,7 +64,7 @@ public abstract class BContainer extends SlimefunItem {
             }
 
             public int[] getSlotsAccessedByItemTransport(ItemTransportFlow flow) {
-                return flow.equals(ItemTransportFlow.INSERT)?BContainer.this.getInputSlots():BContainer.this.getOutputSlots();
+                return flow.equals(ItemTransportFlow.INSERT)?FreeEnergyContainer.this.getInputSlots():FreeEnergyContainer.this.getOutputSlots();
             }
 
         };
@@ -75,7 +75,7 @@ public abstract class BContainer extends SlimefunItem {
             public boolean onBreak(Player p, Block b, SlimefunItem item, UnregisterReason reason) {
                 BlockMenu inv = BlockStorage.getInventory(b);
                 if(inv != null) {
-                    int[] var6 = BContainer.this.getInputSlots();
+                    int[] var6 = FreeEnergyContainer.this.getInputSlots();
                     int var7 = var6.length;
 
                     int var8;
@@ -87,7 +87,7 @@ public abstract class BContainer extends SlimefunItem {
                         }
                     }
 
-                    var6 = BContainer.this.getOutputSlots();
+                    var6 = FreeEnergyContainer.this.getOutputSlots();
                     var7 = var6.length;
 
                     for(var8 = 0; var8 < var7; ++var8) {
@@ -98,19 +98,19 @@ public abstract class BContainer extends SlimefunItem {
                     }
                 }
 
-                BContainer.progress.remove(b);
-                BContainer.processing.remove(b);
+                FreeEnergyContainer.progress.remove(b);
+                FreeEnergyContainer.processing.remove(b);
                 return true;
             }
         });
         this.registerDefaultRecipes();
     }
 
-    public BContainer(Category category, ItemStack item, final String name, RecipeType recipeType, ItemStack[] recipe, ItemStack recipeOutput) {
+    public FreeEnergyContainer(Category category, ItemStack item, final String name, RecipeType recipeType, ItemStack[] recipe, ItemStack recipeOutput) {
         super(category, item, name, recipeType, recipe, recipeOutput);
         BlockMenuPreset var10001 = new BlockMenuPreset(name, this.getInventoryTitle()) {
             public void init() {
-                BContainer.this.constructMenu(this);
+                FreeEnergyContainer.this.constructMenu(this);
             }
 
             public void newInstance(BlockMenu menu, Block b) {
@@ -121,7 +121,7 @@ public abstract class BContainer extends SlimefunItem {
             }
 
             public int[] getSlotsAccessedByItemTransport(ItemTransportFlow flow) {
-                return flow.equals(ItemTransportFlow.INSERT)?BContainer.this.getInputSlots():BContainer.this.getOutputSlots();
+                return flow.equals(ItemTransportFlow.INSERT)?FreeEnergyContainer.this.getInputSlots():FreeEnergyContainer.this.getOutputSlots();
             }
         };
         registerBlockHandler(name, new SlimefunBlockHandler() {
@@ -129,7 +129,7 @@ public abstract class BContainer extends SlimefunItem {
             }
 
             public boolean onBreak(Player p, Block b, SlimefunItem item, UnregisterReason reason) {
-                int[] var5 = BContainer.this.getInputSlots();
+                int[] var5 = FreeEnergyContainer.this.getInputSlots();
                 int var6 = var5.length;
 
                 int var7;
@@ -141,7 +141,7 @@ public abstract class BContainer extends SlimefunItem {
                     }
                 }
 
-                var5 = BContainer.this.getOutputSlots();
+                var5 = FreeEnergyContainer.this.getOutputSlots();
                 var6 = var5.length;
 
                 for(var7 = 0; var7 < var6; ++var7) {
@@ -151,8 +151,8 @@ public abstract class BContainer extends SlimefunItem {
                     }
                 }
 
-                BContainer.processing.remove(b);
-                BContainer.progress.remove(b);
+                FreeEnergyContainer.processing.remove(b);
+                FreeEnergyContainer.progress.remove(b);
                 return true;
             }
         });
@@ -234,7 +234,7 @@ public abstract class BContainer extends SlimefunItem {
     public abstract String getMachineIdentifier();
 
     public int[] getInputSlots() {
-        return new int[]{10, 11, 19, 20};
+        return new int[]{};
     }
 
     public int[] getOutputSlots() {
@@ -297,7 +297,7 @@ public abstract class BContainer extends SlimefunItem {
     public void register(boolean slimefun) {
         this.addItemHandler(new ItemHandler[]{new BlockTicker() {
             public void tick(Block b, SlimefunItem sf, Config data) {
-                BContainer.this.tick(b);
+                FreeEnergyContainer.this.tick(b);
             }
 
             public void uniqueTick() {

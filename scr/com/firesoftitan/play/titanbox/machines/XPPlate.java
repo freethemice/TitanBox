@@ -40,7 +40,7 @@ public abstract class XPPlate extends AContainer {
     @SuppressWarnings("deprecation")
     protected void tick(Block b) {
         try {
-            if (b.getType() != Material.CARPET)
+            if (b.getType() != Material.CYAN_CARPET)
             {
                 BlockStorage.clearBlockInfo(b);
                 return;
@@ -59,7 +59,7 @@ public abstract class XPPlate extends AContainer {
                             for (int slot : getInputSlots()) {
                                 ItemStack flask = BlockStorage.getInventory(b).getItemInSlot(slot);
                                 if (!TitanBox.isEmpty(flask)) {
-                                    if (flask.getType() == Material.EXP_BOTTLE) {
+                                    if (flask.getType() == Material.EXPERIENCE_BOTTLE) {
                                         int amount = flask.getAmount();
                                         int xp = amount * 7;
 

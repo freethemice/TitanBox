@@ -186,14 +186,14 @@ public class SlimefunSetup {
 
 
 
-        new AutomatedVanillaCraftingChamber(CustomCategories.ELECTRICITY, SlimefunItemsHolder.AUTOMATED_VANILLA_CRAFTING_CHAMBER, "AUTOMATED_VANILLA_CRAFTING_CHAMBER", RecipeType.ENHANCED_CRAFTING_TABLE,
-                new ItemStack[] {null, new ItemStack(Material.WORKBENCH), null, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.CARGO_MOTOR, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.COPPER_INGOT, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.CARGO_MOTOR, null, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.ELECTRIC_MOTOR, null}) {
+        /*new AutomatedVanillaCraftingChamber(CustomCategories.ELECTRICITY, SlimefunItemsHolder.AUTOMATED_VANILLA_CRAFTING_CHAMBER, "AUTOMATED_VANILLA_CRAFTING_CHAMBER", RecipeType.ENHANCED_CRAFTING_TABLE,
+                new ItemStack[] {null, new ItemStack(Material.CRAFTING_TABLE), null, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.CARGO_MOTOR, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.COPPER_INGOT, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.CARGO_MOTOR, null, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.ELECTRIC_MOTOR, null}) {
 
             @Override
             public int getEnergyConsumption() {
                 return 5;
             }
-        }.registerChargeableBlock(true, 256);
+        }.registerChargeableBlock(true, 256);*/
 
         new AncientAltarCrafter(CustomCategories.ELECTRICITY, SlimefunItemsHolder.ANCIENT_ALTAR_CRAFTER, "ANCIENT_ALTAR_CRAFTER_CHAMBER", RecipeType.ENHANCED_CRAFTING_TABLE,
                 new ItemStack[] {null, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.ANCIENT_PEDESTAL, null, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.CARGO_MOTOR, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.ANCIENT_ALTAR, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.CARGO_MOTOR, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.ANCIENT_PEDESTAL, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.ELECTRIC_MOTOR, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.ANCIENT_PEDESTAL}) {
@@ -205,7 +205,7 @@ public class SlimefunSetup {
         }.registerChargeableBlock(true, 256);
 
         new AutomatedAncientAltarCrafter(CustomCategories.ELECTRICITY, SlimefunItemsHolder.AUTOMATED_ANCIENT_ALTAR_CRAFTER, "AUTOMATED_ANCIENT_ALTAR_CRAFTER_CHAMBER", RecipeType.ENHANCED_CRAFTING_TABLE,
-                new ItemStack[] {null, new ItemStack(Material.WORKBENCH), null, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.CARGO_MOTOR, SlimefunItemsHolder.ANCIENT_ALTAR_CRAFTER, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.CARGO_MOTOR, null, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.ELECTRIC_MOTOR, null}) {
+                new ItemStack[] {null, new ItemStack(Material.CRAFTING_TABLE), null, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.CARGO_MOTOR, SlimefunItemsHolder.ANCIENT_ALTAR_CRAFTER, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.CARGO_MOTOR, null, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.ELECTRIC_MOTOR, null}) {
 
             @Override
             public int getEnergyConsumption() {
@@ -253,7 +253,7 @@ public class SlimefunSetup {
         }.registerChargeableBlock(true, 50);
         new FreeFactory(CustomCategories.ELECTRICITY, SlimefunItemsHolder.XP_FACTORY, "XP_FACTORY", RecipeType.ENHANCED_CRAFTING_TABLE,
                 new ItemStack[] {SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.TITAN_MOTOR, SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.ECLIPSE_COIL, SlimefunItemsHolder.REPAIRED_SPAWNER_PIG, SlimefunItemsHolder.ECLIPSE_COIL, SlimefunItemsHolder.REPAIRED_SPAWNER_PIG, SlimefunItemsHolder.TITAN_MOTOR, SlimefunItemsHolder.REPAIRED_SPAWNER_PIG},
-                new CustomItem(Material.EXP_BOTTLE, "&aFlask of Knowledge", 0)) {
+                new CustomItem(Material.EXPERIENCE_BOTTLE, "&aFlask of Knowledge", 0)) {
 
             @Override
             public void registerDefaultRecipes() {
@@ -373,7 +373,7 @@ public class SlimefunSetup {
                 new ItemStack[] {SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.TITAN_MOTOR, SlimefunItemsHolder.EclipseIngot,
                                 SlimefunItemsHolder.ECLIPSE_COIL, SlimefunItemsHolder.REPAIRED_SPAWNER_WITHER, SlimefunItemsHolder.ECLIPSE_COIL,
                                 SlimefunItemsHolder.REPAIRED_SPAWNER_WITHER, SlimefunItemsHolder.TITAN_MOTOR, SlimefunItemsHolder.REPAIRED_SPAWNER_WITHER},
-                new ItemStack(Material.SKULL_ITEM, 1, (short) 1)) {
+                new ItemStack(Material.WITHER_SKELETON_SKULL, 1)) {
 
             @Override
             public void registerDefaultRecipes() {
@@ -485,6 +485,170 @@ public class SlimefunSetup {
             }
 
         }.registerChargeableBlock(true, 50);
+        new SaplingFactory(CustomCategories.ELECTRICITY, SlimefunItemsHolder.SAPLING_FACTORY, "SAPLING_FACTORY", RecipeType.ENHANCED_CRAFTING_TABLE,
+                new ItemStack[] {SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.TITAN_MOTOR, SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.ECLIPSE_COIL, new ItemStack(Material.GOLDEN_HOE), SlimefunItemsHolder.ECLIPSE_COIL, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.GILDED_IRON, SlimefunItemsHolder.TITAN_MOTOR, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.GILDED_IRON}) {
+
+            @Override
+            public void registerDefaultRecipes() {
+            }
+
+            @Override
+            public int getEnergyConsumption() {
+                return 15;
+            }
+
+            @Override
+            public int getSpeed() {
+                return 1;
+            }
+
+        }.registerChargeableBlock(true, 50);
+        new SaplingFactory(CustomCategories.ELECTRICITY, SlimefunItemsHolder.SAPLING_FACTORY_2, "SAPLING_FACTORY_2", RecipeType.ENHANCED_CRAFTING_TABLE,
+                new ItemStack[] {SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.TITAN_MOTOR, SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.ECLIPSE_COIL, SlimefunItemsHolder.SAPLING_FACTORY, SlimefunItemsHolder.ECLIPSE_COIL, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.GILDED_IRON, SlimefunItemsHolder.TITAN_MOTOR, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.GILDED_IRON}) {
+
+            @Override
+            public void registerDefaultRecipes() {
+            }
+
+            @Override
+            public int getEnergyConsumption() {
+                return 15;
+            }
+
+            @Override
+            public int getSpeed() {
+                return 10;
+            }
+
+        }.registerChargeableBlock(true, 50);
+        new SaplingFactory(CustomCategories.ELECTRICITY, SlimefunItemsHolder.SAPLING_FACTORY_3, "SAPLING_FACTORY_3", RecipeType.ENHANCED_CRAFTING_TABLE,
+                new ItemStack[] {SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.TITAN_MOTOR, SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.ECLIPSE_COIL, SlimefunItemsHolder.SAPLING_FACTORY_2, SlimefunItemsHolder.ECLIPSE_COIL, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.GILDED_IRON, SlimefunItemsHolder.TITAN_MOTOR, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.GILDED_IRON}) {
+
+            @Override
+            public void registerDefaultRecipes() {
+            }
+
+            @Override
+            public int getEnergyConsumption() {
+                return 15;
+            }
+
+            @Override
+            public int getSpeed() {
+                return 20;
+            }
+
+        }.registerChargeableBlock(true, 50);
+        new LogFactory(CustomCategories.ELECTRICITY, SlimefunItemsHolder.LOG_FACTORY, "LOG_FACTORY", RecipeType.ENHANCED_CRAFTING_TABLE,
+                new ItemStack[] {SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.TITAN_MOTOR, SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.ECLIPSE_COIL, new ItemStack(Material.GOLDEN_AXE), SlimefunItemsHolder.ECLIPSE_COIL, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.GILDED_IRON, SlimefunItemsHolder.TITAN_MOTOR, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.GILDED_IRON}) {
+
+            @Override
+            public void registerDefaultRecipes() {
+            }
+
+            @Override
+            public int getEnergyConsumption() {
+                return 15;
+            }
+
+            @Override
+            public int getSpeed() {
+                return 1;
+            }
+
+        }.registerChargeableBlock(true, 50);
+        new LogFactory(CustomCategories.ELECTRICITY, SlimefunItemsHolder.LOG_FACTORY_2, "LOG_FACTORY_2", RecipeType.ENHANCED_CRAFTING_TABLE,
+                new ItemStack[] {SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.TITAN_MOTOR, SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.ECLIPSE_COIL, SlimefunItemsHolder.LOG_FACTORY, SlimefunItemsHolder.ECLIPSE_COIL, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.GILDED_IRON, SlimefunItemsHolder.TITAN_MOTOR, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.GILDED_IRON}) {
+
+            @Override
+            public void registerDefaultRecipes() {
+            }
+
+            @Override
+            public int getEnergyConsumption() {
+                return 15;
+            }
+
+            @Override
+            public int getSpeed() {
+                return 10;
+            }
+
+        }.registerChargeableBlock(true, 50);
+        new LogFactory(CustomCategories.ELECTRICITY, SlimefunItemsHolder.LOG_FACTORY_3, "LOG_FACTORY_3", RecipeType.ENHANCED_CRAFTING_TABLE,
+                new ItemStack[] {SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.TITAN_MOTOR, SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.ECLIPSE_COIL, SlimefunItemsHolder.LOG_FACTORY_2, SlimefunItemsHolder.ECLIPSE_COIL, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.GILDED_IRON, SlimefunItemsHolder.TITAN_MOTOR, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.GILDED_IRON}) {
+
+            @Override
+            public void registerDefaultRecipes() {
+            }
+
+            @Override
+            public int getEnergyConsumption() {
+                return 15;
+            }
+
+            @Override
+            public int getSpeed() {
+                return 20;
+            }
+
+        }.registerChargeableBlock(true, 50);
+
+        new StrippedLogFactory(CustomCategories.ELECTRICITY, SlimefunItemsHolder.STRIPPED_LOG_FACTORY, "STRIPPED_LOG_FACTORY", RecipeType.ENHANCED_CRAFTING_TABLE,
+                new ItemStack[] {SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.TITAN_MOTOR, SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.ECLIPSE_COIL, new ItemStack(Material.DIAMOND_AXE), SlimefunItemsHolder.ECLIPSE_COIL, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.GILDED_IRON, SlimefunItemsHolder.TITAN_MOTOR, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.GILDED_IRON}) {
+
+            @Override
+            public void registerDefaultRecipes() {
+            }
+
+            @Override
+            public int getEnergyConsumption() {
+                return 15;
+            }
+
+            @Override
+            public int getSpeed() {
+                return 1;
+            }
+
+        }.registerChargeableBlock(true, 50);
+        new StrippedLogFactory(CustomCategories.ELECTRICITY, SlimefunItemsHolder.STRIPPED_LOG_FACTORY_2, "STRIPPED_LOG_FACTORY_2", RecipeType.ENHANCED_CRAFTING_TABLE,
+                new ItemStack[] {SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.TITAN_MOTOR, SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.ECLIPSE_COIL, SlimefunItemsHolder.STRIPPED_LOG_FACTORY, SlimefunItemsHolder.ECLIPSE_COIL, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.GILDED_IRON, SlimefunItemsHolder.TITAN_MOTOR, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.GILDED_IRON}) {
+
+            @Override
+            public void registerDefaultRecipes() {
+            }
+
+            @Override
+            public int getEnergyConsumption() {
+                return 15;
+            }
+
+            @Override
+            public int getSpeed() {
+                return 10;
+            }
+
+        }.registerChargeableBlock(true, 50);
+        new StrippedLogFactory(CustomCategories.ELECTRICITY, SlimefunItemsHolder.STRIPPED_LOG_FACTORY_3, "STRIPPED_LOG_FACTORY_3", RecipeType.ENHANCED_CRAFTING_TABLE,
+                new ItemStack[] {SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.TITAN_MOTOR, SlimefunItemsHolder.EclipseIngot, SlimefunItemsHolder.ECLIPSE_COIL, SlimefunItemsHolder.STRIPPED_LOG_FACTORY_2, SlimefunItemsHolder.ECLIPSE_COIL, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.GILDED_IRON, SlimefunItemsHolder.TITAN_MOTOR, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.GILDED_IRON}) {
+
+            @Override
+            public void registerDefaultRecipes() {
+            }
+
+            @Override
+            public int getEnergyConsumption() {
+                return 15;
+            }
+
+            @Override
+            public int getSpeed() {
+                return 20;
+            }
+
+        }.registerChargeableBlock(true, 50);
+
         new NuggettoIngotFactory(CustomCategories.ELECTRICITY, SlimefunItemsHolder.NUGGETTOINGOT, "NUGGET_TO_IGNOT", RecipeType.ENHANCED_CRAFTING_TABLE,
                 new ItemStack[] {SlimefunItemsHolder.LuckyIngot, new ItemStack(Material.BOOKSHELF), SlimefunItemsHolder.LuckyIngot, SlimefunItemsHolder.LuckyIngot,  new ItemStack(Material.DISPENSER),  SlimefunItemsHolder.LuckyIngot,  SlimefunItemsHolder.LuckyIngot,   new ItemStack(Material.BOOKSHELF),  SlimefunItemsHolder.LuckyIngot}) {
 
@@ -499,7 +663,7 @@ public class SlimefunSetup {
             }
         }.registerChargeableBlock(true, 512);
         new IngotUpFactory(CustomCategories.ELECTRICITY, SlimefunItemsHolder.INGOTUP, "INGOT_UP", RecipeType.ENHANCED_CRAFTING_TABLE,
-                new ItemStack[] {SlimefunItemsHolder.LuckyIngot, new ItemStack(Material.WORKBENCH), SlimefunItemsHolder.LuckyIngot, SlimefunItemsHolder.LuckyIngot,  new ItemStack(Material.DISPENSER),  SlimefunItemsHolder.LuckyIngot,  SlimefunItemsHolder.LuckyIngot,   new ItemStack(Material.BOOKSHELF),  SlimefunItemsHolder.LuckyIngot}) {
+                new ItemStack[] {SlimefunItemsHolder.LuckyIngot, new ItemStack(Material.CRAFTING_TABLE), SlimefunItemsHolder.LuckyIngot, SlimefunItemsHolder.LuckyIngot,  new ItemStack(Material.DISPENSER),  SlimefunItemsHolder.LuckyIngot,  SlimefunItemsHolder.LuckyIngot,   new ItemStack(Material.BOOKSHELF),  SlimefunItemsHolder.LuckyIngot}) {
 
             @Override
             public int getEnergyConsumption() {
@@ -618,15 +782,16 @@ public class SlimefunSetup {
                             if (l == null) {
                                 return 0;
                             }
+                            if (!l.getWorld().isChunkLoaded(l.getBlockX() >> 4, l.getBlockZ() >> 4)) return 0D;
                             Location lavaCheck = l.clone().add(0, -1, 0);
                             Location AirCheck = l.clone().add(0, 1, 0);
                             boolean Run = true;
                             boolean explode = false;
-                            if (l.getChunk().isLoaded()) {
+                            if (Utilities.isLoaded(l)) {
                                 try {
                                     for (int x = -1; x < 2; x++) {
                                         for (int z = -1; z < 2; z++) {
-                                            if (lavaCheck.clone().add(x, 0, z).getBlock().getType() != Material.STATIONARY_LAVA) {
+                                            if (lavaCheck.clone().add(x, 0, z).getBlock().getType() != Material.LAVA) {
                                                 Run = false;
                                             }
                                             if (AirCheck.clone().add(x, 0, z).getBlock().getType() != Material.AIR) {
@@ -638,6 +803,7 @@ public class SlimefunSetup {
 
                                 }
                             }
+                            if (!l.getWorld().isChunkLoaded(l.getBlockX() >> 4, l.getBlockZ() >> 4)) return 0D;
                             if (Run && !explode) {
                                 double past = 256 * (1D - (l.getBlockY() / 100D));
                                 return past * 2;
@@ -682,14 +848,15 @@ public class SlimefunSetup {
                 });
         ChargableBlock.registerChargableBlock("THERMAL_GENERATOR", 8192, false);
 
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.FREE_ENERGY_I, "FREE_ENERGY_I", RecipeType.ENHANCED_CRAFTING_TABLE,
+        new FreeEnergy(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.FREE_ENERGY_I, "FREE_ENERGY_I", RecipeType.ENHANCED_CRAFTING_TABLE,
             new ItemStack[] {null, null, null,
                     null, null, null,
-                    null, null, new ItemStack(Material.BARRIER, 1, (short)1)})
+                    null, null, new ItemStack(Material.BARRIER, 1, (short)1)}, 500)
             .register(true, new EnergyTicker() {
 
                 @Override
                 public double generateEnergy(Location l, SlimefunItem item, Config data) {
+                    if (!l.getWorld().isChunkLoaded(l.getBlockX() >> 4, l.getBlockZ() >> 4)) return 0D;
                     try {
                         return 500;
                     }
@@ -708,14 +875,15 @@ public class SlimefunSetup {
 
         ChargableBlock.registerChargableBlock("FREE_ENERGY_I", 8192, false);
 
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.FREE_ENERGY_II, "FREE_ENERGY_II", RecipeType.ENHANCED_CRAFTING_TABLE,
+        new FreeEnergy(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.FREE_ENERGY_II, "FREE_ENERGY_II", RecipeType.ENHANCED_CRAFTING_TABLE,
             new ItemStack[] {null, null, null,
                     null, null, null,
-                    null, null, new ItemStack(Material.BARRIER, 1, (short)2)})
+                    null, null, new ItemStack(Material.BARRIER, 1, (short)2)}, 1000)
             .register(true, new EnergyTicker() {
 
                 @Override
                 public double generateEnergy(Location l, SlimefunItem item, Config data) {
+                    if (!l.getWorld().isChunkLoaded(l.getBlockX() >> 4, l.getBlockZ() >> 4)) return 0D;
                     try {
                         return 1000;
                     }
@@ -734,10 +902,10 @@ public class SlimefunSetup {
 
         ChargableBlock.registerChargableBlock("FREE_ENERGY_II", 8192, false);
 
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.FREE_ENERGY_III, "FREE_ENERGY_III", RecipeType.ENHANCED_CRAFTING_TABLE,
+        new FreeEnergy(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.FREE_ENERGY_III, "FREE_ENERGY_III", RecipeType.ENHANCED_CRAFTING_TABLE,
                 new ItemStack[] {null, null, null,
                         null, null, null,
-                        null, null, new ItemStack(Material.BARRIER, 1, (short)3)})
+                        null, null, new ItemStack(Material.BARRIER, 1, (short)3)}, 2000)
                 .register(true, new EnergyTicker() {
 
                     @Override
@@ -867,9 +1035,9 @@ public class SlimefunSetup {
     private void setupTitanBox()
     {
         new SlimefunItem(CustomCategories.STORAGE_ROUTING, TitanBox.instants.getItem("A"), "Storage Unit, Size:" + ItemHolder.UNIT_A.getSize(), RecipeType.ENHANCED_CRAFTING_TABLE,
-                new ItemStack[] {new ItemStack(Material.LOG), new ItemStack(Material.WOOD_STEP), new ItemStack(Material.LOG),
-                new ItemStack(Material.LOG), me.mrCookieSlime.Slimefun.Lists.SlimefunItems.BATTERY, new ItemStack(Material.LOG),
-                new ItemStack(Material.LOG), new ItemStack(Material.LOG), new ItemStack(Material.LOG)}).register();
+                new ItemStack[] {new ItemStack(Material.OAK_LOG), new ItemStack(Material.OAK_SLAB), new ItemStack(Material.OAK_LOG),
+                new ItemStack(Material.OAK_LOG), me.mrCookieSlime.Slimefun.Lists.SlimefunItems.BATTERY, new ItemStack(Material.OAK_LOG),
+                new ItemStack(Material.OAK_LOG), new ItemStack(Material.OAK_LOG), new ItemStack(Material.OAK_LOG)}).register();
         new SlimefunItem(CustomCategories.STORAGE_ROUTING, TitanBox.instants.getItem("B"), "Storage Unit, Size:" + ItemHolder.UNIT_B.getSize(), RecipeType.ENHANCED_CRAFTING_TABLE,
                 new ItemStack[] {me.mrCookieSlime.Slimefun.Lists.SlimefunItems.BRONZE_INGOT, TitanBox.instants.getItem("A"), me.mrCookieSlime.Slimefun.Lists.SlimefunItems.BRONZE_INGOT,
                         me.mrCookieSlime.Slimefun.Lists.SlimefunItems.BRONZE_INGOT, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.BATTERY, me.mrCookieSlime.Slimefun.Lists.SlimefunItems.BRONZE_INGOT,
@@ -912,7 +1080,7 @@ public class SlimefunSetup {
 
         new SlimefunItem(CustomCategories.STORAGE_ROUTING, TitanBox.instants.getItem("router"), "Item Routing Router", RecipeType.ENHANCED_CRAFTING_TABLE,
                 new ItemStack[] {SlimefunItems.STEEL_INGOT, SlimefunItems.STEEL_INGOT, SlimefunItems.STEEL_INGOT,
-                        new ItemStack(Material.WORKBENCH), new ItemStack(Material.BOOKSHELF), new ItemStack(Material.WORKBENCH),
+                        new ItemStack(Material.CRAFTING_TABLE), new ItemStack(Material.BOOKSHELF), new ItemStack(Material.CRAFTING_TABLE),
                         SlimefunItems.STEEL_INGOT, SlimefunItems.STEEL_INGOT, SlimefunItems.STEEL_INGOT}).register();
 
         new SlimefunItem(CustomCategories.STORAGE_ROUTING, Pumps.getMeAsDrop("killer"), "Killer Block", RecipeType.ENHANCED_CRAFTING_TABLE,
@@ -941,23 +1109,23 @@ public class SlimefunSetup {
                         SlimefunItemsHolder.LuckyIngot, SlimefunItemsHolder.LuckyIngot, SlimefunItemsHolder.LuckyIngot}).register();
 
         new SlimefunItem(CustomCategories.STORAGE_ROUTING, Elevator.getMeAsDrop(), "Elevator", RecipeType.ENHANCED_CRAFTING_TABLE,
-                new ItemStack[] {new ItemStack(Material.IRON_INGOT), new ItemStack(Material.PISTON_BASE), new ItemStack(Material.IRON_INGOT),
+                new ItemStack[] {new ItemStack(Material.IRON_INGOT), new ItemStack(Material.PISTON), new ItemStack(Material.IRON_INGOT),
                         new ItemStack(Material.IRON_INGOT), new ItemStack(Material.ENDER_PEARL), new ItemStack(Material.IRON_INGOT),
-                        new ItemStack(Material.IRON_INGOT), new ItemStack(Material.PISTON_BASE), new ItemStack(Material.IRON_INGOT)}).register();
+                        new ItemStack(Material.IRON_INGOT), new ItemStack(Material.PISTON), new ItemStack(Material.IRON_INGOT)}).register();
 
         new SlimefunItem(CustomCategories.STORAGE_ROUTING, BackpackRecover.getMeAsDrop(), "Backpack Recover", RecipeType.ENHANCED_CRAFTING_TABLE,
                 new ItemStack[] {SlimefunItemsHolder.LuckyIngot, SlimefunItemsHolder.LuckyIngot, SlimefunItemsHolder.LuckyIngot,
-                        new ItemStack(Material.WOOL), new ItemStack(Material.WORKBENCH), new ItemStack(Material.WOOL),
+                        new ItemStack(Material.WHITE_WOOL), new ItemStack(Material.CRAFTING_TABLE), new ItemStack(Material.WHITE_WOOL),
                         SlimefunItemsHolder.LuckyIngot, SlimefunItemsHolder.LuckyIngot, SlimefunItemsHolder.LuckyIngot}).register();
 
         new SlimefunItem(CustomCategories.STORAGE_ROUTING, StorageRecover.getMeAsDrop(), "Storage Recover", RecipeType.ENHANCED_CRAFTING_TABLE,
             new ItemStack[] {SlimefunItemsHolder.LuckyIngot, SlimefunItemsHolder.LuckyIngot, SlimefunItemsHolder.LuckyIngot,
-                    new ItemStack(Material.WOOL), new ItemStack(Material.DISPENSER), new ItemStack(Material.WOOL),
+                    new ItemStack(Material.WHITE_WOOL), new ItemStack(Material.DISPENSER), new ItemStack(Material.WHITE_WOOL),
                     SlimefunItemsHolder.LuckyIngot, SlimefunItemsHolder.LuckyIngot, SlimefunItemsHolder.LuckyIngot}).register();
 
         new SlimefunItem(CustomCategories.ELECTRICITY, NetworkMonitor.getMeAsDrop(), "NetworkMonitor", RecipeType.ENHANCED_CRAFTING_TABLE,
                 new ItemStack[] {SlimefunItems.MAGNESIUM_INGOT, SlimefunItems.MAGNESIUM_INGOT, SlimefunItems.MAGNESIUM_INGOT,
-                        new ItemStack(Material.GLASS), new ItemStack(Material.REDSTONE_LAMP_OFF), new ItemStack(Material.GLASS),
+                        new ItemStack(Material.GLASS), new ItemStack(Material.REDSTONE_LAMP), new ItemStack(Material.GLASS),
                         SlimefunItems.MAGNESIUM_INGOT, SlimefunItems.MAGNESIUM_INGOT, SlimefunItems.MAGNESIUM_INGOT}).register();
 
 
@@ -978,21 +1146,21 @@ public class SlimefunSetup {
     private void setupTitanSet() {
         ItemStack Reward =  new ItemStack(SlimefunItemsHolder.TitanNugget);
         Reward.setAmount(3);
-        new SlimefunItem(CustomCategories.SLIMEFUN_RESOURCES, SlimefunItemsHolder.TitanNuggetB, "TitanNugget", RecipeType.ORE_CRUSHER, new ItemStack[] {null,null, SlimefunItemsHolder.TitanAxe, SlimefunItemsHolder.TitanBoots, SlimefunItemsHolder.TitanChestplate, SlimefunItemsHolder.TitanHelmet, SlimefunItemsHolder.TitanLeggings, SlimefunItemsHolder.TitanSword, SlimefunItemsHolder.TitanPickaxe}).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_RESOURCES, SlimefunItemsHolder.TitanNugget.clone(), "TitanNugget ", RecipeType.ORE_CRUSHER, new ItemStack[] {null,null, SlimefunItemsHolder.TitanAxe, SlimefunItemsHolder.TitanBoots, SlimefunItemsHolder.TitanChestplate, SlimefunItemsHolder.TitanHelmet, SlimefunItemsHolder.TitanLeggings, SlimefunItemsHolder.TitanSword, SlimefunItemsHolder.TitanPickaxe}).register();
         Reward.setAmount(3);
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.TitanNugget, "TitanNugget", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.TitanAxe, null, null, null, null, null, null, null, null}, Reward).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.TitanNugget.clone(), "TitanNugget  ", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.TitanAxe, null, null, null, null, null, null, null, null}, Reward).register();
         Reward.setAmount(4);
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.TitanNugget, "TitanNugget ", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.TitanBoots, null, null, null, null, null, null, null, null}, Reward).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.TitanNugget.clone(), "TitanNuggetA", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.TitanBoots, null, null, null, null, null, null, null, null}, Reward).register();
         Reward.setAmount(5);
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.TitanNugget, "TitanNugget", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.TitanChestplate, null, null, null, null, null, null, null, null}, Reward).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.TitanNugget.clone(), "TitanNuggetB", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.TitanChestplate, null, null, null, null, null, null, null, null}, Reward).register();
         Reward.setAmount(4);
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.TitanNugget, "TitanNugget", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.TitanHelmet, null, null, null, null, null, null, null, null}, Reward).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.TitanNugget.clone(), "TitanNuggetC", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.TitanHelmet, null, null, null, null, null, null, null, null}, Reward).register();
         Reward.setAmount(4);
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.TitanNugget, "TitanNugget", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.TitanLeggings, null, null, null, null, null, null, null, null}, Reward).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.TitanNugget.clone(), "TitanNuggetD", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.TitanLeggings, null, null, null, null, null, null, null, null}, Reward).register();
         Reward.setAmount(3);
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.TitanNugget, "TitanNugget", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.TitanSword, null, null, null, null, null, null, null, null}, Reward).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.TitanNugget.clone(), "TitanNuggetE", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.TitanSword, null, null, null, null, null, null, null, null}, Reward).register();
         Reward.setAmount(3);
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.TitanNugget, "TitanNugget", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.TitanPickaxe, null, null, null, null, null, null, null, null}, Reward).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.TitanNugget.clone(), "TitanNuggetF", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.TitanPickaxe, null, null, null, null, null, null, null, null}, Reward).register();
 
         Reward = SlimefunItemsHolder.TitanNugget.clone();
         Reward.setAmount(3);
@@ -1011,21 +1179,21 @@ public class SlimefunSetup {
     private void setupEclipseSet() {
         ItemStack Reward =  new ItemStack(SlimefunItemsHolder.EclipseNugget);
         Reward.setAmount(3);
-        new SlimefunItem(CustomCategories.SLIMEFUN_RESOURCES, SlimefunItemsHolder.EclipseNuggetB, "EclipseNugget", RecipeType.ORE_CRUSHER, new ItemStack[] {null,null, SlimefunItemsHolder.EclipseAxe, SlimefunItemsHolder.EclipseBoots, SlimefunItemsHolder.EclipseChestplate, SlimefunItemsHolder.EclipseHelmet, SlimefunItemsHolder.EclipseLeggings, SlimefunItemsHolder.EclipseSword, SlimefunItemsHolder.EclipsePickaxe}).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_RESOURCES, SlimefunItemsHolder.EclipseNugget.clone(), "EclipseNugget ", RecipeType.ORE_CRUSHER, new ItemStack[] {null,null, SlimefunItemsHolder.EclipseAxe, SlimefunItemsHolder.EclipseBoots, SlimefunItemsHolder.EclipseChestplate, SlimefunItemsHolder.EclipseHelmet, SlimefunItemsHolder.EclipseLeggings, SlimefunItemsHolder.EclipseSword, SlimefunItemsHolder.EclipsePickaxe}).register();
         Reward.setAmount(3);
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.EclipseNugget, "EclipseNugget", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.EclipseAxe, null, null, null, null, null, null, null, null}, Reward).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.EclipseNugget.clone(), "EclipseNugget  ", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.EclipseAxe, null, null, null, null, null, null, null, null}, Reward).register();
         Reward.setAmount(4);
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.EclipseNugget, "EclipseNugget ", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.EclipseBoots, null, null, null, null, null, null, null, null}, Reward).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.EclipseNugget.clone(), "EclipseNuggetA", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.EclipseBoots, null, null, null, null, null, null, null, null}, Reward).register();
         Reward.setAmount(5);
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.EclipseNugget, "EclipseNugget", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.EclipseChestplate, null, null, null, null, null, null, null, null}, Reward).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.EclipseNugget.clone(), "EclipseNuggetB", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.EclipseChestplate, null, null, null, null, null, null, null, null}, Reward).register();
         Reward.setAmount(5);
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.EclipseNugget, "EclipseNugget", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.EclipseHelmet, null, null, null, null, null, null, null, null}, Reward).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.EclipseNugget.clone(), "EclipseNuggetC", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.EclipseHelmet, null, null, null, null, null, null, null, null}, Reward).register();
         Reward.setAmount(4);
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.EclipseNugget, "EclipseNugget", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.EclipseLeggings, null, null, null, null, null, null, null, null}, Reward).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.EclipseNugget.clone(), "EclipseNuggetD", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.EclipseLeggings, null, null, null, null, null, null, null, null}, Reward).register();
         Reward.setAmount(3);
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.EclipseNugget, "EclipseNugget", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.EclipseSword, null, null, null, null, null, null, null, null}, Reward).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.EclipseNugget.clone(), "EclipseNuggetE", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.EclipseSword, null, null, null, null, null, null, null, null}, Reward).register();
         Reward.setAmount(3);
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.EclipseNugget, "EclipseNugget", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.EclipsePickaxe, null, null, null, null, null, null, null, null}, Reward).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.EclipseNugget.clone(), "EclipseNuggetF", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.EclipsePickaxe, null, null, null, null, null, null, null, null}, Reward).register();
 
         Reward = SlimefunItemsHolder.EclipseNugget.clone();
         Reward.setAmount(3);
@@ -1048,21 +1216,21 @@ public class SlimefunSetup {
 
         Reward =  new ItemStack(SlimefunItemsHolder.LuckyNugget);
         Reward.setAmount(3);
-        new SlimefunItem(CustomCategories.SLIMEFUN_RESOURCES, SlimefunItemsHolder.LuckyNuggetB, "LuckyNugget", RecipeType.ORE_CRUSHER, new ItemStack[] {null,null, SlimefunItemsHolder.LuckyAxe, SlimefunItemsHolder.LuckyBoots, SlimefunItemsHolder.LuckyChestplate, SlimefunItemsHolder.LuckyHelmet, SlimefunItemsHolder.LuckyLeggings, SlimefunItemsHolder.LuckySword, SlimefunItemsHolder.LuckyPickaxe}).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_RESOURCES, SlimefunItemsHolder.LuckyNugget.clone(), "LuckyNugget ", RecipeType.ORE_CRUSHER, new ItemStack[] {null,null, SlimefunItemsHolder.LuckyAxe, SlimefunItemsHolder.LuckyBoots, SlimefunItemsHolder.LuckyChestplate, SlimefunItemsHolder.LuckyHelmet, SlimefunItemsHolder.LuckyLeggings, SlimefunItemsHolder.LuckySword, SlimefunItemsHolder.LuckyPickaxe}).register();
         Reward.setAmount(3);
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.LuckyNugget, "LuckyNugget", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.LuckyAxe, null, null, null, null, null, null, null, null}, Reward).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.LuckyNugget.clone(), "LuckyNuggetA", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.LuckyAxe, null, null, null, null, null, null, null, null}, Reward).register();
         Reward.setAmount(4);
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.LuckyNugget, "LuckyNugget ", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.LuckyBoots, null, null, null, null, null, null, null, null}, Reward).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.LuckyNugget.clone(), "LuckyNuggetB", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.LuckyBoots, null, null, null, null, null, null, null, null}, Reward).register();
         Reward.setAmount(5);
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.LuckyNugget, "LuckyNugget", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.LuckyChestplate, null, null, null, null, null, null, null, null}, Reward).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.LuckyNugget.clone(), "LuckyNuggetC", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.LuckyChestplate, null, null, null, null, null, null, null, null}, Reward).register();
         Reward.setAmount(4);
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.LuckyNugget, "LuckyNugget", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.LuckyHelmet, null, null, null, null, null, null, null, null}, Reward).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.LuckyNugget.clone(), "LuckyNuggetD", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.LuckyHelmet, null, null, null, null, null, null, null, null}, Reward).register();
         Reward.setAmount(4);
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.LuckyNugget, "LuckyNugget", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.LuckyLeggings, null, null, null, null, null, null, null, null}, Reward).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.LuckyNugget.clone(), "LuckyNuggetE", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.LuckyLeggings, null, null, null, null, null, null, null, null}, Reward).register();
         Reward.setAmount(3);
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.LuckyNugget, "LuckyNugget", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.LuckySword, null, null, null, null, null, null, null, null}, Reward).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.LuckyNugget.clone(), "LuckyNuggetF", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.LuckySword, null, null, null, null, null, null, null, null}, Reward).register();
         Reward.setAmount(3);
-        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.LuckyNugget, "LuckyNugget", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.LuckyPickaxe, null, null, null, null, null, null, null, null}, Reward).register();
+        new SlimefunItem(CustomCategories.SLIMEFUN_BLANK, SlimefunItemsHolder.LuckyNugget.clone(), "LuckyNuggetG", RecipeType.ORE_CRUSHER, new ItemStack[] {SlimefunItemsHolder.LuckyPickaxe, null, null, null, null, null, null, null, null}, Reward).register();
 
         Reward = SlimefunItemsHolder.LuckyNugget.clone();
         Reward.setAmount(3);

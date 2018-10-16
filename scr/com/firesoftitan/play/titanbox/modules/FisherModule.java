@@ -1,8 +1,10 @@
 package com.firesoftitan.play.titanbox.modules;
 
 import com.firesoftitan.play.titanbox.TitanBox;
+import com.firesoftitan.play.titanbox.Utilities;
 import com.firesoftitan.play.titanbox.enums.ModuleTypeEnum;
 import com.firesoftitan.play.titanbox.machines.Pumps;
+import com.firesoftitan.play.titansql.ResultData;
 import me.mrCookieSlime.Slimefun.SlimefunStartup;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -10,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
 import java.util.Random;
 import java.util.UUID;
 
@@ -27,7 +30,7 @@ public class FisherModule extends MainModule {
     @Override
     public String getLinkLore()
     {
-        if (getModuleid() == null)
+        if (getModuleid() == null || waterPump == null)
         {
             return ChatColor.WHITE  + "not set.";
         }
@@ -43,7 +46,14 @@ public class FisherModule extends MainModule {
 
     }
     @Override
+    public void unLinkAll() {
+        this.link = null;
+        this.waterPump = null;
+        saveInfo();
+    }
+    @Override
     public boolean setLink(Location link, Player player) {
+        super.setLink(link, player);
         String pump = Pumps.getPumpType(link);
         this.link = null;
         if (pump != null)
@@ -62,18 +72,25 @@ public class FisherModule extends MainModule {
         return false;
     }
     @Override
-    public void loadInfo() {
-        super.loadInfo();
+    public void loadInfo(HashMap<String, ResultData> result)
+    {
+        super.loadInfo(result);
         waterPump = null;
-        if (modules.contains("modules." + moduleid + ".slots.waterpump")) {
-            waterPump = modules.getLocation("modules." + moduleid + ".slots.waterpump");
+        if (result.get("pump_a") != null) {
+            if (result.get("pump_a").getLocation() != null) {
+                waterPump = result.get("pump_a").getLocation().clone();
+            }
         }
     }
+
 
     @Override
     public void saveInfo() {
         super.saveInfo();
-        modules.setValue("modules." + moduleid + ".slots.waterpump", waterPump);
+        modulesSQL.setDataField("pump_a", waterPump);
+        this.sendDate();
+
+        //modules.setValue("modules." + moduleid + ".slots.waterpump", waterPump);
     }
 
     @Override
@@ -85,13 +102,20 @@ public class FisherModule extends MainModule {
     @Override
     public ItemStack getMeAsIcon()
     {
-        return new ItemStack(Material.FISHING_ROD, 1);
+
+        if (isLoaded()) {
+            if (Pumps.getLiquid(link, "Water"))
+            {
+                return new ItemStack(Material.FISHING_ROD, 1);
+            }
+        }
+        return new ItemStack(Material.BARRIER, 1);
     }
     @Override
     public boolean isLoaded()
     {
         if (waterPump != null) {
-            return waterPump.getChunk().isLoaded();
+            return Utilities.isLoaded(waterPump);
         }
         return false;
     }
@@ -104,15 +128,15 @@ public class FisherModule extends MainModule {
             if (waterPump != null) {
                 if (Pumps.getLiquid(waterPump, "Water")) {
                     if (SlimefunStartup.chance(100, 1)) {
-                        TitanBox.addItemToStorage(owner, Material.RAW_FISH, 1, (short) 3);
+                        TitanBox.addItemToStorage(owner, Material.PUFFERFISH, 1);
                     } else {
                         if (SlimefunStartup.chance(100, 5)) {
-                            TitanBox.addItemToStorage(owner, Material.RAW_FISH, 1, (short) 2);
+                            TitanBox.addItemToStorage(owner, Material.TROPICAL_FISH, 1);
                         } else {
                             if (SlimefunStartup.chance(100, 15)) {
-                                TitanBox.addItemToStorage(owner, Material.RAW_FISH, 1, (short) 1);
+                                TitanBox.addItemToStorage(owner, Material.SALMON, 1, (short) 0);
                             } else {
-                                TitanBox.addItemToStorage(owner, Material.RAW_FISH, 1, (short) 0);
+                                TitanBox.addItemToStorage(owner, Material.COD, 1, (short) 0);
                             }
                         }
                     }

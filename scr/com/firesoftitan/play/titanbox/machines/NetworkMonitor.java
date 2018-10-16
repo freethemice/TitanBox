@@ -44,6 +44,12 @@ public class NetworkMonitor {
     public static void openGui(Player player, Location loc)
     {
         loc = loc.add(0, -1, 0).clone();
+        if (EnergyNet.getNetworkFromLocation(loc) == null){
+            loc = loc.add(0, -1, 0).clone();
+            if (EnergyNet.getNetworkFromLocation(loc) == null){
+                loc = loc.add(0, -1, 0).clone();
+            }
+        }
         Inventory guiRecover = Bukkit.createInventory(null, 9, "Network Monitor");
 
         double[] check = getEnergyInfo(loc);
@@ -76,13 +82,15 @@ public class NetworkMonitor {
         double totalCosumption = 0.0D;
         double totalGenerated = 0.0D;
 
-
-        if (EnergyNet.scan(loc, EnergyNet.Axis.UNKNOWN, new HashSet<Location>(), input, storage, output, supplyMax, demandMax).isEmpty()) {
+        EnergyNet eNet  = EnergyNet.getNetworkFromLocation(loc);
+        if (eNet == null){
             //No Network
         }
         else
         {
-
+            input = eNet.getInput();
+            storage = eNet.getStorage();
+            output = eNet.getOutput();
             for (final Location source: input) {
 
                 totalCosumption = totalCosumption  + getEnergyConsumption(source);
@@ -146,7 +154,7 @@ public class NetworkMonitor {
 
     public static int getEnergyProduction(Location loc) {
         try {
-            String id = BlockStorage.getBlockInfo(loc, "id");
+            String id = BlockStorage.getLocationInfo(loc).getString("id");
             SlimefunItem slItem = SlimefunItem.getByID(id);
             if (slItem != null) {
                 if (slItem instanceof AGenerator) {
@@ -168,7 +176,7 @@ public class NetworkMonitor {
     }
     public static int getEnergyConsumption(Location loc)
     {
-        String id = BlockStorage.getBlockInfo(loc, "id");
+        String id = BlockStorage.getLocationInfo(loc).getString("id");
         SlimefunItem slItem = SlimefunItem.getByID(id);
         if (slItem instanceof AContainer) {
             AContainer EnergeyBlock = (AContainer) slItem;

@@ -1,5 +1,6 @@
 package com.firesoftitan.play.titanbox.machines;
 
+import com.firesoftitan.play.titanbox.TitanBox;
 import com.firesoftitan.play.titanbox.containers.BContainer;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.InvUtils;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
@@ -7,7 +8,6 @@ import me.mrCookieSlime.Slimefun.Lists.RecipeType;
 import me.mrCookieSlime.Slimefun.Objects.Category;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineHelper;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
-import me.mrCookieSlime.Slimefun.Setup.SlimefunManager;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.energy.ChargableBlock;
 import org.bukkit.Material;
@@ -33,7 +33,7 @@ public abstract class CharcoalFactory extends BContainer {;
 
     @Override
     public ItemStack getProgressBar() {
-        return new ItemStack(Material.GOLD_SPADE);
+        return new ItemStack(Material.GOLDEN_AXE);
     }
 
     @Override
@@ -70,7 +70,7 @@ public abstract class CharcoalFactory extends BContainer {;
                 if (ChargableBlock.getCharge(b) < getEnergyConsumption()) return;
                 ChargableBlock.addCharge(b, -getEnergyConsumption());
 
-                BlockStorage.getInventory(b).replaceExistingItem(22, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 15), " "));
+                BlockStorage.getInventory(b).replaceExistingItem(22, new CustomItem(new MaterialData(Material.BLACK_STAINED_GLASS_PANE), " "));
                 pushItems(b, processing.get(b).getOutput());
 
                 progress.remove(b);
@@ -80,16 +80,18 @@ public abstract class CharcoalFactory extends BContainer {;
         else {
 
             for (int slot: getInputSlots()) {
-                if (SlimefunManager.isItemSimiliar(BlockStorage.getInventory(b).getItemInSlot(slot), new ItemStack(Material.SAPLING, 1), true)) {
-                    Random number = new Random(System.currentTimeMillis());
-                    ItemStack adding = new ItemStack(Material.COAL, 10 + number.nextInt(10), (short)1);
-                    adding = adding.clone();
-                    MachineRecipe r = new MachineRecipe(4 / getSpeed(), new ItemStack[0], new ItemStack[] {adding});
-                    if (!fits(b, r.getOutput())) return;
-                    BlockStorage.getInventory(b).replaceExistingItem(slot, InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(slot), 1));
-                    processing.put(b, r);
-                    progress.put(b, r.getTicks());
-                    break;
+                if (!TitanBox.isEmpty(BlockStorage.getInventory(b).getItemInSlot(slot))) {
+                    if (BlockStorage.getInventory(b).getItemInSlot(slot).getType().name().toLowerCase().endsWith("_sapling")) {
+                        Random number = new Random(System.currentTimeMillis());
+                        ItemStack adding = new ItemStack(Material.CHARCOAL, 10 + number.nextInt(10));
+                        adding = adding.clone();
+                        MachineRecipe r = new MachineRecipe(4 / getSpeed(), new ItemStack[0], new ItemStack[]{adding});
+                        if (!fits(b, r.getOutput())) return;
+                        BlockStorage.getInventory(b).replaceExistingItem(slot, InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(slot), 1));
+                        processing.put(b, r);
+                        progress.put(b, r.getTicks());
+                        break;
+                    }
                 }
             }
         }

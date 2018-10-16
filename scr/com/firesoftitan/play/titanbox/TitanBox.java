@@ -11,6 +11,9 @@ import com.firesoftitan.play.titanbox.modules.MainModule;
 import com.firesoftitan.play.titanbox.runnables.MainRunnable;
 import com.firesoftitan.play.titanbox.runnables.RouterRunable;
 import com.firesoftitan.play.titanbox.runnables.SaverRunable;
+import com.firesoftitan.play.titanbox.shops.MainShops;
+import com.firesoftitan.play.titanbox.shops.PlayerShopHolder;
+import com.firesoftitan.play.titanbox.shops.ShopHolder;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
@@ -20,17 +23,19 @@ import me.mrCookieSlime.Slimefun.api.energy.EnergyNet;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.PlayerData;
 import net.milkbowl.vault.economy.Economy;
-import net.minecraft.server.v1_12_R1.*;
+import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.*;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.*;
+import org.bukkit.block.Chest;
+import org.bukkit.block.DoubleChest;
+import org.bukkit.block.Skull;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_13_R2.CraftServer;
+import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -60,8 +65,9 @@ public class TitanBox extends JavaPlugin
     private static HashMap<EntityType, String> bToMConversion;
     private RouterRunable RouterTimer = new RouterRunable();
     private SaverRunable SaverTimer = new SaverRunable();
+    public MainShops mainShops;
     public static long isRunning = 0;
-    static {
+        static {
         bToMConversion = new HashMap<EntityType, String> ();
         bToMConversion.put(EntityType.MUSHROOM_COW, "mooshroom");
         bToMConversion.put(EntityType.PIG_ZOMBIE, "zombie_pigman");
@@ -147,11 +153,11 @@ public class TitanBox extends JavaPlugin
 
         setup = new SlimefunSetup();
 
+        mainShops  = new MainShops();
+
         InventoryModule.loadConfig();
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new MainRunnable(),25, 25);
-
-
 
 
     }
@@ -189,18 +195,20 @@ public class TitanBox extends JavaPlugin
             if (block.getLocation().equals(block.getLocation())) {
                 if (CustomSkull.getItem(skulltexture) != null) {
                     try {
-                        if (block.getType() != Material.SKULL) {
-                            block.setType(Material.SKULL);
+                        if (block.getType() != Material.PLAYER_HEAD) {
+                            block.setType(Material.PLAYER_HEAD);
                         }
-                        if (block.getData() != (byte) 0x1) {
+                        /*if (block.getData() != (byte) 0x1) {
                             block.setData((byte) 0x1); // Floor
-                        }
+                        }*/
                         Skull skullE = ((Skull) block.getState());
+                        skullE.getData().setData((byte) 0x1);
+                        /*
                         if (skullE.getRotation() != BlockFace.NORTH) {
                             skullE.setRotation(BlockFace.NORTH);
                             skullE.update();
                         }
-
+*/
                         CustomSkull.setSkull(block, skulltexture);
 
 
@@ -240,9 +248,9 @@ public class TitanBox extends JavaPlugin
 
         StorageUnit.loadStorage();
 
-        MainModule.loadAllModules();
+//        MainModule.loadAllModules();
 
-        RouterHolder.loadAllRouters();
+        //RouterHolder.loadAllRouters();
 
         Elevator.loadAllElevators();
 
@@ -262,6 +270,54 @@ public class TitanBox extends JavaPlugin
         CraftPlayer opCr = npc.getBukkitEntity();
         List<Entity> nearEntity = opCr.getNearbyEntities(rad,rad,rad);
         return nearEntity;
+    }
+    public static ItemStack addItemsToPlayer(Player player, ItemStack placing)
+    {
+        placing = placing.clone();
+        List<Integer> emptySlos = new ArrayList<Integer>();
+        Inventory playersInv = player.getInventory();
+        for (int i = 0; i < 36; i++) {
+            ItemStack checkItem = playersInv.getItem(i);
+            if (TitanBox.isEmpty(checkItem))
+            {
+                emptySlos.add(i); //this slot is empty lets keep that in mind for later
+            }
+            else
+            {
+                checkItem = checkItem.clone();
+                if (TitanBox.isItemEqual(checkItem, placing))// is this the same thing
+                {
+                    if (checkItem.getAmount() < checkItem.getMaxStackSize()) //is there room in this stack for more
+                    {
+                        int placeAmount = Math.min(checkItem.getMaxStackSize() - checkItem.getAmount(), placing.getAmount()); //how much more can it hold
+                        checkItem.setAmount(checkItem.getAmount() + placeAmount); //uppdate the item
+                        playersInv.setItem(i, checkItem.clone());//place the item back
+                        if (placing.getAmount() - placeAmount <= 0) //is there any left over we need to place
+                        {
+                            return null; //we are done
+                        }
+                        placing.setAmount(placing.getAmount() - placeAmount); //some was left, lets keep looking
+                    }
+                }
+            }
+
+        }
+        //we finished looking for more room now lets fill in the empty slots
+        for (Integer slot: emptySlos)
+        {
+            int howMuch = Math.min(placing.getMaxStackSize(), placing.getAmount());
+            ItemStack itemStack = placing.clone();
+            itemStack.setAmount(howMuch);
+            playersInv.setItem(slot, itemStack.clone());
+            if (placing.getAmount() - howMuch <= 0) //is there any left over we need to place
+            {
+                return null; //we are done
+            }
+            placing.setAmount(placing.getAmount() - howMuch); //some was left, lets keep looking
+        }
+
+        return placing.clone(); // didn't have enough room, sorry
+
     }
     public void checkRegisterdPower()
     {
@@ -287,8 +343,6 @@ public class TitanBox extends JavaPlugin
     public void saveEveryThing()
     {
         StorageUnit.saveStorage();
-        MainModule.saveModules();
-        RouterHolder.saveRoutes();
         Pumps.savePumps();
         Elevator.saveElevators();
         BackpackRecover.saveRecovers();
@@ -412,6 +466,46 @@ public class TitanBox extends JavaPlugin
         }
         return null;
     }
+    public static long getItemCount(UUID owner, ItemStack typeBucket) {
+        for (StorageUnit stH : StorageUnit.getStorageFromOwner(owner)) {
+            if (stH.getOwner().toString().equals(owner.toString())) {
+                for(int i =0;i <stH.getSize(); i++)
+                {
+                    ItemStack view = stH.viewSlot(i);
+                    if (!TitanBox.isEmpty(view))
+                    {
+                        if (TitanBox.isItemEqual(view, typeBucket))
+                        {
+                            return stH.getStorageCount(i);
+                        }
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+    public static ItemStack getItemByPassPower(UUID owner, ItemStack typeBucket, int amount) {
+        for (StorageUnit stH : StorageUnit.getStorageFromOwner(owner)) {
+            if (stH.getOwner().toString().equals(owner.toString())) {
+                for(int i =0;i <stH.getSize(); i++)
+                {
+                    ItemStack view = stH.viewSlot(i);
+                    if (!TitanBox.isEmpty(view))
+                    {
+                        if (TitanBox.isItemEqual(view, typeBucket))
+                        {
+                            ItemStack getIt = stH.getItem(i,amount, true);
+                            if (!TitanBox.isEmpty(getIt))
+                            {
+                                return  getIt;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
     public static boolean hasItem(UUID owner, Material typeBucket, short data) {
         return hasItem(owner, new ItemStack(typeBucket, 1, data));
     }
@@ -419,6 +513,9 @@ public class TitanBox extends JavaPlugin
         return hasItem(owner, typeBucket, (short) 0);
     }
     public static boolean hasItem(UUID owner, ItemStack typeBucket) {
+        return hasItem(owner, typeBucket, true);
+    }
+    public static boolean hasItem(UUID owner, ItemStack typeBucket, boolean useItem) {
         boolean foundbucket = false;
         for (StorageUnit stH : StorageUnit.getStorageFromOwner(owner)) {
             if (stH.getOwner().toString().equals(owner.toString())) {
@@ -429,8 +526,14 @@ public class TitanBox extends JavaPlugin
                     {
                         if (TitanBox.isItemEqual(view, typeBucket))
                         {
-                            ItemStack getIt = stH.getItem(i, 1);
-                            if (!TitanBox.isEmpty(getIt))
+                            if (useItem) {
+                                ItemStack getIt = stH.getItem(i, 1);
+                                if (!TitanBox.isEmpty(getIt)) {
+                                    foundbucket = true;
+                                    break;
+                                }
+                            }
+                            else
                             {
                                 foundbucket = true;
                                 break;
@@ -458,7 +561,7 @@ public class TitanBox extends JavaPlugin
             case DROPPER:
             case FURNACE:
             case BREWING_STAND:
-            case BURNING_FURNACE:
+            //case BURNING_FURNACE:
                 return true;
             default:
                 return false;
@@ -508,7 +611,7 @@ public class TitanBox extends JavaPlugin
             case DROPPER:
             case FURNACE:
             case BREWING_STAND:
-            case BURNING_FURNACE:
+            //case BURNING_FURNACE:
                 return ((InventoryHolder) target.getState()).getInventory();
             // any other vanilla inventory types ?
             default:
@@ -541,10 +644,7 @@ public class TitanBox extends JavaPlugin
         toAdd.setItemMeta(IM);
         return toAdd.clone();
     }
-    public static ItemStack addLore(ItemStack toAdd, List<String> lore)
-    {
-        return addLore(false, toAdd, lore);
-    }
+
     public static int getLoreSize(ItemStack toAdd)
     {
         ItemMeta ITM = null;
@@ -610,17 +710,9 @@ public class TitanBox extends JavaPlugin
         }
         return toAdd.clone();
     }
-    public static ItemStack clearLore(ItemStack toAdd)
+    public static ItemStack addLore(ItemStack toAdd, List<String> lore)
     {
-        List<String> lore = new ArrayList<String>();
-        ItemMeta ITM = null;
-        if (toAdd.hasItemMeta()) {
-            ITM = toAdd.getItemMeta();
-            ITM.setLore(lore);
-            toAdd.setItemMeta(ITM.clone());
-            return toAdd;
-        }
-        return toAdd.clone();
+        return addLore(false, toAdd, lore);
     }
     public static ItemStack addLore(boolean clear, ItemStack toAdd, String... lores)
     {
@@ -635,6 +727,19 @@ public class TitanBox extends JavaPlugin
     {
         return addLore(false, toAdd, lores);
     }
+    public static ItemStack clearLore(ItemStack toAdd)
+    {
+        List<String> lore = new ArrayList<String>();
+        ItemMeta ITM = null;
+        if (toAdd.hasItemMeta()) {
+            ITM = toAdd.getItemMeta();
+            ITM.setLore(lore);
+            toAdd.setItemMeta(ITM.clone());
+            return toAdd;
+        }
+        return toAdd.clone();
+    }
+
     public static ItemStack clearEnchanents(ItemStack toAdd)
     {
         Set<Enchantment> all = toAdd.getEnchantments().keySet();
@@ -681,8 +786,11 @@ public class TitanBox extends JavaPlugin
         if (item == null) return SFitem == null;
         if (SFitem == null) return false;
         if (item.getType() == SFitem.getType()) {//&& item.getAmount() >= SFitem.getAmount()
-            if (item.getData().getData() != SFitem.getData().getData()) {
-                if (!(SFitem.getDurability() == item.getData().getData() && SFitem.getData().getData() == item.getDurability())) return false;
+            if (isWeapon(item) || isArmor(item)) {
+                if (item.getData().getData() != SFitem.getData().getData()) {
+                    if (!(SFitem.getDurability() == item.getData().getData() && SFitem.getData().getData() == item.getDurability()))
+                        return false;
+                }
             }
             if (!equalsEnchants(item.getEnchantments(), SFitem.getEnchantments())) return false;
             if (item.hasItemMeta() && SFitem.hasItemMeta()) {
@@ -718,11 +826,12 @@ public class TitanBox extends JavaPlugin
                 }
                 if (a instanceof SkullMeta && b instanceof SkullMeta)
                 {
+                    /*
                     if (((SkullMeta)a).getOwningPlayer() != null && ((SkullMeta)b).getOwningPlayer() ==null) return false;
                     if (((SkullMeta)a).getOwningPlayer() == null && ((SkullMeta)b).getOwningPlayer() !=null) return false;
                     if (((SkullMeta)a).getOwningPlayer() != null && ((SkullMeta)b).getOwningPlayer() !=null) {
                         if (!((SkullMeta) a).getOwningPlayer().equals(((SkullMeta) b).getOwningPlayer())) return false;
-                    }
+                    }*/
                 }
                 if (a instanceof PotionMeta && b instanceof PotionMeta)
                 {
@@ -791,7 +900,7 @@ public class TitanBox extends JavaPlugin
                 return true;
             case CHAINMAIL_CHESTPLATE:
                 return true;
-            case GOLD_CHESTPLATE:
+            case GOLDEN_CHESTPLATE:
                 return true;
             case IRON_CHESTPLATE:
                 return true;
@@ -805,13 +914,13 @@ public class TitanBox extends JavaPlugin
                 return true;
             case CHAINMAIL_HELMET:
                 return true;
-            case GOLD_HELMET:
+            case GOLDEN_HELMET:
                 return true;
             case DIAMOND_LEGGINGS:
                 return true;
             case CHAINMAIL_LEGGINGS:
                 return true;
-            case GOLD_LEGGINGS:
+            case GOLDEN_LEGGINGS:
                 return true;
             case IRON_LEGGINGS:
                 return true;
@@ -821,7 +930,7 @@ public class TitanBox extends JavaPlugin
                 return true;
             case CHAINMAIL_BOOTS:
                 return true;
-            case GOLD_BOOTS:
+            case GOLDEN_BOOTS:
                 return true;
             case IRON_BOOTS:
                 return true;
@@ -836,6 +945,18 @@ public class TitanBox extends JavaPlugin
     {
         return isWeapon(mat.getType());
     }
+    public static boolean hasCustomName(ItemStack mat)
+    {
+        if (mat.hasItemMeta())
+        {
+            if (mat.getItemMeta().hasDisplayName())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static boolean isExpensive(ItemStack mat)
     {
         return isExpensive(mat.getType());
@@ -848,15 +969,15 @@ public class TitanBox extends JavaPlugin
                 return true;
             case BEACON:
                 return true;
-            case SKULL:
+            case SKELETON_SKULL:L:
                 return true;
-            case SKULL_ITEM:
+            case SKELETON_WALL_SKULL:
                 return true;
             case BOOKSHELF:
                 return true;
             case BOOK:
                 return true;
-            case BOOK_AND_QUILL:
+            case WRITABLE_BOOK:
                 return true;
             case ENCHANTED_BOOK:
                 return true;
@@ -868,13 +989,13 @@ public class TitanBox extends JavaPlugin
                 return true;
             case POTION:
                 return true;
-            case MOB_SPAWNER:
+            case SPAWNER:
                 return true;
             case CHEST:
                 return true;
             case DRAGON_EGG:
                 return true;
-            case DRAGONS_BREATH:
+            case DRAGON_BREATH:
                 return true;
             case ENDER_CHEST:
                 return true;
@@ -882,7 +1003,7 @@ public class TitanBox extends JavaPlugin
                 return true;
             case FURNACE:
                 return true;
-            case WORKBENCH:
+            case CRAFTING_TABLE:
                 return true;
             case DISPENSER:
                 return true;
@@ -898,14 +1019,24 @@ public class TitanBox extends JavaPlugin
                 return true;
             case HOPPER:
                 return true;
-            case ENCHANTMENT_TABLE:
+            case ENCHANTING_TABLE:
                 return true;
-            case BED:
-                return true;
-            case EXP_BOTTLE:
+            case EXPERIENCE_BOTTLE:
                 return true;
             case TRIPWIRE_HOOK:
                 return true;
+        }
+        if (mat.toString().contains("SKULL"))
+        {
+            return true;
+        }
+        if (mat.toString().contains("BOOK"))
+        {
+            return true;
+        }
+        if (mat.toString().contains("BED"))
+        {
+            return true;
         }
         if (mat.toString().contains("DOOR"))
         {
@@ -932,23 +1063,23 @@ public class TitanBox extends JavaPlugin
         {
             case DIAMOND_SWORD:
                 return true;
-            case GOLD_SWORD:
+            case GOLDEN_SWORD:
                 return true;
             case IRON_SWORD:
                 return true;
             case STONE_SWORD:
                 return true;
-            case WOOD_SWORD:
+            case WOODEN_SWORD:
                 return true;
             case DIAMOND_AXE:
                 return true;
-            case GOLD_AXE:
+            case GOLDEN_AXE:
                 return true;
             case IRON_AXE:
                 return true;
             case STONE_AXE:
                 return true;
-            case WOOD_AXE:
+            case WOODEN_AXE:
                 return true;
             case SHIELD:
                 return true;
@@ -965,43 +1096,43 @@ public class TitanBox extends JavaPlugin
         {
             case DIAMOND_PICKAXE:
             return true;
-            case GOLD_PICKAXE:
+            case GOLDEN_PICKAXE:
                 return true;
             case IRON_PICKAXE:
                 return true;
             case STONE_PICKAXE:
                 return true;
-            case WOOD_PICKAXE:
+            case WOODEN_PICKAXE:
                 return true;
             case DIAMOND_AXE:
                 return true;
-            case GOLD_AXE:
+            case GOLDEN_AXE:
                 return true;
             case IRON_AXE:
                 return true;
             case STONE_AXE:
                 return true;
-            case WOOD_AXE:
+            case WOODEN_AXE:
                 return true;
-            case DIAMOND_SPADE:
+            case DIAMOND_SHOVEL:
                 return true;
-            case STONE_SPADE:
+            case STONE_SHOVEL:
                 return true;
-            case GOLD_SPADE:
+            case GOLDEN_SHOVEL:
                 return true;
-            case IRON_SPADE:
+            case IRON_SHOVEL:
                 return true;
-            case WOOD_SPADE:
+            case WOODEN_SHOVEL:
                 return true;
             case DIAMOND_HOE:
                 return true;
-            case GOLD_HOE:
+            case GOLDEN_HOE:
                 return true;
             case IRON_HOE:
                 return true;
             case STONE_HOE:
                 return true;
-            case WOOD_HOE:
+            case WOODEN_HOE:
                 return true;
             case SHEARS:
                 return true;
@@ -1148,7 +1279,148 @@ public class TitanBox extends JavaPlugin
     {
         try {
             if (sender instanceof Player) {
+                if (label.equalsIgnoreCase("shop") || label.equalsIgnoreCase("shops")) {
+                    if (args.length > 0) {
+                        if (args[0].equalsIgnoreCase("admin")) {
+                            if (sender.hasPermission("titanbox.admin"))
+                            {
+                                if (args.length > 1) {
+                                    String shopname = "";
+                                    for (int i = 1; i < args.length; i++) {
+                                        shopname = shopname + args[i] + " ";
+                                    }
+                                    shopname = shopname.trim();
+                                    MainShops.instance.makeAdminShop((Player) sender, shopname);
+                                    return true;
+                                }
+                            }
+                        }
+                        if (args[0].equalsIgnoreCase("find") || args[0].equalsIgnoreCase("search")) {
+                            if (args.length > 1) {
+                                String shopname = "";
+                                for (int i = 1; i < args.length; i++) {
+                                    shopname = shopname + args[i] + " ";
+                                }
+                                shopname = shopname.trim();
+                                HashMap<ShopHolder,List<ItemStack>> shops = new HashMap<ShopHolder,List<ItemStack>>();
+                                for(ShopHolder shopHolder: mainShops.allShopsByIDS.values())
+                                {
+                                    List<ItemStack> itemStack = shopHolder.searchItem(shopname);
+                                    if (itemStack != null && itemStack.size() > 0)
+                                    {
+                                        shops.put(shopHolder, itemStack);
+                                    }
+                                }
+                                for(ShopHolder shopHolder: shops.keySet())
+                                {
+                                    List<ItemStack> itemStack = shops.get(shopHolder);
+                                    String name = Bukkit.getOfflinePlayer(shopHolder.getOwner()).getName();
+                                    for (ItemStack itemStack1: itemStack) {
+                                        if (!shopHolder.isAdmin()) {
+                                            sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + ChatColor.WHITE + TitanBox.getName(itemStack1) + ChatColor.LIGHT_PURPLE + " Owner:"  + ChatColor.WHITE + name + ChatColor.LIGHT_PURPLE + " Shop: " + ChatColor.WHITE + shopHolder.getName());
+                                        } else {
+                                            sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + ChatColor.WHITE + TitanBox.getName(itemStack1) + ChatColor.RED + " Admin Shop" + ChatColor.LIGHT_PURPLE + " Shop: " + ChatColor.WHITE + shopHolder.getName());
+                                        }
+                                    }
+                                }
+
+                                return true;
+                            }
+                        }
+                        if (args[0].equalsIgnoreCase("remove")) {
+                            if (args.length > 1) {
+                                String shopname = "";
+                                for (int i = 1; i < args.length; i++) {
+                                    shopname = shopname + args[i] + " ";
+                                }
+                                shopname = shopname.trim();
+                                mainShops.deleteShop((Player) sender, shopname);
+                                return true;
+                            }
+                        }
+                        if (args[0].equalsIgnoreCase("new")) {
+                            if (args.length > 1) {
+                                String shopname = "";
+                                for (int i = 1; i < args.length; i++) {
+                                    shopname = shopname + args[i] + " ";
+                                }
+                                shopname = shopname.trim();
+                                mainShops.createNewShop((Player) sender, shopname);
+                                mainShops.openShop((Player) sender, shopname);
+                                return true;
+                            }
+                        }
+                        if (args[0].equalsIgnoreCase("open")) {
+                            if (args.length > 1) {
+                                String shopname = "";
+                                for (int i = 1; i < args.length; i++) {
+                                    shopname = shopname + args[i] + " ";
+                                }
+                                shopname = shopname.trim();
+                                mainShops.openShop((Player) sender, shopname);
+                                return true;
+                            }
+                        }
+                        if (args[0].equalsIgnoreCase("view")) {
+                            String openPlayer = sender.getName();
+                            if (args.length > 1) {
+                                openPlayer = args[1];
+                            }
+                            UUID uuid = Bukkit.getOfflinePlayer(openPlayer).getUniqueId();
+                            PlayerShopHolder psh = mainShops.allShopsByOwners.get(uuid);
+                            if (psh != null) {
+                                HashMap<String, ShopHolder> playerShops = psh.getIdList();
+                                Inventory tmp = Bukkit.createInventory(null, 54, "Shops: " + openPlayer);
+                                for (String name : playerShops.keySet()) {
+                                    ItemStack shopITS = new ItemStack(Material.BROWN_SHULKER_BOX);
+                                    shopITS = TitanBox.changeName(shopITS, name);
+                                    shopITS = TitanBox.addLore(shopITS, "Click To View This Shop");
+                                    tmp.addItem(shopITS.clone());
+                                }
+                                ((Player) sender).openInventory(tmp);
+                                return true;
+                            } else {
+                                sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + "Player has no shops.");
+                                return true;
+                            }
+
+                        }
+                        if (args[0].equalsIgnoreCase("list")) {
+                            if (args.length > 1) {
+                                String name = Bukkit.getOfflinePlayer(args[1]).getName();
+                                UUID owner = Bukkit.getOfflinePlayer(args[1]).getUniqueId();
+                                PlayerShopHolder psh = mainShops.allShopsByOwners.get(owner);
+                                int size = psh.getSize();
+                                int max = psh.getMax();
+                                HashMap<String, ShopHolder> playerShops = psh.getIdList();
+                                for (String namepsh : playerShops.keySet()) {
+                                    sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + ChatColor.YELLOW + namepsh);
+                                }
+                                sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + ChatColor.BLUE + name + ChatColor.WHITE + ": " + size + "/" + max);
+                            } else {
+                                for (UUID owner : mainShops.allShopsByOwners.keySet()) {
+                                    String name = Bukkit.getOfflinePlayer(owner).getName();
+                                    PlayerShopHolder psh = mainShops.allShopsByOwners.get(owner);
+                                    int size = psh.getSize();
+                                    int max = psh.getMax();
+                                    sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + ChatColor.BLUE + name + ChatColor.WHITE + ": " + size + "/" + max);
+                                }
+                            }
+                            return true;
+                        }
+                    }
+                    sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + ChatColor.RED + "Command, " + ChatColor.BLUE + "Option,  " + ChatColor.WHITE + "Required, "+ ChatColor.GRAY + "Optional");
+                    sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + ChatColor.RED + "/shop " + ChatColor.BLUE + "new " + ChatColor.WHITE + "shop name");
+                    sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + ChatColor.RED + "/shop " + ChatColor.BLUE + "open " + ChatColor.WHITE + "shop name");
+                    sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + ChatColor.RED + "/shop " + ChatColor.BLUE + "remove " + ChatColor.WHITE + "shop name");
+                    sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + ChatColor.RED + "/shop " + ChatColor.BLUE + "find " + ChatColor.WHITE + "item");
+                    sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + ChatColor.RED + "/shop " + ChatColor.BLUE + "view " + ChatColor.GRAY + "owner");
+                    sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + ChatColor.RED + "/shop " + ChatColor.BLUE + "list " + ChatColor.GRAY + "owner");
+
+                    return true;
+                }
                 if (label.equalsIgnoreCase("titanbox") || label.equalsIgnoreCase("tb")) {
+
                     if (args[0].equalsIgnoreCase("save")) {
                         if (sender.hasPermission("titanbox.admin")) {
                             saveEveryThing();
@@ -1202,6 +1474,14 @@ public class TitanBox extends JavaPlugin
             else
             {
                 try {
+                    if (label.equalsIgnoreCase("shop") || label.equalsIgnoreCase("shops")) {
+                        if (args.length > 0) {
+                            if (args[0].equalsIgnoreCase("addmax")) {
+                                Player player = Bukkit.getPlayer(args[1]);
+                                mainShops.increaseMax(player, 1);
+                            }
+                        }
+                    }
                     if (label.equalsIgnoreCase("titanbox") || label.equalsIgnoreCase("tb")) {
                         if (args[0].equalsIgnoreCase("give")) {
                             Player player = Bukkit.getPlayer(args[args.length - 1]);
@@ -1233,7 +1513,7 @@ public class TitanBox extends JavaPlugin
         }
         catch (Exception e)
         {
-
+            e.printStackTrace();
         }
         return true;
     }
@@ -1363,12 +1643,17 @@ public class TitanBox extends JavaPlugin
     }
     public static String getName(ItemStack toName)
     {
-        String name = toName.getType().name() + "_" + toName.getDurability();
+        String name = toName.getType().name();
         if (toName.hasItemMeta())
         {
             if (toName.getItemMeta().hasDisplayName())
             {
-                name = ChatColor.stripColor(toName.getItemMeta().getDisplayName());
+                String test = ChatColor.stripColor(toName.getItemMeta().getDisplayName());
+                if (test.length() > 0)
+                {
+                    return test;
+                }
+
             }
         }
         return name;

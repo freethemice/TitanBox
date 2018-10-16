@@ -43,7 +43,7 @@ public abstract class ElectricMiner extends MinerContainer {;
 
     @Override
     public ItemStack getProgressBar() {
-        return new ItemStack(Material.GOLD_SPADE);
+        return new ItemStack(Material.GOLDEN_SHOVEL);
     }
 
     @Override
@@ -85,7 +85,7 @@ public abstract class ElectricMiner extends MinerContainer {;
                 }
                 ChargableBlock.addCharge(b, -getEnergyConsumption());
 
-                BlockStorage.getInventory(b).replaceExistingItem(22, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 15), " "));
+                BlockStorage.getInventory(b).replaceExistingItem(22, new CustomItem(new MaterialData(Material.BLACK_STAINED_GLASS_PANE), " "));
                 pushItems(b, processing.get(b).getOutput());
 
                 progress.remove(b);
@@ -120,7 +120,7 @@ public abstract class ElectricMiner extends MinerContainer {;
                         return;
                     }
                     ItemStack walls = BlockStorage.getInventory(b).getItemInSlot(10).clone();
-                    if ((walls.getType() == Material.SKULL) || (walls.getType() == Material.SKULL_ITEM))
+                    if ((walls.getType() == Material.PLAYER_HEAD))
                     {
                         return;
                     }
@@ -145,7 +145,7 @@ public abstract class ElectricMiner extends MinerContainer {;
                     if (!TitanBox.isEmpty(BlockStorage.getInventory(b).getItemInSlot(49)))
                     {
                         pickaxe = BlockStorage.getInventory(b).getItemInSlot(49).clone();
-                        if (pickaxe.getType() != Material.DIAMOND_PICKAXE && pickaxe.getType() == Material.IRON_PICKAXE || pickaxe.getType() == Material.STONE_PICKAXE || pickaxe.getType() == Material.GOLD_PICKAXE || pickaxe.getType() == Material.WOOD_PICKAXE)
+                        if (pickaxe.getType() != Material.DIAMOND_PICKAXE && pickaxe.getType() == Material.IRON_PICKAXE || pickaxe.getType() == Material.STONE_PICKAXE || pickaxe.getType() == Material.GOLDEN_PICKAXE || pickaxe.getType() == Material.WOODEN_PICKAXE)
                         {
                             pickaxe = null;
                         }
@@ -181,7 +181,7 @@ public abstract class ElectricMiner extends MinerContainer {;
                                         int f = pickaxe.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
                                         for(ItemStack drop: drops)
                                         {
-                                            if (drop.getType() == Material.DIAMOND || drop.getType() == Material.IRON_ORE || drop.getType() == Material.GOLD_ORE || drop.getType() == Material.COAL || drop.getType() == Material.INK_SACK || drop.getType() == Material.REDSTONE || drop.getType() == Material.QUARTZ || drop.getType() == Material.EMERALD) {
+                                            if (drop.getType() == Material.DIAMOND || drop.getType() == Material.IRON_ORE || drop.getType() == Material.GOLD_ORE || drop.getType() == Material.COAL || drop.getType() == Material.LAPIS_LAZULI || drop.getType() == Material.REDSTONE || drop.getType() == Material.QUARTZ || drop.getType() == Material.EMERALD) {
                                                 drop.setAmount(drop.getAmount() + f);
                                             }
                                         }

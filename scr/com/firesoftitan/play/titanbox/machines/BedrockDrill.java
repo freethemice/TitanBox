@@ -63,12 +63,13 @@ public abstract class BedrockDrill extends AContainer {
 
 
         try {
-            if (block.getType() != Material.SKULL) {
-                block.setType(Material.SKULL);
+            if (block.getType() != Material.PLAYER_HEAD) {
+                block.setType(Material.PLAYER_HEAD);
             }
+            /*
             if (block.getData() != (byte) 0x1) {
                 block.setData((byte) 0x1); // Floor
-            }
+            }*/
             Skull skullE = ((Skull) block.getState());
             if (skullE.getRotation() != BlockFace.NORTH) {
                 skullE.setRotation(BlockFace.NORTH);
@@ -94,7 +95,7 @@ public abstract class BedrockDrill extends AContainer {
                 Block bedRock = b.getLocation().add(0, -1, 0).getBlock();
 
                 if (ChargableBlock.getCharge(b) < getEnergyConsumption()) return;
-                if ((bedRock.getType() != Material.BEDROCK) && bedRock.getType() != Material.MAGMA) return;
+                if ((bedRock.getType() != Material.BEDROCK) && bedRock.getType() != Material.MAGMA_BLOCK) return;
                 if (!processing.containsKey(b)) {
                     boolean proccess = false;
                     for (int slot : getInputSlots()) {
@@ -112,19 +113,19 @@ public abstract class BedrockDrill extends AContainer {
                                 break;
                             }
                             if (SlimefunManager.isItemSimiliar(BlockStorage.getInventory(b).getItemInSlot(slot), SlimefunItemsHolder.LASER_CHARGE, true)) {
-                                MachineRecipe r = new MachineRecipe(4 / getSpeed(), new ItemStack[]{SlimefunItemsHolder.LASER_CHARGE.clone()}, new ItemStack[]{new ItemStack(Material.MAGMA)});
+                                MachineRecipe r = new MachineRecipe(4 / getSpeed(), new ItemStack[]{SlimefunItemsHolder.LASER_CHARGE.clone()}, new ItemStack[]{new ItemStack(Material.MAGMA_BLOCK)});
                                 startProcess(b, slot, r);
                                 proccess = true;
                                 break;
                             }
                             if (SlimefunManager.isItemSimiliar(BlockStorage.getInventory(b).getItemInSlot(slot), SlimefunItemsHolder.LASER_CHARGE_OLD, true)) {
-                                MachineRecipe r = new MachineRecipe(4 / getSpeed(), new ItemStack[]{SlimefunItemsHolder.LASER_CHARGE_OLD.clone()}, new ItemStack[]{new ItemStack(Material.MAGMA)});
+                                MachineRecipe r = new MachineRecipe(4 / getSpeed(), new ItemStack[]{SlimefunItemsHolder.LASER_CHARGE_OLD.clone()}, new ItemStack[]{new ItemStack(Material.MAGMA_BLOCK)});
                                 startProcess(b, slot, r);
                                 proccess = true;
                                 break;
                             }
                         }
-                        if (bedRock.getType() == Material.MAGMA) {
+                        if (bedRock.getType() == Material.MAGMA_BLOCK) {
                             if (SlimefunManager.isItemSimiliar(BlockStorage.getInventory(b).getItemInSlot(slot), me.mrCookieSlime.Slimefun.Lists.SlimefunItems.REACTOR_COOLANT_CELL, true)) {
                                 MachineRecipe r = new MachineRecipe(4 / getSpeed(), new ItemStack[]{me.mrCookieSlime.Slimefun.Lists.SlimefunItems.REACTOR_COOLANT_CELL.clone()}, new ItemStack[]{new ItemStack(Material.BEDROCK)});
                                 startProcess(b, slot, r);
@@ -176,18 +177,18 @@ public abstract class BedrockDrill extends AContainer {
 
                 if (SlimefunManager.isItemSimiliar(WhatAmIDoing.getInput()[0], SlimefunItemsHolder.LASER_CHARGE, true) || SlimefunManager.isItemSimiliar(WhatAmIDoing.getInput()[0], SlimefunItemsHolder.LASER_CHARGE_OLD, true)) {
                     adding = new ItemStack(Material.REDSTONE, 1);
-                    if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.INK_SACK, 1, (short) 4);
+                    if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.LAPIS_LAZULI, 1);
                     else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.COBBLESTONE, 1);
                     else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.STONE, 1);
                     else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.DIAMOND, 1);
                     else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.EMERALD, 1);
                     else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.CLAY_BALL, 1);
-                    else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.INK_SACK, 1, (short)4);
+                    else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.LAPIS_LAZULI, 1);
                     else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.REDSTONE, 1);
                     else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.DIRT, 1);
-                    else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.STONE, 1, (short) 1);
-                    else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.STONE, 1, (short) 3);
-                    else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.STONE, 1, (short) 5);
+                    else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.ANDESITE, 1);
+                    else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.GRANITE, 1);
+                    else if (SlimefunStartup.chance(100, 25)) adding = new ItemStack(Material.DIORITE, 1);
                     adding = adding.clone();
                     adding.setAmount(1);
                 }

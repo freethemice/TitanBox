@@ -15,7 +15,6 @@ public class IRRUserRunnable implements Runnable  {
     @Override
     public void run() {
         try {
-
             if (itemRoutingRouter != null) {
                 TitanBox.instants.checkRegisterdPower();
                 itemRoutingRouter.setLastTick();

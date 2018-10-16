@@ -71,7 +71,7 @@ public abstract class CloneFactory extends AContainer {;
                 if (ChargableBlock.getCharge(b) < getEnergyConsumption()) return;
                 ChargableBlock.addCharge(b, -getEnergyConsumption());
 
-                BlockStorage.getInventory(b).replaceExistingItem(22, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 15), " "));
+                BlockStorage.getInventory(b).replaceExistingItem(22, new CustomItem(new MaterialData(Material.BLACK_STAINED_GLASS_PANE), " "));
                 pushItems(b, processing.get(b).getOutput());
 
                 progress.remove(b);
@@ -95,7 +95,7 @@ public abstract class CloneFactory extends AContainer {;
                 ItemStack mySlotItem = BlockStorage.getInventory(b).getItemInSlot(slot);
                 if (!TitanBox.isEmpty(mySlotItem)) {
                     if (!mySlotItem.hasItemMeta()) {
-                        if (!TitanBox.isTool(mySlotItem) && !TitanBox.isWeapon(mySlotItem) && !TitanBox.isArmor(mySlotItem) && !TitanBox.isExpensive(mySlotItem)) {
+                        if (!TitanBox.isTool(mySlotItem) && !TitanBox.isWeapon(mySlotItem) && !TitanBox.isArmor(mySlotItem) && !TitanBox.isExpensive(mySlotItem) && !TitanBox.hasCustomName(mySlotItem)) {
                             if (mySlotItem.getMaxStackSize() > 1) {
                                 //BlockStorage.getInventory(b).replaceExistingItem(slot, InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(slot), 1));
                                 Random number = new Random(System.currentTimeMillis());

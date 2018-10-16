@@ -37,10 +37,10 @@ public class TreeHolder {
         Location checkSides = getLocMain().clone();
         if (checkSides != null) {
             checkSides = checkSides.add(0 ,1 ,0);
-            TitanBox.pickupItem(owner, checkSides.clone(), Material.SAPLING, 10);
+            TitanBox.pickupItem(owner, checkSides.clone(), this.getType().getSapling(), 10);
 
-            if (checkSides.getBlock().getType() == Material.SAPLING) {
-                if (TitanBox.hasItem(owner, Material.INK_SACK, (short) 15)) {
+            if (checkSides.getBlock().getType() == this.getType().getSapling()) {
+                if (TitanBox.hasItem(owner, Material.BONE_MEAL)) {
                     int size = 1;
                     if (isbig)
                     {
@@ -54,8 +54,7 @@ public class TreeHolder {
                     if (!didIgrow) {
                         for (int i = 0; i < size; i++) {
                             Block blockd = getLoc(i).clone().add(0,1,0).getBlock();
-                            blockd.setType(Material.SAPLING);
-                            blockd.setData((byte) type.getSpalingdata());
+                            blockd.setType(this.getType().getSapling());
                         }
                     }
                     return true;
@@ -78,11 +77,10 @@ public class TreeHolder {
             if (checkSides != null) {
                 checkSides = checkSides.add(0 ,1 ,0);
                 if (checkSides.getBlock().getType() == Material.AIR) {
-                    if (TitanBox.hasItem(owner, Material.SAPLING, type.getSpalingdata())) {
+                    if (TitanBox.hasItem(owner, this.getType().getSapling())) {
                         checkSides.getWorld().playSound(checkSides, Sound.BLOCK_GRASS_PLACE, 1, 0.5f);
                         Block blockd = checkSides.getBlock();
-                        blockd.setType(Material.SAPLING);
-                        blockd.setData((byte) type.getSpalingdata());
+                        blockd.setType(this.getType().getSapling());
                         planted = true;
                     }
                 }
@@ -106,13 +104,13 @@ public class TreeHolder {
             if (checkSides != null) {
                 checkSides = checkSides.add(0 ,1 ,0);
                 checkSides.getWorld().playSound(checkSides, Sound.BLOCK_WOOD_BREAK, 1, 0.5f);
-                ItemStack sap = new ItemStack(Material.SAPLING, 3, type.getSpalingdata());
+                ItemStack sap = new ItemStack(this.getType().getSapling(), 3);
                 if (sap != null) {
                     TitanBox.addItemToStorage(owner, sap.clone());
                 }
                 for (int l = 0; l < 50; l++) {
                     Location checkUp = checkSides.clone().add(0, l, 0);
-                    if (checkUp.getBlock().getType() == Material.LOG_2 || checkUp.getBlock().getType() == Material.LOG) {
+                    if (checkUp.getBlock().getType() == this.getType().getLog()) {
                         ItemStack drop = type.getItemStack().clone();
                         drop.setAmount(1);
                         TitanBox.addItemToStorage(owner, drop.clone());
@@ -204,7 +202,10 @@ public class TreeHolder {
         }
     }
     public Location getLocMain() {
-        return loc[0].clone();
+        if (loc[0] != null) {
+            return loc[0].clone();
+        }
+        return null;
     }
     public Location getLoc(int index) {
         return loc[index].clone();
@@ -236,7 +237,7 @@ public class TreeHolder {
         for (int i = 0;i < 50; i++)
         {
             Location check = loc.clone().add(0, -1 * i, 0);
-            if (check.getBlock().getType() != Material.LOG && check.getBlock().getType() != Material.LOG_2)
+            if (!check.getBlock().getType().toString().toLowerCase().contains("_log"))
             {
                 if (check.getBlock().getType() == Material.DIRT || check.getBlock().getType() == Material.GRASS)
                 {
@@ -248,9 +249,9 @@ public class TreeHolder {
     }
     public static Boolean isTree(Location loc)
     {
-        if (loc.getBlock().getType() != Material.LOG && loc.getBlock().getType() != Material.LOG_2)
+        if (!loc.getBlock().getType().toString().toLowerCase().contains("_log"))
         {
-            if (loc.getBlock().getType() == Material.SAPLING)
+            if (loc.getBlock().getType().toString().toLowerCase().contains("_sapling"))
             {
                 return true;
             }
@@ -260,7 +261,7 @@ public class TreeHolder {
         for (int i = 0;i < 50; i++)
         {
             Location check = loc.clone().add(0, -1 * i, 0);
-            if (check.getBlock().getType() != Material.LOG && check.getBlock().getType() != Material.LOG_2)
+            if (!check.getBlock().getType().toString().toLowerCase().contains("_log"))
             {
                 if (check.getBlock().getType() == Material.DIRT || check.getBlock().getType() == Material.GRASS)
                 {
@@ -280,9 +281,9 @@ public class TreeHolder {
         for (int i = 0;i < 50; i++)
         {
             Location check = loc.clone().add(0,  i, 0);
-            if (check.getBlock().getType() != Material.LOG && check.getBlock().getType() != Material.LOG_2)
+            if (!check.getBlock().getType().toString().toLowerCase().contains("_log"))
             {
-                if (check.getBlock().getType() == Material.LEAVES || check.getBlock().getType() == Material.LEAVES_2 || check.getBlock().getType() == Material.AIR)
+                if (check.getBlock().getType().toString().toLowerCase().contains("_leaves"))
                 {
                     return true;
                 }

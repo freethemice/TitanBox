@@ -66,32 +66,7 @@ public class StorageRecover {
                     tmp = StorageUnit.StorageById.get(id);
                 }
                 if (tmp !=null) {
-                    for (int i = 0; i < 36; i++) {
-                        ItemStack checking = event.getWhoClicked().getInventory().getItem(i);
-                        if (!TitanBox.isEmpty(checking)) {
-                            if (checking.hasItemMeta()) {
-                                if (checking.getItemMeta().hasDisplayName()) {
-                                    if (checking.getItemMeta().getDisplayName().startsWith(ChatColor.YELLOW + "New Storage Unit, Size: ")) {
-                                        int size = Integer.parseInt(ChatColor.stripColor(checking.getItemMeta().getDisplayName()).replace("New Storage Unit, Size: ", ""));
-                                        if (size >= tmp.getSize())
-                                        {
-                                            event.getWhoClicked().getInventory().addItem(item.clone());
-                                            if (checking.getAmount() > 1)
-                                            {
-                                                checking.setAmount(checking.getAmount() - 1);
-                                                event.getWhoClicked().getInventory().setItem(i, checking);
-                                            }
-                                            else
-                                            {
-                                                event.getWhoClicked().getInventory().setItem(i, null);
-                                            }
-                                            return;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    event.getWhoClicked().getInventory().addItem(item.clone());
                 }
             }
 

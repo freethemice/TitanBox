@@ -21,7 +21,7 @@ public class buttonGUIs {
     private List<String> lore = new ArrayList<String>();
     private mainGUI parent;
     private buttonEnum type;
-    private ItemStack blank = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 12);
+    private ItemStack blank = new ItemStack(Material.BROWN_STAINED_GLASS_PANE);
 
 
     public buttonGUIs(mainGUI parent, int slot)

@@ -1,14 +1,17 @@
 package com.firesoftitan.play.titanbox.modules;
 
 import com.firesoftitan.play.titanbox.TitanBox;
+import com.firesoftitan.play.titanbox.Utilities;
 import com.firesoftitan.play.titanbox.enums.ModuleTypeEnum;
 import com.firesoftitan.play.titanbox.machines.Pumps;
+import com.firesoftitan.play.titansql.ResultData;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 public class IceModule extends MainModule {
@@ -23,7 +26,7 @@ public class IceModule extends MainModule {
     @Override
     public String getLinkLore()
     {
-        if (getModuleid() == null)
+        if (getModuleid() == null || icePump == null)
         {
             return ChatColor.WHITE  + "not set.";
         }
@@ -39,7 +42,14 @@ public class IceModule extends MainModule {
 
     }
     @Override
+    public void unLinkAll() {
+        this.link = null;
+        this.icePump = null;
+        saveInfo();
+    }
+    @Override
     public boolean setLink(Location link, Player player) {
+        super.setLink(link, player);
         String pump = Pumps.getPumpType(link);
         this.link = null;
         if (pump != null)
@@ -60,29 +70,42 @@ public class IceModule extends MainModule {
     @Override
     public ItemStack getMeAsIcon()
     {
-        return new ItemStack(Material.ICE, 1);
+        if (isLoaded()) {
+            if (Pumps.getLiquid(icePump, "Ice"))
+            {
+                return new ItemStack(Material.ICE, 1);
+            }
+        }
+        return new ItemStack(Material.BARRIER, 1);
+
     }
     @Override
     public boolean isLoaded()
     {
         if (icePump != null) {
-            return icePump.getChunk().isLoaded();
+            return Utilities.isLoaded(icePump);
         }
         return false;
     }
     @Override
-    public void loadInfo() {
-        super.loadInfo();
+    public void loadInfo(HashMap<String, ResultData> result)
+    {
+        super.loadInfo(result);
         icePump = null;
-        if (modules.contains("modules." + moduleid + ".slots.icepump")) {
-            icePump = modules.getLocation("modules." + moduleid + ".slots.icepump");
+        if (result.get("pump_a") != null) {
+            if (result.get("pump_a").getLocation() != null) {
+                icePump = result.get("pump_a").getLocation().clone();
+            }
         }
     }
+
 
     @Override
     public void saveInfo() {
         super.saveInfo();
-        modules.setValue("modules." + moduleid + ".slots.icepump", icePump);
+        modulesSQL.setDataField("pump_a", icePump);
+        this.sendDate();
+        //modules.setValue("modules." + moduleid + ".slots.icepump", icePump);
     }
 
     @Override
