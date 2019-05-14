@@ -5,6 +5,8 @@
 
 package com.firesoftitan.play.titanbox.containers;
 
+import com.firesoftitan.play.titanbox.Utilities;
+import com.firesoftitan.play.titanbox.managers.TitanItemManager;
 import me.mrCookieSlime.CSCoreLibPlugin.CSCoreLib;
 import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu.AdvancedMenuClickHandler;
@@ -41,7 +43,7 @@ import org.bukkit.material.MaterialData;
 import java.util.*;
 import java.util.Map.Entry;
 
-public abstract class FreeEnergyContainer extends SlimefunItem {
+public abstract class FreeEnergyContainer extends TitanItemManager {
     public static Map<Block, MachineRecipe> processing = new HashMap();
     public static Map<Block, Integer> progress = new HashMap();
     protected List<MachineRecipe> recipes = new ArrayList();
@@ -60,7 +62,10 @@ public abstract class FreeEnergyContainer extends SlimefunItem {
             }
 
             public boolean canOpen(Block b, Player p) {
-                return p.hasPermission("slimefun.inventory.bypass") || CSCoreLib.getLib().getProtectionManager().canAccessChest(p.getUniqueId(), b, true);
+                if ((Utilities.hasBuildRights(p, b.getLocation()))) {
+                    return true;
+                }
+                return false;
             }
 
             public int[] getSlotsAccessedByItemTransport(ItemTransportFlow flow) {
@@ -238,7 +243,7 @@ public abstract class FreeEnergyContainer extends SlimefunItem {
     }
 
     public int[] getOutputSlots() {
-        return new int[]{24, 25};
+        return new int[]{};
     }
 
     public MachineRecipe getProcessing(Block b) {

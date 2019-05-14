@@ -1,20 +1,16 @@
 package com.firesoftitan.play.titanbox.modules;
 
-import com.firesoftitan.play.titanbox.TitanBox;
 import com.firesoftitan.play.titanbox.Utilities;
 import com.firesoftitan.play.titanbox.enums.ModuleTypeEnum;
-import com.firesoftitan.play.titanbox.holders.RouterHolder;
+import com.firesoftitan.play.titanbox.managers.RouterManager;
 import com.firesoftitan.play.titansql.CallbackResults;
 import com.firesoftitan.play.titansql.DataTypeEnum;
 import com.firesoftitan.play.titansql.ResultData;
 import com.firesoftitan.play.titansql.Table;
 import me.mrCookieSlime.CSCoreLibPlugin.general.World.CustomSkull;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
-import org.apache.commons.lang.WordUtils;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import net.minecraft.server.v1_14_R1.NBTTagCompound;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -29,7 +25,7 @@ public class MainModule {
     protected ModuleTypeEnum type = null;
     protected Location link = null;
     protected String moduleid = null;
-    //public static Config modules = new Config("data-storage" + File.separator + "TitanBox" + File.separator  + "modules.yml");
+    protected boolean needsaving = true;
     public static Table modulesSQL = new Table("tb_modules");
     public static HashMap<String, MainModule> moduleByID = new HashMap<String, MainModule>();
 
@@ -68,7 +64,7 @@ public class MainModule {
     }
     public static void loadModules()
     {
-        Utilities.reTryLoad(modulesSQL, MainModule.class, "loadModules", "Modules");
+        Utilities.reTryLoad(modulesSQL, MainModule.class, "loadProtection", "Modules");
         modulesSQL.search(new CallbackResults() {
             @Override
             public void onResult(List<HashMap<String, ResultData>> results) {
@@ -77,22 +73,61 @@ public class MainModule {
                         ModuleTypeEnum type = null;
                         String tmpType = result.get("type").getString();
                         String key = result.get("id").getString();
-                        type = ModuleTypeEnum.valueOf(tmpType);
-                        if (type == null)
-                        {
-                            type = ModuleTypeEnum.Inventory;
+                        type = getModuleTypeSafe(tmpType);
+                        if (type != null) {
+                            MainModule mh = type.getNew();
+                            mh.setModuleid(key);
+                            mh.loadInfo(result);
+                            moduleByID.put(key, mh);
                         }
-                        MainModule mh = type.getNew();
-                        mh.setModuleid(key);
-                        mh.loadInfo(result);
-                        moduleByID.put(key, mh);
                     }
-                    Utilities.doneTryLoading(modulesSQL);
                 }
-                RouterHolder.loadAllRouters();
+                Utilities.doneTryLoading(modulesSQL);
+                RouterManager.loadAllRouters();
             }
         });
 
+    }
+    public static void saveALL() {
+        for (MainModule mainModule : moduleByID.values()) {
+            if (mainModule.needsaving) {
+                if (mainModule instanceof BottleModule) {
+                    ((BottleModule) mainModule).saveInfo();
+                } else if (mainModule instanceof BucketsModule) {
+                    ((BucketsModule) mainModule).saveInfo();
+                } else if (mainModule instanceof CobblestoneGenModule) {
+                    ((CobblestoneGenModule) mainModule).saveInfo();
+                } else if (mainModule instanceof FarmModule) {
+                    ((FarmModule) mainModule).saveInfo();
+                } else if (mainModule instanceof IceModule) {
+                    ((IceModule) mainModule).saveInfo();
+                } else if (mainModule instanceof InfernalModule) {
+                    ((InfernalModule) mainModule).saveInfo();
+                } else if (mainModule instanceof InventoryModule) {
+                    ((InventoryModule) mainModule).saveInfo();
+                } else if (mainModule instanceof ItemModule) {
+                    ((ItemModule) mainModule).saveInfo();
+                } else if (mainModule instanceof KillerModule) {
+                    ((KillerModule) mainModule).saveInfo();
+                } else if (mainModule instanceof PlacerModule) {
+                    ((PlacerModule) mainModule).saveInfo();
+                } else if (mainModule instanceof SandGenModule) {
+                    ((SandGenModule) mainModule).saveInfo();
+                } else {
+                    System.out.println("[TitanBox]: Unsupported Module Type.");
+                    mainModule.saveInfo();
+                }
+            }
+        }
+    }
+    private static ModuleTypeEnum getModuleTypeSafe(String tmpType) {
+        try {
+            ModuleTypeEnum type;
+            type = ModuleTypeEnum.valueOf(tmpType);
+            return type;
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
     public boolean isLoaded()
     {
@@ -112,7 +147,10 @@ public class MainModule {
             }
         }
     }
-
+    public void needSaving()
+    {
+        needsaving = true;
+    }
     public void saveInfo()
     {
         if (type == null)
@@ -142,13 +180,13 @@ public class MainModule {
     {
 
         ItemStack itStack = new ItemStack(Material.PAPER, 1);
-        itStack = TitanBox.changeName(itStack, type.getTitle());
+        itStack = Utilities.changeName(itStack, type.getTitle());
         List<String> info = new ArrayList<String>();
 
         info.add(ChatColor.YELLOW + "link: " + ChatColor.WHITE + "not set");
         info.add(ChatColor.YELLOW + "Type: " + ChatColor.WHITE + type.getType());
 
-        itStack = TitanBox.addLore(itStack, info);
+        itStack = Utilities.addLore(itStack, info);
         return itStack;
     }
     public ItemStack getMeAsIcon()
@@ -183,49 +221,48 @@ public class MainModule {
                 if (BlockStorage.getBlockInfo(from.getLink().getBlock()).contains("id")) {
                     SLIMEFUNname = BlockStorage.getBlockInfo(from.getLink().getBlock()).getString("id");
                     if (SLIMEFUNname != null) {
-                        SLIMEFUNname = SLIMEFUNname.replace("_", " ").toLowerCase();
-                        SLIMEFUNname = WordUtils.capitalize(SLIMEFUNname);
+                        SLIMEFUNname = Utilities.fixCapitalization(SLIMEFUNname);
                     }
                     else
                     {
-                        return null;
+                        SLIMEFUNname = "";
                     }
                 }
             }
         }
-        block = TitanBox.changeName(block, from.getType().getTitle());
+        NBTTagCompound data = new NBTTagCompound();
         List<String> info = new ArrayList<String>();
         info.add(ChatColor.YELLOW + "link: " + from.getLinkLore());
+        if (from.getLink() != null)
+        {
+            data.setString("link", Utilities.serializeLocation(from.getLink()));
+        }
         if (from.getModuleid() != null) {
-            info.add(ChatColor.YELLOW + "Module ID: " + ChatColor.WHITE + from.getModuleid());
+            data.setString("id", from.getModuleid());
         }
         if (from.getType() != null) {
             info.add(ChatColor.YELLOW + "Type: " + ChatColor.WHITE + from.getType().getType());
+            data.setString("type", from.getType().getType());
         }
         if (!SLIMEFUNname.equals(""))
         {
             info.add(ChatColor.YELLOW + "Name: " + ChatColor.WHITE + SLIMEFUNname);
+            data.setString("name", SLIMEFUNname);
         }
 
-        block = TitanBox.addLore(block, info);
-        if (block == null) return null;
+
+        block = Utilities.changeName(block, from.getType().getTitle());
+        block = Utilities.addLore(block, info);
+        NBTTagCompound main = Utilities.getNBTTag(block);
+        main.set("module", data);
+        block = Utilities.setNBTTag(block, main);
+
+        if (block == null)
+        {
+            return Utilities.addLore(new ItemStack(Material.PAPER), info);
+        }
         return block.clone();
     }
- /*   public static ItemStack getItemfromModule(MainModule from)
-    {
-        ItemStack itStack = new ItemStack(Material.PAPER, 1);
-        itStack = TitanBox.changeName(itStack, from.getType().getTitle());
-        List<String> info = new ArrayList<String>();
-        info.add(ChatColor.YELLOW + "link: " + from.getLinkLore());
-        if (from.getModuleid() != null) {
-            info.add(ChatColor.YELLOW + "Module ID: " + ChatColor.WHITE + from.getModuleid());
-        }
-        if (from.getType() != null) {
-            info.add(ChatColor.YELLOW + "Type: " + ChatColor.WHITE + from.getType().getType());
-        }
-        itStack = TitanBox.addLore(itStack, info);
-        return itStack;
-    }*/
     public String getLinkLore()
     {
         if (getLink() == null)
@@ -261,7 +298,36 @@ public class MainModule {
         ItemMeta IMeta = from.getItemMeta();
         ModuleTypeEnum type = null;
         String moduleID = null;
-        if (IMeta != null)
+        Location location = null;
+        NBTTagCompound nbtTagCompound = Utilities.getNBTTag(from);
+
+        if (nbtTagCompound != null && nbtTagCompound.hasKey("module"))
+        {
+            NBTTagCompound subnbtTagCompound = nbtTagCompound.getCompound("module");
+            moduleID = subnbtTagCompound.getString("id");
+            if (moduleByID.containsKey(moduleID)) {
+                return moduleByID.get(moduleID);
+            }
+            if (subnbtTagCompound.hasKey("type")) {
+                type = getModuleTypeSafe(subnbtTagCompound.getString("type"));
+            }
+            if (subnbtTagCompound.hasKey("link")) {
+                location = Utilities.deserializeLocation(subnbtTagCompound.getString("link"));
+            }
+            if (type == null)
+            {
+                type = ModuleTypeEnum.Inventory;
+            }
+            printing = type.getNew();
+            if (moduleID != null) {
+                printing.setModuleid(moduleID);
+            }
+            if (location != null)
+            {
+                printing.setLink(location, null);
+            }
+        }
+        else if (IMeta != null)
         {
             if (IMeta.hasDisplayName()) {
                 if (IMeta.getDisplayName().startsWith(ChatColor.DARK_BLUE + "")) {
@@ -278,9 +344,21 @@ public class MainModule {
                                 moduleID = info[1];
                             }
                             if (info[0].equalsIgnoreCase("Type")) {
-                                type = ModuleTypeEnum.valueOf(info[1]);
+                                type = getModuleTypeSafe(info[1]);
                             }
-
+                            if (info[0].equalsIgnoreCase("Link")) {
+                                if (info.length > 2) {
+                                    if (info[4].contains("Secondary"))
+                                    {
+                                        info[4] = info[4].split(" ")[0];
+                                    }
+                                    World world = Bukkit.getWorld(info[1]);
+                                    int x = Integer.parseInt(info[2]);
+                                    int y = Integer.parseInt(info[3]);
+                                    int z = Integer.parseInt(info[4]);
+                                    location = new Location(world, x, y, z);
+                                }
+                            }
 
                         }
                         if (type == null)
@@ -291,9 +369,11 @@ public class MainModule {
                         if (moduleID != null) {
                             printing.setModuleid(moduleID);
                         }
-                        if (moduleByID.containsKey(moduleID)) {
-                            printing = moduleByID.get(moduleID);
+                        if (location != null)
+                        {
+                            printing.setLink(location, null);
                         }
+
 
                     }
                 }
@@ -325,20 +405,9 @@ public class MainModule {
         {
             if (link.getBlock().getType() == Material.PLAYER_WALL_HEAD)
             {
-
-                String texture = "";
-                try {
-                    texture = CustomSkull.getTexture(getLink().getBlock());
-                } catch (Exception e) {
-
-                }
                 Block block = link.getBlock();
                 block.setType(Material.PLAYER_HEAD);
-                try {
-                    CustomSkull.setSkull(block, texture);
-                } catch (Exception e) {
-
-                }
+                Utilities.fixBlockTexture(link);
             }
         }
         return false;
@@ -367,10 +436,10 @@ public class MainModule {
     }
     public static void onInventoryClickEvent(InventoryClickEvent event) {
         for (ModuleTypeEnum mte: ModuleTypeEnum.values()) {
-            if (event.getInventory().getName().startsWith(mte.getTitle())) {
+            if (event.getView().getTitle().startsWith(mte.getTitle())) {
                 event.setCancelled(true);
                 ItemStack mainHand = event.getWhoClicked().getInventory().getItemInMainHand();
-                if (TitanBox.isEmpty(mainHand)) {
+                if (Utilities.isEmpty(mainHand)) {
                     event.getWhoClicked().closeInventory();
                     return;
                 }
@@ -393,7 +462,7 @@ public class MainModule {
     public static void onPlayerInteractEvent(PlayerInteractEvent event)
     {
         ItemStack mainHand = event.getPlayer().getInventory().getItemInMainHand();
-        if (!TitanBox.isEmpty(mainHand)) {
+        if (!Utilities.isEmpty(mainHand)) {
             MainModule mh = MainModule.getModulefromItem(mainHand);
             if (mh != null) {
                 if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_AIR) {
@@ -415,12 +484,13 @@ public class MainModule {
 
                 if (event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                     String location = event.getClickedBlock().getLocation().toString();
-                    if (RouterHolder.routersByLocation.containsKey(location)) {
+                    if (RouterManager.routersByLocation.containsKey(location)) {
                         return;
                     }
                     event.setCancelled(true);
                     Block clicked = event.getClickedBlock();
-                    if ((GriefPrevention.instance.allowBuild(event.getPlayer(), clicked.getLocation()) == null) || event.getPlayer().hasPermission("titanbox.admin")){
+                    if ((Utilities.hasBuildRights(event.getPlayer(), clicked.getLocation())))
+                    {
                             if (mh.getModuleid() == null) {
                                 mh.setModuleid(MainModule.getNewIDString());
                             }
@@ -455,7 +525,7 @@ public class MainModule {
     }
 
     public static void updateGUIClicked(Player who, MainModule mh, boolean showgui) {
-        mh.saveInfo();
+        mh.needSaving();
         ItemStack update = MainModule.getItemfromModule(mh);
         ItemStack mainHand = who.getInventory().getItemInMainHand();
         if (mainHand != null)

@@ -1,8 +1,8 @@
 package com.firesoftitan.play.titanbox.runnables;
 
 import com.firesoftitan.play.titanbox.TitanBox;
-import com.firesoftitan.play.titanbox.holders.RouterHolder;
 import com.firesoftitan.play.titanbox.machines.ItemRoutingRouter;
+import com.firesoftitan.play.titanbox.managers.ConfigManager;
 import com.firesoftitan.play.titanbox.modules.MainModule;
 
 import java.util.UUID;
@@ -20,7 +20,7 @@ public class IRRUserRunnable implements Runnable  {
                 itemRoutingRouter.setLastTick();
                 if (itemRoutingRouter.hasModules()) {
                     UUID owner = itemRoutingRouter.getOwner();
-                    int size = Math.min(itemRoutingRouter.getModules().size(), RouterHolder.bufferSize);
+                    int size = Math.min(itemRoutingRouter.getModules().size(), ConfigManager.getRouter_BufferSize());
                     for (int i = 0; i < size; i++) {
                         final MainModule mh = itemRoutingRouter.getNextBuffered();
                         if (mh != null) {

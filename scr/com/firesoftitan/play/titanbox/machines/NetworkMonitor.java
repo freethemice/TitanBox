@@ -1,7 +1,8 @@
 package com.firesoftitan.play.titanbox.machines;
 
 import com.firesoftitan.play.titanbox.TitanBox;
-import com.firesoftitan.play.titanbox.holders.ItemHolder;
+import com.firesoftitan.play.titanbox.Utilities;
+import com.firesoftitan.play.titanbox.enums.ItemEnum;
 import com.firesoftitan.play.titanbox.runnables.NetworkRunnable;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunItem;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AContainer;
@@ -9,7 +10,6 @@ import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AGenerator;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.energy.ChargableBlock;
 import me.mrCookieSlime.Slimefun.api.energy.EnergyNet;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -23,6 +23,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,9 +36,9 @@ public class NetworkMonitor {
     }
     public static ItemStack getMeAsDrop()
     {
-        ItemStack BackpackRecover = TitanBox.getSkull(ItemHolder.NETWORK.getTexute());
-        BackpackRecover = TitanBox.changeName(BackpackRecover, ChatColor.YELLOW + "Network Monitor");
-        BackpackRecover = TitanBox.addLore(BackpackRecover, ChatColor.WHITE + "Show you detail status of your Energy Network", ChatColor.WHITE + "Must be place 1 block above energy regulator.");
+        ItemStack BackpackRecover = Utilities.getSkull(ItemEnum.NETWORK.getTexute());
+        BackpackRecover = Utilities.changeName(BackpackRecover, ChatColor.YELLOW + "Network Monitor");
+        BackpackRecover = Utilities.addLore(BackpackRecover, ChatColor.WHITE + "Show you detail status of your Energy Network", ChatColor.WHITE + "Must be place 1 block above energy regulator.");
 
         return BackpackRecover;
     }
@@ -88,9 +89,22 @@ public class NetworkMonitor {
         }
         else
         {
-            input = eNet.getInput();
-            storage = eNet.getStorage();
-            output = eNet.getOutput();
+            try {
+                Field f = eNet.getClass().getDeclaredField("input"); //NoSuchFieldException
+                f.setAccessible(true);
+                input = (Set<Location>) f.get(eNet);
+
+                f = eNet.getClass().getDeclaredField("storage"); //NoSuchFieldException
+                f.setAccessible(true);
+                storage = (Set<Location>) f.get(eNet);
+
+                f = eNet.getClass().getDeclaredField("output"); //NoSuchFieldException
+                f.setAccessible(true);
+                output = (Set<Location>) f.get(eNet);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             for (final Location source: input) {
 
                 totalCosumption = totalCosumption  + getEnergyConsumption(source);
@@ -186,7 +200,7 @@ public class NetworkMonitor {
     }
     public static void onInventoryClickEvent(InventoryClickEvent event) {
 
-        if (event.getInventory().getName().startsWith("Network Monitor"))
+        if (event.getView().getTitle().startsWith("Network Monitor"))
         {
             event.setCancelled(true);
         }
@@ -204,7 +218,7 @@ public class NetworkMonitor {
     public static void onBlockBreakEvent(BlockBreakEvent event)
     {
         Block Broken = event.getBlock();
-        if ((GriefPrevention.instance.allowBreak(event.getPlayer(), Broken, Broken.getLocation()) == null) || event.getPlayer().hasPermission("titanbox.admin")) {
+        if ((Utilities.hasBuildRights(event.getPlayer(), Broken.getLocation())) ) {
             String key = getLocationKey(Broken.getLocation());
             if (key != null) {
                 if (BackpackRecover.recovers.contains("network.storage."  + key)) {
@@ -230,7 +244,7 @@ public class NetworkMonitor {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             if (event.getClickedBlock() != null) {
                 Block Broken = event.getClickedBlock();
-                if ((GriefPrevention.instance.allowBuild(event.getPlayer(), Broken.getLocation()) == null) || event.getPlayer().hasPermission("titanbox.admin")) {
+                if ((Utilities.hasBuildRights(event.getPlayer(), Broken.getLocation()))) {
                     String key = getLocationKey(Broken.getLocation());
                     if (key != null) {
                         if (BackpackRecover.recovers.contains("network.storage." + key)) {
@@ -241,22 +255,24 @@ public class NetworkMonitor {
             }
         }
     }
-    public static void onBlockPlaceEvent(BlockPlaceEvent event) {
+    public static boolean onBlockPlaceEvent(BlockPlaceEvent event) {
         ItemStack item = event.getItemInHand();
         if (item != null) {
             if (item.hasItemMeta()) {
                 if (item.getItemMeta().hasDisplayName()) {
                     if (item.getItemMeta().getDisplayName().startsWith(ChatColor.YELLOW + "Network Monitor")) {
                         Block Placed = event.getBlockPlaced();
-                        if ((GriefPrevention.instance.allowBuild(event.getPlayer(), Placed.getLocation()) == null) || event.getPlayer().hasPermission("titanbox.admin")) {
+                        if ((Utilities.hasBuildRights(event.getPlayer(), Placed.getLocation()))) {
                             String key = getLocationKey(Placed.getLocation());
                             if (key != null) {
                                 BackpackRecover.recovers.setValue("network.storage." + key, true);
                             }
                         }
+                        return true;
                     }
                 }
             }
         }
+        return false;
     }
 }

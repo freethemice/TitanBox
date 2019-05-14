@@ -1,15 +1,14 @@
 package com.firesoftitan.play.titanbox.modules;
 
-import com.firesoftitan.play.titanbox.TitanBox;
 import com.firesoftitan.play.titanbox.Utilities;
 import com.firesoftitan.play.titanbox.enums.ModuleTypeEnum;
+import com.firesoftitan.play.titanbox.managers.NPCManager;
 import com.firesoftitan.play.titanbox.machines.Pumps;
 import com.firesoftitan.play.titansql.ResultData;
-import net.minecraft.server.v1_13_R2.EntityPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -56,7 +55,7 @@ public class KillerModule extends MainModule {
     {
         this.link = null;
         this.killerPump = null;
-        saveInfo();
+        needSaving();
     }
     @Override
     public boolean setLink(Location link, Player player) {
@@ -68,14 +67,14 @@ public class KillerModule extends MainModule {
             if (pump.equals("Killer"))
             {
                 this.killerPump = link.clone();
-                saveInfo();
+                needSaving();
                 if (player != null) {
-                player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Killer Block linked!");
-            }
+                    player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Killer Block linked!");
+                }
                 return true;
             }
         }
-        saveInfo();
+        needSaving();
         return false;
     }
     @Override
@@ -102,7 +101,7 @@ public class KillerModule extends MainModule {
     @Override
     public void clearInfo()
     {
-        super.clearInfo();
+        super.clearInfo();;
     }
 
     @Override
@@ -113,7 +112,7 @@ public class KillerModule extends MainModule {
                 return new ItemStack(Material.DIAMOND_SWORD, 1);
             }
         }
-        return new ItemStack(Material.BARRIER, 1);
+        return new ItemStack(Material.PAPER, 1);
 
     }
     @Override
@@ -136,20 +135,18 @@ public class KillerModule extends MainModule {
                 if (Pumps.getLiquid(killerPump, "Killer")) {
                     try {
                         int Damage = 10;
-
-                        EntityPlayer npc = TitanBox.instants.npcs.get(killerPump.getWorld().getName());
-                        npc.setLocation(killerPump.getX(), killerPump.getY(), killerPump.getZ(), 0, 0);
-                        CraftPlayer opCr = npc.getBukkitEntity();
-                        List<Entity> nearEntity = npc.getBukkitEntity().getNearbyEntities(5,5,5);
+                        List<Entity> nearEntity = NPCManager.getNearbyEntities(killerPump,7);
+                        CraftPlayer opCr = NPCManager.getCraftNPC(killerPump);
                         for (int i = 0; i < nearEntity.size(); i++) {
                             if (nearEntity.get(i).getType() != EntityType.PLAYER) {
                                 if (nearEntity.get(i) instanceof LivingEntity) {
                                     if (!nearEntity.get(i).isDead()) {
-                                        if (nearEntity.get(i).getLocation().distance(killerPump) < 5) {
+                                        if (nearEntity.get(i).getLocation().distance(killerPump) < 7) {
                                             if (nearEntity.get(i).getTicksLived() > 10) {
                                                 try {
                                                     ((LivingEntity) nearEntity.get(i)).damage(4 * Damage, opCr);
                                                 } catch (Exception e) {
+                                                    //e.printStackTrace();
                                                 }
                                             }
                                         }
@@ -160,7 +157,7 @@ public class KillerModule extends MainModule {
                     }
                     catch (Exception e)
                     {
-
+                       // e.printStackTrace();
                     }
 
                 }

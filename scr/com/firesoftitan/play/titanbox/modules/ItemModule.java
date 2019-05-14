@@ -1,6 +1,5 @@
 package com.firesoftitan.play.titanbox.modules;
 
-import com.firesoftitan.play.titanbox.TitanBox;
 import com.firesoftitan.play.titanbox.Utilities;
 import com.firesoftitan.play.titanbox.enums.ModuleTypeEnum;
 import com.firesoftitan.play.titanbox.machines.Pumps;
@@ -47,14 +46,14 @@ public class ItemModule extends MainModule {
         if (isLoaded()) {
             return new ItemStack(Material.HOPPER, 1);
         }
-        return new ItemStack(Material.BARRIER, 1);
+        return new ItemStack(Material.PAPER, 1);
     }
     @Override
     public void unLinkAll()
     {
         this.link = null;
         this.itemPump = null;
-        saveInfo();
+        needSaving();
     }
     @Override
     public boolean setLink(Location link, Player player) {
@@ -66,14 +65,14 @@ public class ItemModule extends MainModule {
             if (pump.equals("Item"))
             {
                 this.itemPump = link.clone();
-                saveInfo();
+                needSaving();
                 if (player != null) {
                     player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Item Sucker linked!");
                 }
                 return true;
             }
         }
-        saveInfo();
+        needSaving();
         return false;
     }
     @Override
@@ -121,7 +120,7 @@ public class ItemModule extends MainModule {
             lastran = System.currentTimeMillis();
             if (itemPump != null) {
                 if (Pumps.getLiquid(itemPump, "Item")) {
-                    TitanBox.pickupItem(owner, itemPump.clone(), null, 10);
+                    Utilities.pickupItemToStorage(owner, itemPump.clone(), null, 10);
                 }
             }
         }

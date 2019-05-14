@@ -1,6 +1,6 @@
 package com.firesoftitan.play.titanbox.modules;
 
-import com.firesoftitan.play.titanbox.TitanBox;
+import com.firesoftitan.play.titanbox.Utilities;
 import com.firesoftitan.play.titanbox.enums.ModuleTypeEnum;
 import com.firesoftitan.play.titanbox.machines.Pumps;
 import com.firesoftitan.play.titanbox.machines.StorageUnit;
@@ -30,7 +30,7 @@ public class BucketsModule extends MainModule {
     @Override
     public void unLinkAll() {
         this.link = null;
-        saveInfo();
+        needSaving();
     }
     @Override
     public boolean setLink(Location link, Player player) {
@@ -42,7 +42,7 @@ public class BucketsModule extends MainModule {
             if (pump.equals("Water"))
             {
                 this.link = link.clone();
-                saveInfo();
+                needSaving();
                 if (player != null) {
                     player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Water pummp  linked!");
                 }
@@ -51,14 +51,14 @@ public class BucketsModule extends MainModule {
             if(pump.equals("Lava"))
             {
                 this.link = link.clone();
-                saveInfo();
+                needSaving();
                 if (player != null) {
                     player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Lava pummp  linked!");
                 }
                 return true;
             }
         }
-        saveInfo();
+        needSaving();
         return false;
     }
     @Override
@@ -70,7 +70,7 @@ public class BucketsModule extends MainModule {
                 return new ItemStack(Material.BUCKET, 1);
             }
         }
-        return new ItemStack(Material.BARRIER, 1);
+        return new ItemStack(Material.PAPER, 1);
 
     }
     @Override
@@ -109,12 +109,12 @@ public class BucketsModule extends MainModule {
                         for(int i =0;i <stH.getSize(); i++)
                         {
                             ItemStack view = stH.viewSlot(i);
-                            if (!TitanBox.isEmpty(view))
+                            if (!Utilities.isEmpty(view))
                             {
                                 if (view.getType() == Material.BUCKET)
                                 {
                                     ItemStack getIt = stH.getItem(i, 1);
-                                    if (!TitanBox.isEmpty(getIt))
+                                    if (!Utilities.isEmpty(getIt))
                                     {
                                         foundbucket = true;
                                         break;
@@ -129,7 +129,7 @@ public class BucketsModule extends MainModule {
                         if (stH.getOwner().toString().equals(owner.toString())) {
                             int giveamount = 1;
                             ItemStack out = stH.insertItem(new ItemStack(typeBucket, giveamount));
-                            if (TitanBox.isEmpty(out)) {
+                            if (Utilities.isEmpty(out)) {
                                 return;
                             }
                             if (out.getAmount() < giveamount) {

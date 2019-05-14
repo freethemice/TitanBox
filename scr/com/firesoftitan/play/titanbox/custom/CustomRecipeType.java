@@ -1,6 +1,6 @@
 package com.firesoftitan.play.titanbox.custom;
 
-import com.firesoftitan.play.titanbox.holders.SlimefunItemsHolder;
+import com.firesoftitan.play.titanbox.managers.SlimefunItemsManager;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
 import me.mrCookieSlime.Slimefun.Lists.RecipeType;
 import org.bukkit.Material;
@@ -10,7 +10,7 @@ import org.bukkit.Material;
  */
 public class CustomRecipeType {
 
-    public static RecipeType TitanStone = new RecipeType(SlimefunItemsHolder.TitanStone);
+    public static RecipeType TitanStone = new RecipeType(SlimefunItemsManager.TitanStone);
 
     public static final RecipeType BEDROCK_DRILL = new RecipeType(new CustomItem(Material.IRON_BLOCK, "&aBedrock Drill", 1, new String[] { "", "&a&oObtain it by mining bedrock using the Bedrock Drill with Bedrock Drill Head" }));
 }

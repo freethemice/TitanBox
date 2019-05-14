@@ -1,6 +1,6 @@
 package com.firesoftitan.play.titanbox.modules;
 
-import com.firesoftitan.play.titanbox.TitanBox;
+import com.firesoftitan.play.titanbox.Utilities;
 import com.firesoftitan.play.titanbox.enums.ModuleTypeEnum;
 import com.firesoftitan.play.titanbox.machines.Pumps;
 import com.firesoftitan.play.titanbox.machines.StorageUnit;
@@ -31,7 +31,7 @@ public class BottleModule extends MainModule {
     @Override
     public void unLinkAll() {
         this.link = null;
-        saveInfo();
+        needSaving();
     }
     @Override
     public boolean setLink(Location link, Player player) {
@@ -43,14 +43,14 @@ public class BottleModule extends MainModule {
             if (pump.equals("Water"))
             {
                 this.link = link.clone();
-                saveInfo();
+                needSaving();
                 if (player != null) {
                     player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Water pummp linked!");
                 }
                 return true;
             }
         }
-        saveInfo();
+        needSaving();
         return false;
     }
     @Override
@@ -61,7 +61,7 @@ public class BottleModule extends MainModule {
                 return new ItemStack(Material.GLASS_BOTTLE, 1);
             }
         }
-        return new ItemStack(Material.BARRIER, 1);
+        return new ItemStack(Material.PAPER, 1);
 
     }
 
@@ -96,12 +96,12 @@ public class BottleModule extends MainModule {
                         for(int i =0;i <stH.getSize(); i++)
                         {
                             ItemStack view = stH.viewSlot(i);
-                            if (!TitanBox.isEmpty(view))
+                            if (!Utilities.isEmpty(view))
                             {
                                 if (view.getType() == Material.GLASS_BOTTLE)
                                 {
                                     ItemStack getIt = stH.getItem(i, 1);
-                                    if (!TitanBox.isEmpty(getIt))
+                                    if (!Utilities.isEmpty(getIt))
                                     {
                                         foundbucket = true;
                                         break;
@@ -117,7 +117,7 @@ public class BottleModule extends MainModule {
                             int giveamount = 1;
                             Potion tmp = new Potion(PotionType.WATER);
                             ItemStack out = stH.insertItem(tmp.toItemStack(1));
-                            if (TitanBox.isEmpty(out)) {
+                            if (Utilities.isEmpty(out)) {
                                 return;
                             }
                             if (out.getAmount() < giveamount) {

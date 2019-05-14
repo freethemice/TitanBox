@@ -1,6 +1,7 @@
 package com.firesoftitan.play.titanbox.items;
 
 import com.firesoftitan.play.titanbox.TitanBox;
+import com.firesoftitan.play.titanbox.Utilities;
 import com.firesoftitan.play.titanbox.custom.CustomCategories;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
 import me.mrCookieSlime.Slimefun.Lists.RecipeType;
@@ -26,7 +27,7 @@ public class TitanTalisman extends SlimefunItem {
     private static BukkitRunnable checkTimer = null;
 
     public TitanTalisman(ItemStack item, String name, ItemStack[] recipe, boolean consumable, boolean cancelEvent, String messageSuffix, PotionEffect... effects) {
-        super(CustomCategories.SLIMEFUN_TITAN_TALISMAN, item, name, RecipeType.MAGIC_WORKBENCH, recipe, new CustomItem(item, consumable ? 4: 1));
+        super(CustomCategories.SLIMEFUN_PARTS, item, name, RecipeType.MAGIC_WORKBENCH, recipe, new CustomItem(item, consumable ? 4: 1));
         this.consumed = consumable;
         this.cancel = cancelEvent;
         this.suffix = messageSuffix;
@@ -36,7 +37,7 @@ public class TitanTalisman extends SlimefunItem {
     }
 
     public TitanTalisman(ItemStack item, String name, ItemStack[] recipe, boolean consumable, boolean cancelEvent, String messageSuffix, int chance, PotionEffect... effects) {
-        super(CustomCategories.SLIMEFUN_TITAN_TALISMAN, item, name, RecipeType.MAGIC_WORKBENCH, recipe, new CustomItem(item, consumable ? 4: 1));
+        super(CustomCategories.SLIMEFUN_PARTS, item, name, RecipeType.MAGIC_WORKBENCH, recipe, new CustomItem(item, consumable ? 4: 1));
         this.consumed = consumable;
         this.cancel = cancelEvent;
         this.suffix = messageSuffix;
@@ -46,7 +47,7 @@ public class TitanTalisman extends SlimefunItem {
     }
 
     public TitanTalisman(ItemStack item, String name, ItemStack[] recipe, String messageSuffix, int chance, PotionEffect... effects) {
-        super(CustomCategories.SLIMEFUN_TITAN_TALISMAN, item, name, RecipeType.MAGIC_WORKBENCH, recipe, item);
+        super(CustomCategories.SLIMEFUN_PARTS, item, name, RecipeType.MAGIC_WORKBENCH, recipe, item);
         this.consumed = true;
         this.cancel = true;
         this.suffix = messageSuffix;
@@ -65,7 +66,7 @@ public class TitanTalisman extends SlimefunItem {
                 try {
                     for(Player player: Bukkit.getOnlinePlayers())
                     {
-                        HashMap<Integer,ItemStack> findTally = TitanTalisman.checkFor(player, SlimefunItem.getByName("TALISMAN_VOID"));
+                        HashMap<Integer,ItemStack> findTally = TitanTalisman.checkFor(player, SlimefunItem.getByID("TALISMAN_VOID"));
                         if (findTally != null)
                         {
                             if (findTally.size() > 0)
@@ -74,8 +75,8 @@ public class TitanTalisman extends SlimefunItem {
                                 for(int i = 0; i < 36; i++)
                                 {
                                     ItemStack item = playerinv.getItem(i);
-                                    if (!TitanBox.isEmpty(item)) {
-                                        ItemStack leftOver = TitanBox.addItemToStorage(player.getUniqueId(), item);
+                                    if (!Utilities.isEmpty(item)) {
+                                        ItemStack leftOver = Utilities.addItemToStorage(player.getUniqueId(), item);
                                         if (leftOver != null) {
                                             if (leftOver.getAmount() != playerinv.getItem(i).getAmount()) {
                                                 playerinv.setItem(i, leftOver.clone());
@@ -119,7 +120,7 @@ public class TitanTalisman extends SlimefunItem {
 
                         for (int i = 0; i < p.getInventory().getSize(); i++)
                         {
-                            if (TitanBox.isItemEqual(p.getInventory().getItem(i), talisman.getItem()))
+                            if (Utilities.isItemEqual(p.getInventory().getItem(i), talisman.getItem()))
                             {
                                 if (Slimefun.hasUnlocked(p, talisman.getItem(), true)) {
                                     tmpY.put(i, p.getInventory().getItem(i));

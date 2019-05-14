@@ -1,7 +1,7 @@
 package com.firesoftitan.play.titanbox.runnables;
 
 import com.firesoftitan.play.titanbox.TitanBox;
-import com.firesoftitan.play.titanbox.holders.RouterHolder;
+import com.firesoftitan.play.titanbox.managers.RouterManager;
 
 public class RouterRunable implements Runnable  {
     @Override
@@ -9,7 +9,7 @@ public class RouterRunable implements Runnable  {
         try {
             TitanBox.isRunning = System.currentTimeMillis();
             TitanBox.instants.checkRegisterdPower();
-            RouterHolder.tick();
+            RouterManager.tick();
         }
         catch (Exception e)
         {

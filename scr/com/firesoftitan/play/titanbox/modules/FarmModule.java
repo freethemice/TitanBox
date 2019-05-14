@@ -1,6 +1,5 @@
 package com.firesoftitan.play.titanbox.modules;
 
-import com.firesoftitan.play.titanbox.TitanBox;
 import com.firesoftitan.play.titanbox.Utilities;
 import com.firesoftitan.play.titanbox.enums.ModuleTypeEnum;
 import com.firesoftitan.play.titansql.ResultData;
@@ -62,7 +61,7 @@ public class FarmModule extends MainModule {
             {
                 crops[i] = null;
             }
-            saveInfo();
+            needSaving();
             updateGUIClicked(player, this, false);
             player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "All crops removed!");
             return;
@@ -87,7 +86,7 @@ public class FarmModule extends MainModule {
         {
             crops[i] = null;
         }
-        saveInfo();
+        needSaving();
     }
 
     @Override
@@ -102,7 +101,7 @@ public class FarmModule extends MainModule {
                 if (crops[i] != null) {
                     if (crops[i].toString().equalsIgnoreCase(link.toString())) {
                         crops[i] = null;
-                        saveInfo();
+                        needSaving();
                         if (player != null) {
                             player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Crop removed!");
                         }
@@ -117,7 +116,7 @@ public class FarmModule extends MainModule {
                 {
                     crops[i] = link.clone();
 
-                    saveInfo();
+                    needSaving();
                     if (player != null) {
                         player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Crop added!");
                     }
@@ -126,7 +125,7 @@ public class FarmModule extends MainModule {
             }
 
     }
-    saveInfo();
+        needSaving();
         if (player != null) {
         if (getCrops() >= crops.length)
         {
@@ -235,20 +234,23 @@ public class FarmModule extends MainModule {
                                 ageable.setAge(0);
                                 block.setBlockData(ageable);
                                 crops[treeIndex].getWorld().playEffect(crops[treeIndex], Effect.STEP_SOUND, crops[treeIndex].getBlock().getType());
-                                TitanBox.addItemToStorage(owner, Material.NETHER_WART, 2);
-                                if (block.getType() == Material.WHEAT_SEEDS) {
-                                    TitanBox.addItemToStorage(owner, Material.WHEAT, 1);
-                                    TitanBox.addItemToStorage(owner, Material.WHEAT_SEEDS, 1);
+
+                                if (block.getType() == Material.WHEAT || block.getType() == Material.WHEAT_SEEDS) {
+                                    Utilities.addItemToStorage(owner, Material.WHEAT, 1);
+                                    Utilities.addItemToStorage(owner, Material.WHEAT_SEEDS, 1);
                                 }
-                                if (block.getType() == Material.POTATO) {
-                                    TitanBox.addItemToStorage(owner, Material.POTATOES, 1);
+                                else if (block.getType() == Material.POTATO) {
+                                    Utilities.addItemToStorage(owner, Material.POTATOES, 1);
                                 }
-                                if (block.getType() == Material.CARROT) {
-                                    TitanBox.addItemToStorage(owner, Material.CARROTS, 1);
+                                else if (block.getType() == Material.CARROT) {
+                                    Utilities.addItemToStorage(owner, Material.CARROTS, 1);
+                                }
+                                else {
+                                    Utilities.addItemToStorage(owner, Material.NETHER_WART, 2);
                                 }
 
                             } else {
-                                if (TitanBox.hasItem(owner, Material.BONE_MEAL)) {
+                                if (Utilities.hasItemInStorage(owner, Material.BONE_MEAL)) {
                                     ageable.setAge(ageable.getMaximumAge());
                                     block.setBlockData(ageable);
 

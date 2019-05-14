@@ -1,6 +1,5 @@
 package com.firesoftitan.play.titanbox.modules;
 
-import com.firesoftitan.play.titanbox.TitanBox;
 import com.firesoftitan.play.titanbox.Utilities;
 import com.firesoftitan.play.titanbox.enums.ModuleTypeEnum;
 import com.firesoftitan.play.titanbox.machines.Pumps;
@@ -45,7 +44,7 @@ public class IceModule extends MainModule {
     public void unLinkAll() {
         this.link = null;
         this.icePump = null;
-        saveInfo();
+        needSaving();
     }
     @Override
     public boolean setLink(Location link, Player player) {
@@ -57,14 +56,14 @@ public class IceModule extends MainModule {
             if (pump.equals("Ice"))
             {
                 this.icePump = link.clone();
-                saveInfo();
+                needSaving();
                 if (player != null) {
                     player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Ice Extractor linked!");
                 }
                 return true;
             }
         }
-        saveInfo();
+        needSaving();
         return false;
     }
     @Override
@@ -76,7 +75,7 @@ public class IceModule extends MainModule {
                 return new ItemStack(Material.ICE, 1);
             }
         }
-        return new ItemStack(Material.BARRIER, 1);
+        return new ItemStack(Material.PAPER, 1);
 
     }
     @Override
@@ -122,7 +121,7 @@ public class IceModule extends MainModule {
             if (icePump != null) {
 
                 if (Pumps.getLiquid(icePump, "Ice")) {
-                    TitanBox.addItemToStorage(owner, Material.ICE, 3, (short) 0);
+                    Utilities.addItemToStorage(owner, Material.ICE, 3);
                 }
             }
         }

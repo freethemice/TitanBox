@@ -1,11 +1,11 @@
 package com.firesoftitan.play.titanbox.machines;
 
-import com.firesoftitan.play.titanbox.holders.SlimefunItemsHolder;
+import com.firesoftitan.play.titanbox.containers.TitanAContainer;
+import com.firesoftitan.play.titanbox.managers.SlimefunItemsManager;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.InvUtils;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
 import me.mrCookieSlime.Slimefun.Lists.RecipeType;
 import me.mrCookieSlime.Slimefun.Objects.Category;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AContainer;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineHelper;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.Setup.SlimefunManager;
@@ -20,7 +20,7 @@ import org.bukkit.material.MaterialData;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ElectricLuckyBlockFactory extends AContainer {
+public abstract class ElectricLuckyBlockFactory extends TitanAContainer {
 
 
     public ElectricLuckyBlockFactory(Category category, ItemStack item, String name, RecipeType recipeType, ItemStack[] recipe) {
@@ -72,6 +72,7 @@ public abstract class ElectricLuckyBlockFactory extends AContainer {
                 if (processing.get(b).getOutput() == null)
                 {
                     progress.remove(b);
+                    processing.remove(b);
                     return;
                 }
                 ChargableBlock.addCharge(b, -getEnergyConsumption());
@@ -187,7 +188,7 @@ public abstract class ElectricLuckyBlockFactory extends AContainer {
     }
 
     private void makeBlock(Block b, int slot, int amount) {
-        ItemStack adding = SlimefunItemsHolder.LuckyBlock;
+        ItemStack adding = SlimefunItemsManager.LuckyBlock;
 
         MachineRecipe r = new MachineRecipe(4 / getSpeed(), new ItemStack[0], new ItemStack[] {adding});
         if (!fits(b, r.getOutput())) return;

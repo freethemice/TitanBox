@@ -1,6 +1,5 @@
 package com.firesoftitan.play.titanbox.modules;
 
-import com.firesoftitan.play.titanbox.TitanBox;
 import com.firesoftitan.play.titanbox.Utilities;
 import com.firesoftitan.play.titanbox.enums.ModuleTypeEnum;
 import com.firesoftitan.play.titanbox.machines.Pumps;
@@ -45,7 +44,7 @@ public class CobblestoneGenModule extends MainModule {
     public void OpenGui(Player player)
     {
         ItemStack mainHand = player.getInventory().getItemInMainHand();
-        if (!TitanBox.isEmpty(mainHand)) {
+        if (!Utilities.isEmpty(mainHand)) {
             MainModule mh = MainModule.getModulefromItem(mainHand);
             if (mh != null) {
                     mh.clearInfo();
@@ -66,7 +65,7 @@ public class CobblestoneGenModule extends MainModule {
         this.link = null;
         this.waterPump = null;
         this.lavaPump = null;
-        saveInfo();
+        needSaving();
     }
     @Override
     public boolean setLink(Location link, Player player) {
@@ -78,7 +77,7 @@ public class CobblestoneGenModule extends MainModule {
             if (pump.equals("Water"))
             {
                 this.waterPump = link.clone();
-                saveInfo();
+                needSaving();
                 if (player != null) {
                     player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Water pummp  linked!");
                 }
@@ -87,14 +86,14 @@ public class CobblestoneGenModule extends MainModule {
             if(pump.equals("Lava"))
             {
                 this.lavaPump = link.clone();
-                saveInfo();
+                needSaving();
                 if (player != null) {
                     player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Lava pummp  linked!");
                 }
                 return true;
             }
         }
-        saveInfo();
+        needSaving();
         return false;
     }
     @Override
@@ -137,7 +136,7 @@ public class CobblestoneGenModule extends MainModule {
         if (isLoaded()) {
             return new ItemStack(Material.COBBLESTONE, 1);
         }
-        return new ItemStack(Material.BARRIER, 1);
+        return new ItemStack(Material.PAPER, 1);
     }
     @Override
     public boolean isLoaded()
@@ -161,18 +160,18 @@ public class CobblestoneGenModule extends MainModule {
         {
             if (Pumps.getLiquid(waterPump, "Water") && Pumps.getLiquid(lavaPump, "Lava"))
             {
-                TitanBox.addItemToStorage(owner, Material.COBBLESTONE, 64);
+                Utilities.addItemToStorage(owner, Material.COBBLESTONE, 64);
             }
         }
         else
         {
-            if (TitanBox.hasItem(owner, Material.WATER_BUCKET))
+            if (Utilities.hasItemInStorage(owner, Material.WATER_BUCKET))
             {
-                if (TitanBox.hasItem(owner, Material.LAVA_BUCKET)) {
-                    TitanBox.addItemToStorage(owner, Material.COBBLESTONE, 32);
-                    TitanBox.addItemToStorage(owner, Material.BUCKET, 1);
+                if (Utilities.hasItemInStorage(owner, Material.LAVA_BUCKET)) {
+                    Utilities.addItemToStorage(owner, Material.COBBLESTONE, 32);
+                    Utilities.addItemToStorage(owner, Material.BUCKET, 1);
                 }
-                TitanBox.addItemToStorage(owner, Material.BUCKET, 1);
+                Utilities.addItemToStorage(owner, Material.BUCKET, 1);
             }
         }
     }

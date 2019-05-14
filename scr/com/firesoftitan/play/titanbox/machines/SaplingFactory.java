@@ -1,7 +1,7 @@
 package com.firesoftitan.play.titanbox.machines;
 
-import com.firesoftitan.play.titanbox.TitanBox;
-import com.firesoftitan.play.titanbox.containers.BContainer;
+import com.firesoftitan.play.titanbox.Utilities;
+import com.firesoftitan.play.titanbox.containers.PickThreeContainer;
 import com.firesoftitan.play.titanbox.enums.TreeTypeEnum;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.InvUtils;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
@@ -11,6 +11,7 @@ import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineHelpe
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.energy.ChargableBlock;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
@@ -21,10 +22,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public abstract class SaplingFactory extends BContainer {;
+public abstract class SaplingFactory extends PickThreeContainer {;
     public SaplingFactory(Category category, ItemStack item, String name, RecipeType recipeType, ItemStack[] recipe) {
         super(category, item, name, recipeType, recipe);
-
+        this.border_mat_1 = null;
+        this.border_mat_2 = Material.BONE_MEAL;
+        this.border_info_2.add(ChatColor.BLUE + "Bone Meal");
+        this.border_mat_3 = null;
+        setupUnit();
     }
 
     @Override
@@ -81,14 +86,12 @@ public abstract class SaplingFactory extends BContainer {;
         else {
 
             for (int slot: getInputSlots()) {
-                if (!TitanBox.isEmpty(BlockStorage.getInventory(b).getItemInSlot(slot))) {
-                    if (TitanBox.isItemEqual(BlockStorage.getInventory(b).getItemInSlot(slot), new ItemStack(Material.BONE_MEAL))) {
+                if (!Utilities.isEmpty(BlockStorage.getInventory(b).getItemInSlot(slot))) {
+                    if (Utilities.isItemEqual(BlockStorage.getInventory(b).getItemInSlot(slot), new ItemStack(Material.BONE_MEAL))) {
                         Random number = new Random(System.currentTimeMillis());
-                        Material saplingType = BlockStorage.getInventory(b).getItemInSlot(slot).getType();
-                        ItemStack adding = new ItemStack(Material.OAK_SAPLING, 1 + number.nextInt(10));
                         Random rnd = new Random(System.currentTimeMillis());
                         int pick = rnd.nextInt(TreeTypeEnum.values().length);
-                        adding = new ItemStack(TreeTypeEnum.values()[pick].getSapling(), 1 + number.nextInt(10));
+                        ItemStack adding = new ItemStack(TreeTypeEnum.values()[pick].getSapling(), 1 + number.nextInt(10));
                         adding = adding.clone();
                         MachineRecipe r = new MachineRecipe(4 / getSpeed(), new ItemStack[0], new ItemStack[]{adding});
                         if (!fits(b, r.getOutput())) return;

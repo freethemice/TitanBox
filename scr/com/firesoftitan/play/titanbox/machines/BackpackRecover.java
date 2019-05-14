@@ -1,10 +1,9 @@
 package com.firesoftitan.play.titanbox.machines;
 
-import com.firesoftitan.play.titanbox.TitanBox;
-import com.firesoftitan.play.titanbox.holders.ItemHolder;
+import com.firesoftitan.play.titanbox.Utilities;
+import com.firesoftitan.play.titanbox.enums.ItemEnum;
 import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
 import me.mrCookieSlime.Slimefun.Lists.SlimefunItems;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -34,9 +33,9 @@ public class BackpackRecover {
     }
     public static ItemStack getMeAsDrop()
     {
-        ItemStack BackpackRecover = TitanBox.getSkull(ItemHolder.BACKPACK.getTexute());
-        BackpackRecover = TitanBox.changeName(BackpackRecover, ChatColor.YELLOW + "Backpack Recover");
-        BackpackRecover = TitanBox.addLore(BackpackRecover, ChatColor.WHITE + "Recovers Slimefun Backpacks", ChatColor.WHITE + "Must have new backpack with same slots", ChatColor.WHITE + "in your inventory");
+        ItemStack BackpackRecover = Utilities.getSkull(ItemEnum.BACKPACK.getTexute());
+        BackpackRecover = Utilities.changeName(BackpackRecover, ChatColor.YELLOW + "Backpack Recover");
+        BackpackRecover = Utilities.addLore(BackpackRecover, ChatColor.WHITE + "Recovers Slimefun Backpacks", ChatColor.WHITE + "Must have new backpack with same slots", ChatColor.WHITE + "in your inventory");
 
         return BackpackRecover;
     }
@@ -44,59 +43,68 @@ public class BackpackRecover {
     {
         Inventory recover = Bukkit.createInventory(null, 54, ChatColor.YELLOW + "Backpack Recover");
         ItemStack[] PacksList = getBackpackList(player.getUniqueId());
-        for(int i = 0; i < PacksList.length;i++)
-        {
-            recover.setItem(i, PacksList[i].clone());
-        }
+        if (PacksList != null) {
+            for (int i = 0; i < PacksList.length; i++) {
+                recover.setItem(i, PacksList[i].clone());
+            }
 
-        player.openInventory(recover);
+            player.openInventory(recover);
+        }else
+        {
+            player.sendMessage(ChatColor.RED + "You have no lost backpacks.");
+        }
 
     }
     public static ItemStack[] getBackpackList(UUID uuid)
     {
-
-        Config cfg = new Config(new File("data-storage/Slimefun/Players/" + uuid.toString() + ".yml"));
-        Set<String> keys = cfg.getKeys("backpacks");
-        ItemStack[] list = new ItemStack[keys.size()];
-        int i = 0;
-        for(String key: keys)
-        {
-            int size = cfg.getInt("backpacks." + key + ".size");
-            ItemStack backpack = null;
-            switch (size)
-            {
-                case 9:
-                    backpack = SlimefunItems.BACKPACK_SMALL.clone();
-                    break;
-                case 18:
-                    backpack = SlimefunItems.BACKPACK_MEDIUM.clone();
-                    break;
-                case 27:
-                    backpack = SlimefunItems.BACKPACK_LARGE.clone();
-                    break;
-                case 36:
-                    backpack = SlimefunItems.WOVEN_BACKPACK.clone();
-                    break;
-                case 45:
-                    backpack = SlimefunItems.GILDED_BACKPACK.clone();
-                    break;
-            }
-            if (backpack != null) {
-                for (int line = 0; line < backpack.getItemMeta().getLore().size(); line++) {
-                    if (backpack.getItemMeta().getLore().get(line).equals(ChatColor.translateAlternateColorCodes('&', "&7ID: <ID>"))) {
-                        ItemMeta im = backpack.getItemMeta();
-                        List<String> lore = im.getLore();
-                        lore.set(line, lore.get(line).replace("<ID>", uuid.toString() + "#" + key));
-                        im.setLore(lore);
-                        backpack.setItemMeta(im);
-                        break;
+        try {
+            File yml = new File("data-storage/Slimefun/Players/" + uuid.toString() + ".yml");
+            if (yml.exists()) {
+                Config cfg = new Config(yml);
+                Set<String> keys = cfg.getKeys("backpacks");
+                ItemStack[] list = new ItemStack[keys.size()];
+                int i = 0;
+                for (String key : keys) {
+                    int size = cfg.getInt("backpacks." + key + ".size");
+                    ItemStack backpack = null;
+                    switch (size) {
+                        case 9:
+                            backpack = SlimefunItems.BACKPACK_SMALL.clone();
+                            break;
+                        case 18:
+                            backpack = SlimefunItems.BACKPACK_MEDIUM.clone();
+                            break;
+                        case 27:
+                            backpack = SlimefunItems.BACKPACK_LARGE.clone();
+                            break;
+                        case 36:
+                            backpack = SlimefunItems.WOVEN_BACKPACK.clone();
+                            break;
+                        case 45:
+                            backpack = SlimefunItems.GILDED_BACKPACK.clone();
+                            break;
+                    }
+                    if (backpack != null) {
+                        for (int line = 0; line < backpack.getItemMeta().getLore().size(); line++) {
+                            if (backpack.getItemMeta().getLore().get(line).equals(ChatColor.translateAlternateColorCodes('&', "&7ID: <ID>"))) {
+                                ItemMeta im = backpack.getItemMeta();
+                                List<String> lore = im.getLore();
+                                lore.set(line, lore.get(line).replace("<ID>", uuid.toString() + "#" + key));
+                                im.setLore(lore);
+                                backpack.setItemMeta(im);
+                                break;
+                            }
+                        }
+                        list[i] = backpack.clone();
+                        i++;
                     }
                 }
-                list[i] = backpack.clone();
-                i++;
+                return list;
             }
+            return null;
+        } catch (Exception e) {
+            return null;
         }
-        return list;
     }
     public static int getBackPackSize(ItemStack item)
     {
@@ -150,14 +158,14 @@ public class BackpackRecover {
     }
     public static void onInventoryClickEvent(InventoryClickEvent event) {
 
-        String name = event.getInventory().getName();
+        String name = event.getView().getTitle();
         if (name.equals(ChatColor.YELLOW + "Backpack Recover"))
         {
             event.setCancelled(true);
             if (event.getRawSlot() > -1 && event.getRawSlot() < 54)
             {
                 ItemStack item = event.getClickedInventory().getItem(event.getRawSlot());
-                if (!TitanBox.isEmpty(item))
+                if (!Utilities.isEmpty(item))
                 {
                     int getsize = getBackPackSize(item);
                     for (int i = 0; i < 36; i++)
@@ -169,10 +177,10 @@ public class BackpackRecover {
                             if (getsize == Size) {
                                 int id = getBackPackId(item);
                                 for (int line = 0; line < check.getItemMeta().getLore().size(); line++) {
-                                    if (check.getItemMeta().getLore().get(line).equals(ChatColor.translateAlternateColorCodes('&', "&7ID: <ID>"))) {
+                                    if (check.getItemMeta().getLore().get(line).contains(ChatColor.translateAlternateColorCodes('&', "&7ID:"))) {
                                         ItemMeta im = check.getItemMeta();
                                         List<String> lore = im.getLore();
-                                        lore.set(line, lore.get(line).replace("<ID>", event.getWhoClicked().getUniqueId().toString() + "#" + id));
+                                        lore.set(line, lore.get(line).replace(lore.get(line), ChatColor.GRAY + "ID: " + event.getWhoClicked().getUniqueId().toString() + "#" + id));
                                         im.setLore(lore);
                                         ItemStack check2 = check.clone();
                                         check2.setAmount(1);
@@ -210,7 +218,7 @@ public class BackpackRecover {
     public static void onBlockBreakEvent(BlockBreakEvent event)
     {
         Block Broken = event.getBlock();
-        if ((GriefPrevention.instance.allowBreak(event.getPlayer(), Broken, Broken.getLocation()) == null) || event.getPlayer().hasPermission("titanbox.admin")) {
+        if ((Utilities.hasBuildRights(event.getPlayer(), Broken.getLocation()) ) ) {
             String key = getLocationKey(Broken.getLocation());
             if (key != null) {
                 if (recovers.contains("recovers."  + key)) {
@@ -240,7 +248,7 @@ public class BackpackRecover {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             if (event.getClickedBlock() != null) {
                 Block Broken = event.getClickedBlock();
-                if ((GriefPrevention.instance.allowBuild(event.getPlayer(), Broken.getLocation()) == null) || event.getPlayer().hasPermission("titanbox.admin")) {
+                if ((Utilities.hasBuildRights(event.getPlayer(), Broken.getLocation(), true))) {
                     String key = getLocationKey(Broken.getLocation());
                     if (key != null) {
                         if (recovers.contains("recovers." + key)) {
@@ -251,22 +259,24 @@ public class BackpackRecover {
             }
         }
     }
-    public static void onBlockPlaceEvent(BlockPlaceEvent event) {
+    public static boolean onBlockPlaceEvent(BlockPlaceEvent event) {
         ItemStack item = event.getItemInHand();
         if (item != null) {
             if (item.hasItemMeta()) {
                 if (item.getItemMeta().hasDisplayName()) {
                     if (item.getItemMeta().getDisplayName().startsWith(ChatColor.YELLOW + "Backpack Recover")) {
                         Block Placed = event.getBlockPlaced();
-                        if ((GriefPrevention.instance.allowBuild(event.getPlayer(), Placed.getLocation()) == null) || event.getPlayer().hasPermission("titanbox.admin")) {
+                        if ((Utilities.hasBuildRights(event.getPlayer(), Placed.getLocation())) ) {
                             String key = getLocationKey(Placed.getLocation());
                             if (key != null) {
                                 recovers.setValue("recovers." + key, true);
                             }
                         }
+                        return true;
                     }
                 }
             }
         }
+        return false;
     }
 }

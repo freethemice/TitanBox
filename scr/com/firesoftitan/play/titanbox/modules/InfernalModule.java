@@ -1,6 +1,5 @@
 package com.firesoftitan.play.titanbox.modules;
 
-import com.firesoftitan.play.titanbox.TitanBox;
 import com.firesoftitan.play.titanbox.Utilities;
 import com.firesoftitan.play.titanbox.enums.ModuleTypeEnum;
 import com.firesoftitan.play.titansql.ResultData;
@@ -61,7 +60,7 @@ public class InfernalModule extends MainModule {
             {
                 warts[i] = null;
             }
-            saveInfo();
+            needSaving();
             updateGUIClicked(player, this, false);
             player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "All warts removed!");
             return;
@@ -87,7 +86,7 @@ public class InfernalModule extends MainModule {
         {
             warts[i] = null;
         }
-        saveInfo();
+        needSaving();
     }
     @Override
     public boolean setLink(Location link, Player player) {
@@ -101,7 +100,7 @@ public class InfernalModule extends MainModule {
                 if (warts[i] != null) {
                     if (warts[i].toString().equalsIgnoreCase(link.toString())) {
                         warts[i] = null;
-                        saveInfo();
+                        needSaving();
                         if (player != null) {
                             player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Wart removed!");
                         }
@@ -116,7 +115,7 @@ public class InfernalModule extends MainModule {
                 {
                     warts[i] = link.clone();
 
-                    saveInfo();
+                    needSaving();
                     if (player != null) {
                         player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Wart added!");
                     }
@@ -125,7 +124,7 @@ public class InfernalModule extends MainModule {
             }
 
     }
-    saveInfo();
+    needSaving();
         if (player != null) {
         if (getWarts() >= warts.length)
         {
@@ -234,7 +233,7 @@ public class InfernalModule extends MainModule {
                                 ageable.setAge(0);
                                 block.setBlockData(ageable);
                                 warts[treeIndex].getWorld().playEffect(warts[treeIndex], Effect.STEP_SOUND, warts[treeIndex].getBlock().getType());
-                                TitanBox.addItemToStorage(owner, Material.NETHER_WART, 2);
+                                Utilities.addItemToStorage(owner, Material.NETHER_WART, 2);
                             }
                         }
                     }

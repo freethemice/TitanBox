@@ -1,6 +1,7 @@
 package com.firesoftitan.play.titanbox.machines;
 
-import com.firesoftitan.play.titanbox.holders.SlimefunItemsHolder;
+import com.firesoftitan.play.titanbox.managers.SlimefunItemsManager;
+import com.firesoftitan.play.titanbox.managers.TitanItemManager;
 import me.mrCookieSlime.CSCoreLibPlugin.CSCoreLib;
 import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu.AdvancedMenuClickHandler;
@@ -33,7 +34,7 @@ import org.bukkit.material.MaterialData;
 
 import java.util.*;
 
-public abstract class AncientAltarCrafter extends SlimefunItem {
+public abstract class AncientAltarCrafter extends TitanItemManager {
 
 	private static final int[] border = {0, 1, 3, 4, 5, 7, 8, 13, 14, 15, 16, 17, 50, 51, 52, 53};
 	private static final int[] border_in = {9, 10, 11, 12, 13, 18, 22, 27, 31, 36, 40, 45, 46, 47, 48, 49};
@@ -176,7 +177,7 @@ public abstract class AncientAltarCrafter extends SlimefunItem {
 			});
 		}
 		try {
-			preset.addItem(2, new CustomItem(SlimefunItemsHolder.ANCIENT_ALTAR_CRAFTER_BLOCK, "&eRecipe", "", "&bPut in the Recipe you want to craft", "&6Ancient Altar Recipes ONLY"),
+			preset.addItem(2, new CustomItem(SlimefunItemsManager.ANCIENT_ALTAR_CRAFTER_BLOCK, "&eRecipe", "", "&bPut in the Recipe you want to craft", "&6Ancient Altar Recipes ONLY"),
 					new MenuClickHandler() {
 
 						@Override

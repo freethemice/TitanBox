@@ -1,7 +1,7 @@
 package com.firesoftitan.play.titanbox.machines;
 
-import com.firesoftitan.play.titanbox.TitanBox;
-import com.firesoftitan.play.titanbox.containers.BContainer;
+import com.firesoftitan.play.titanbox.Utilities;
+import com.firesoftitan.play.titanbox.containers.PickThreeContainer;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.InvUtils;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
 import me.mrCookieSlime.Slimefun.Lists.RecipeType;
@@ -10,6 +10,7 @@ import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineHelpe
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.energy.ChargableBlock;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
@@ -20,10 +21,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public abstract class CharcoalFactory extends BContainer {;
+public abstract class CharcoalFactory extends PickThreeContainer {;
     public CharcoalFactory(Category category, ItemStack item, String name, RecipeType recipeType, ItemStack[] recipe) {
         super(category, item, name, recipeType, recipe);
-
+        this.border_mat_1 = null;
+        this.border_mat_2 = Material.OAK_SAPLING;
+        this.border_mat_3 = null;
+        this.border_info_2.add(ChatColor.BLUE + "Any sapling");
+        setupUnit();
     }
 
     @Override
@@ -80,7 +85,7 @@ public abstract class CharcoalFactory extends BContainer {;
         else {
 
             for (int slot: getInputSlots()) {
-                if (!TitanBox.isEmpty(BlockStorage.getInventory(b).getItemInSlot(slot))) {
+                if (!Utilities.isEmpty(BlockStorage.getInventory(b).getItemInSlot(slot))) {
                     if (BlockStorage.getInventory(b).getItemInSlot(slot).getType().name().toLowerCase().endsWith("_sapling")) {
                         Random number = new Random(System.currentTimeMillis());
                         ItemStack adding = new ItemStack(Material.CHARCOAL, 10 + number.nextInt(10));

@@ -1,9 +1,10 @@
 package com.firesoftitan.play.titanbox.machines;
 
-import com.firesoftitan.play.titanbox.TitanBox;
+import com.firesoftitan.play.titanbox.Utilities;
+import com.firesoftitan.play.titanbox.containers.TitanAContainer;
+import com.firesoftitan.play.titanbox.managers.NPCManager;
 import me.mrCookieSlime.Slimefun.Lists.RecipeType;
 import me.mrCookieSlime.Slimefun.Objects.Category;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AContainer;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.energy.ChargableBlock;
 import org.bukkit.Effect;
@@ -16,7 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public abstract class XPPlate extends AContainer {
+public abstract class XPPlate extends TitanAContainer {
 
     public XPPlate(Category category, ItemStack item, String name, RecipeType recipeType, ItemStack[] recipe) {
         super(category, item, name, recipeType, recipe);
@@ -48,7 +49,7 @@ public abstract class XPPlate extends AContainer {
             if (ChargableBlock.isChargable(b)) {
                 if (ChargableBlock.getCharge(b) < getEnergyConsumption()) return;
                 if (b.getLocation().getWorld().getEnvironment() != World.Environment.NORMAL) return;
-                List<Entity> EList = TitanBox.instants.getNearbyEntities(b.getLocation(), 3);
+                List<Entity> EList = NPCManager.getNearbyEntities(b.getLocation(), 3);
                 for(Entity ent: EList)
                 {
                     if (ent instanceof Player)
@@ -58,7 +59,7 @@ public abstract class XPPlate extends AContainer {
                             b.getLocation().getWorld().playEffect(b.getLocation(), Effect.MOBSPAWNER_FLAMES, 1);
                             for (int slot : getInputSlots()) {
                                 ItemStack flask = BlockStorage.getInventory(b).getItemInSlot(slot);
-                                if (!TitanBox.isEmpty(flask)) {
+                                if (!Utilities.isEmpty(flask)) {
                                     if (flask.getType() == Material.EXPERIENCE_BOTTLE) {
                                         int amount = flask.getAmount();
                                         int xp = amount * 7;

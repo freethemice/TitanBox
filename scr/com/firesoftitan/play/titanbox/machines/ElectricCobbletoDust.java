@@ -1,11 +1,11 @@
 package com.firesoftitan.play.titanbox.machines;
 
-import com.firesoftitan.play.titanbox.holders.SlimefunItemsHolder;
+import com.firesoftitan.play.titanbox.containers.TitanAContainer;
+import com.firesoftitan.play.titanbox.managers.SlimefunItemsManager;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.InvUtils;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
 import me.mrCookieSlime.Slimefun.Lists.RecipeType;
 import me.mrCookieSlime.Slimefun.Objects.Category;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AContainer;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineHelper;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.Setup.SlimefunManager;
@@ -21,7 +21,7 @@ import org.bukkit.material.MaterialData;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ElectricCobbletoDust extends AContainer {;
+public abstract class ElectricCobbletoDust extends TitanAContainer {;
     public ElectricCobbletoDust(Category category, ItemStack item, String name, RecipeType recipeType, ItemStack[] recipe) {
         super(category, item, name, recipeType, recipe);
 
@@ -72,6 +72,7 @@ public abstract class ElectricCobbletoDust extends AContainer {;
                 if (processing.get(b).getOutput() == null)
                 {
                     progress.remove(b);
+                    processing.remove(b);
                     return;
                 }
                 ChargableBlock.addCharge(b, -getEnergyConsumption());
@@ -96,8 +97,8 @@ public abstract class ElectricCobbletoDust extends AContainer {;
                     else if (SlimefunStartup.chance(100, 25)) adding = me.mrCookieSlime.Slimefun.Lists.SlimefunItems.MAGNESIUM_DUST;
                     else if (SlimefunStartup.chance(100, 25)) adding = me.mrCookieSlime.Slimefun.Lists.SlimefunItems.LEAD_DUST;
                     else if (SlimefunStartup.chance(100, 25)) adding = me.mrCookieSlime.Slimefun.Lists.SlimefunItems.SILVER_DUST;
-                    else if (SlimefunStartup.chance(500, 1)) adding = SlimefunItemsHolder.EclipseNugget;
-                    else if (SlimefunStartup.chance(200, 10)) adding = SlimefunItemsHolder.LuckyNugget;
+                    else if (SlimefunStartup.chance(500, 1)) adding = SlimefunItemsManager.EclipseNugget;
+                    else if (SlimefunStartup.chance(200, 10)) adding = SlimefunItemsManager.LuckyNugget;
                     adding = adding.clone();
                     adding.setAmount(1);
                     if (getSpeed() > 9)
