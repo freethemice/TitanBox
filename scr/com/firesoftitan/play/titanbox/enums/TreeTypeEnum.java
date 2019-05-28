@@ -6,38 +6,38 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 public enum TreeTypeEnum {
-    OAK(TreeType.TREE, null, TreeType.BIG_TREE, "Oak", Material.LOG,(short)0, (short)0),
-    SPRUCE(TreeType.REDWOOD, TreeType.MEGA_REDWOOD, TreeType.TALL_REDWOOD, "Spruce", Material.LOG,(short)1, (short)1),
-    BIRCH(TreeType.BIRCH, null, TreeType.TALL_BIRCH,"Birch", Material.LOG,(short)2, (short)2),
-    JUNGLE(TreeType.SMALL_JUNGLE, TreeType.JUNGLE, null, "Jungle", Material.LOG,(short)3, (short)3),
-    ACACIA(TreeType.ACACIA, null, null, "Acacia", Material.LOG_2,(short)0, (short)0),
-    DARK_OAK(TreeType.DARK_OAK, null, null, "Acacia", Material.LOG_2,(short)0, (short)0);
+    OAK(TreeType.TREE, null, TreeType.BIG_TREE, "Oak", Material.OAK_LOG, Material.OAK_SAPLING, Material.STRIPPED_OAK_LOG),
+    SPRUCE(TreeType.REDWOOD, TreeType.MEGA_REDWOOD, TreeType.TALL_REDWOOD, "Spruce", Material.SPRUCE_LOG, Material.SPRUCE_SAPLING, Material.STRIPPED_SPRUCE_LOG),
+    BIRCH(TreeType.BIRCH, null, TreeType.TALL_BIRCH,"Birch", Material.BIRCH_LOG, Material.BIRCH_SAPLING, Material.STRIPPED_BIRCH_LOG),
+    JUNGLE(TreeType.SMALL_JUNGLE, TreeType.JUNGLE, null, "Jungle", Material.JUNGLE_LOG,Material.JUNGLE_SAPLING, Material.STRIPPED_JUNGLE_LOG),
+    ACACIA(TreeType.ACACIA, null, null, "Acacia", Material.ACACIA_LOG, Material.ACACIA_SAPLING, Material.STRIPPED_ACACIA_LOG),
+    DARK_OAK(TreeType.DARK_OAK, null, null, "Dark Oak", Material.DARK_OAK_LOG,Material.DARK_OAK_SAPLING, Material.STRIPPED_DARK_OAK_LOG);
 
     private final TreeType type;
     private final TreeType bigtype;
     private final TreeType talltype;
     private final String name;
     private final Material log;
-    private final short blockdata;
-    private final short spalingdata;
-    TreeTypeEnum(TreeType treeType, TreeType big, TreeType tall,String name, Material material, short blockdata, short spalingdata) {
+    private final Material sapling;
+    private final Material stripped;
+    TreeTypeEnum(TreeType treeType, TreeType big, TreeType tall,String name, Material material, Material sapling, Material stripped) {
         this.type = treeType;
         this.bigtype = big;
         this.talltype = tall;
         this.name = name;
         this.log = material;
-        this.blockdata = blockdata;
-        this.spalingdata = spalingdata;
+        this.sapling = sapling;
+        this.stripped = stripped;
     }
     public static TreeTypeEnum getFromMaterial(Material material, short data)
     {
         for(TreeTypeEnum tte: TreeTypeEnum.values())
         {
-            if (material == tte.log && data == tte.getBlockdata())
+            if (material == tte.log)
             {
                 return tte;
             }
-            if (material == Material.SAPLING && data == tte.getSpalingdata())
+            if (material == tte.getSapling())
             {
                 return tte;
             }
@@ -45,15 +45,23 @@ public enum TreeTypeEnum {
         return null;
     }
 
+    public Material getStripped() {
+        return stripped;
+    }
+
+    public Material getSapling() {
+        return sapling;
+    }
+
     public static TreeTypeEnum getFromBlock(Block block)
     {
         for(TreeTypeEnum tte: TreeTypeEnum.values())
         {
-            if (block.getType() == tte.log && block.getData() == tte.getBlockdata())
+            if (block.getType() == tte.log)
             {
                 return tte;
             }
-            if (block.getType() == Material.SAPLING && block.getData() == tte.getSpalingdata())
+            if (block.getType() == tte.getSapling())
             {
                 return tte;
             }
@@ -65,18 +73,10 @@ public enum TreeTypeEnum {
     }
     public ItemStack getItemStack()
     {
-        return new ItemStack(log, 1, blockdata);
+        return new ItemStack(log, 1);
     }
     public Material getLog() {
         return log;
-    }
-
-    public short getBlockdata() {
-        return blockdata;
-    }
-
-    public short getSpalingdata() {
-        return spalingdata;
     }
 
     public TreeType getBigtype() {

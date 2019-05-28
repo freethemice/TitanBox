@@ -1,17 +1,38 @@
 name: TitanBox
 main: com.firesoftitan.play.titanbox.TitanBox
-version: 1.0.0
+version: 1.0.1_14
 author: [freethemice]
-depend: [CS-CoreLib, Slimefun, GriefPrevention, Vault, FoTXRay]
+depend: [CS-CoreLib, Slimefun, TitanSQL, SlimefunLuckyBlocks]
+api-version: 1.13
 commands:
+   home:
+      description: home
+      usage: /<command>
    titanbox:
       description: titanbox
       usage: /<command>
    tb:
       description: fotb
       usage: /<command>
+   override:
+      description: fotb
+      usage: /<command>
 permissions:
    titanbox.use:
+     description: Gives access to use lir
+   titanbox.rank_1:
+     description: Gives access to use lir
+   titanbox.rank_2:
+     description: Gives access to use lir
+   titanbox.rank_3:
+     description: Gives access to use lir
+   titanbox.rank_4:
+     description: Gives access to use lir
+   titanbox.rank_5:
+     description: Gives access to use lir
+   titanbox.rank_6:
+     description: Gives access to use lir
+   titanbox.rank_7:
      description: Gives access to use lir
    titanbox.admin:
      description: Gives access to use lir and edit it

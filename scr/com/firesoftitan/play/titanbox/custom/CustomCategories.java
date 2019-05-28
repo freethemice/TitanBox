@@ -18,14 +18,14 @@ public class CustomCategories
 {
     public static final Category STORAGE_ROUTING = new Category(new CustomItem(new ItemStack(Material.CHEST), "&5Storage and Routing", new String[] { "", "&a >Click to open" }), 5);
     public static final Category STORAGE_MODULES = new Category(new CustomItem(new ItemStack(Material.PAPER), "&5Routing Modules", new String[] { "", "&a >Click to open" }), 5);
-    public static final Category SLIMEFUN_TITAN = new Category(new CustomItem(new ItemStack(Material.ENCHANTED_BOOK), "&5Titan Enchants", new String[] { "", "&a >Click to open" }), 5);
     public static final Category SLIMEFUN_RESOURCES = new Category(new CustomItem(new ItemStack(Material.GOLD_INGOT), "&5Resources", new String[] { "", "&a >Click to open" }), 5);
-    public static final Category SLIMEFUN_PARTS = new Category(new CustomItem(new ItemStack(Material.ANVIL), "&5Parts", new String[] { "", "&a >Click to open" }), 5);
+    public static final Category SLIMEFUN_PARTS = new Category(new CustomItem(new ItemStack(Material.ANVIL), "&5Parts and Toys", new String[] { "", "&a >Click to open" }), 5);
     public static final SeasonCategory SLIMEFUN_BLANK = new SeasonCategory(18, 0, new MenuItem(Material.NETHER_STAR, "TRASH", 0, ChatColor.translateAlternateColorCodes('&', "&chelp &aSanta")));
-    public static final Category SLIMEFUN_LUCKY = new Category(new CustomItem(new ItemStack(Material.ENCHANTMENT_TABLE), "&5Lucky Gear", new String[] { "", "&a >Click to open" }), 5);
-    public static final Category SLIMEFUN_ECLIPSE = new Category(new CustomItem(new ItemStack(Material.IRON_HELMET), "&bEclipse Gear", new String[] { "", "&a >Click to open" }), 5);
-    public static final Category SLIMEFUN_TITAN_GEAR = new Category(new CustomItem(new ItemStack(Material.DIAMOND_CHESTPLATE), "&4Titan Gear", new String[] { "", "&a >Click to open" }), 5);
-    public static final Category SLIMEFUN_TITAN_TALISMAN = new Category(new CustomItem(new ItemStack(Material.EMERALD), "&4Titan Talisman", new String[] { "", "&a >Click to open" }), 5);
+    public static final Category SLIMEFUN_TITAN_GEAR = new Category(new CustomItem(new ItemStack(Material.DIAMOND_CHESTPLATE), "&4Gear", new String[] { "", "&a >Click to open" }), 5);
+    public static final Category SLIMEFUN_TITAN_TOOLS = new Category(new CustomItem(new ItemStack(Material.DIAMOND_SWORD), "&4Tools and Weapons", new String[] { "", "&a >Click to open" }), 5);
+    public static final Category SLIMEFUN_FREE_THINGS = new Category(new CustomItem(new ItemStack(Material.END_CRYSTAL), "&4Energy to Items", new String[] { "", "&a >Click to open" }), 5);
+    public static final Category SLIMEFUN_RECOVERY = new Category(new CustomItem(new ItemStack(Material.ANVIL), "&4Recovery", new String[] { "", "&a >Click to open" }), 5);
+    public static final Category TITAN_EGGS = new Category(new MenuItem(Material.PIG_SPAWN_EGG, "&7Spawn Eggs", 0, "open"), 5);
     public static Category ELECTRICITY = null;
 
     static {

@@ -1,15 +1,17 @@
 package com.firesoftitan.play.titanbox.modules;
 
-import com.firesoftitan.play.titanbox.TitanBox;
+import com.firesoftitan.play.titanbox.Utilities;
 import com.firesoftitan.play.titanbox.enums.ModuleTypeEnum;
 import com.firesoftitan.play.titanbox.machines.Pumps;
 import com.firesoftitan.play.titanbox.machines.StorageUnit;
+import com.firesoftitan.play.titansql.ResultData;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 public class BucketsModule extends MainModule {
@@ -26,7 +28,13 @@ public class BucketsModule extends MainModule {
     }
 
     @Override
+    public void unLinkAll() {
+        this.link = null;
+        needSaving();
+    }
+    @Override
     public boolean setLink(Location link, Player player) {
+        super.setLink(link, player);
         String pump = Pumps.getPumpType(link);
         this.link = null;
         if (pump != null)
@@ -34,7 +42,7 @@ public class BucketsModule extends MainModule {
             if (pump.equals("Water"))
             {
                 this.link = link.clone();
-                saveInfo();
+                needSaving();
                 if (player != null) {
                     player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Water pummp  linked!");
                 }
@@ -43,24 +51,32 @@ public class BucketsModule extends MainModule {
             if(pump.equals("Lava"))
             {
                 this.link = link.clone();
-                saveInfo();
+                needSaving();
                 if (player != null) {
                     player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Lava pummp  linked!");
                 }
                 return true;
             }
         }
-        saveInfo();
+        needSaving();
         return false;
     }
     @Override
     public ItemStack getMeAsIcon()
     {
-        return new ItemStack(Material.BUCKET, 1);
+        if (isLoaded()) {
+            if (Pumps.getLiquid(link, "Water") || Pumps.getLiquid(link, "Lava"))
+            {
+                return new ItemStack(Material.BUCKET, 1);
+            }
+        }
+        return new ItemStack(Material.PAPER, 1);
+
     }
     @Override
-    public void loadInfo() {
-        super.loadInfo();
+    public void loadInfo(HashMap<String, ResultData> result)
+    {
+        super.loadInfo(result);
     }
 
     @Override
@@ -93,12 +109,12 @@ public class BucketsModule extends MainModule {
                         for(int i =0;i <stH.getSize(); i++)
                         {
                             ItemStack view = stH.viewSlot(i);
-                            if (!TitanBox.isEmpty(view))
+                            if (!Utilities.isEmpty(view))
                             {
                                 if (view.getType() == Material.BUCKET)
                                 {
                                     ItemStack getIt = stH.getItem(i, 1);
-                                    if (!TitanBox.isEmpty(getIt))
+                                    if (!Utilities.isEmpty(getIt))
                                     {
                                         foundbucket = true;
                                         break;
@@ -113,7 +129,7 @@ public class BucketsModule extends MainModule {
                         if (stH.getOwner().toString().equals(owner.toString())) {
                             int giveamount = 1;
                             ItemStack out = stH.insertItem(new ItemStack(typeBucket, giveamount));
-                            if (TitanBox.isEmpty(out)) {
+                            if (Utilities.isEmpty(out)) {
                                 return;
                             }
                             if (out.getAmount() < giveamount) {

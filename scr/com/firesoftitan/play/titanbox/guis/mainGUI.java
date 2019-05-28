@@ -1,6 +1,6 @@
 package com.firesoftitan.play.titanbox.guis;
 
-import com.firesoftitan.play.titanbox.interfaces.InventoryHolder;
+import com.firesoftitan.play.titanbox.interfaces.InventoryInterface;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -8,15 +8,15 @@ import org.bukkit.inventory.Inventory;
 
 import java.util.HashMap;
 
-public class mainGUI {
+public class MainGUI {
 
     private Inventory myGui;
     private int size;
     private String name;
-    private HashMap<Integer, buttonGUIs> holdings = new HashMap<Integer, buttonGUIs>();
-    private InventoryHolder parent;
+    private HashMap<Integer, ButtonGUIs> holdings = new HashMap<Integer, ButtonGUIs>();
+    private InventoryInterface parent;
     private Player viewer;
-    public mainGUI(int size, String name, InventoryHolder parent)
+    public MainGUI(int size, String name, InventoryInterface parent)
     {
         myGui = Bukkit.createInventory(null, size, name);
         this.name = name;
@@ -37,18 +37,18 @@ public class mainGUI {
     public Player getViewer()
     {
         if (viewer != null) {
-            if (viewer.getOpenInventory().getTopInventory().getName().equals(name)) {
+            if (viewer.getOpenInventory().getTitle().equals(name)) {
                 return viewer;
             }
         }
         return null;
     }
 
-    public void setParent(InventoryHolder parent) {
+    public void setParent(InventoryInterface parent) {
         this.parent = parent;
     }
 
-    public void addButton(buttonGUIs button, int slot)
+    public void addButton(ButtonGUIs button, int slot)
     {
         holdings.put(slot, button);
         Inventory inv = getMyGui();
@@ -61,7 +61,7 @@ public class mainGUI {
         }
         showGUI();
     }
-    public buttonGUIs getButton(int slot)
+    public ButtonGUIs getButton(int slot)
     {
         return holdings.get(slot);
     }
@@ -77,13 +77,13 @@ public class mainGUI {
         player.openInventory(myGui);
     }
 
-    public InventoryHolder getParent() {
+    public InventoryInterface getParent() {
         return parent;
     }
     public void onInventoryClickEvent(InventoryClickEvent event)
     {
         int slot = event.getRawSlot();
-        buttonGUIs button = null;
+        ButtonGUIs button = null;
         if (slot > -1 && slot < 54) {
             button = holdings.get(slot);
         }

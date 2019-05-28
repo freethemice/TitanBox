@@ -1,7 +1,7 @@
 package com.firesoftitan.play.titanbox.guis;
 
-import com.firesoftitan.play.titanbox.TitanBox;
-import com.firesoftitan.play.titanbox.enums.buttonEnum;
+import com.firesoftitan.play.titanbox.Utilities;
+import com.firesoftitan.play.titanbox.enums.ButtonEnum;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
-public class buttonGUIs {
+public class ButtonGUIs {
 
     private ItemStack materialTrue = null;
     private ItemStack materialFalse = null;
@@ -19,16 +19,16 @@ public class buttonGUIs {
     private String nameFalse = "";
     private int slot = -1;
     private List<String> lore = new ArrayList<String>();
-    private mainGUI parent;
-    private buttonEnum type;
-    private ItemStack blank = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 12);
+    private MainGUI parent;
+    private ButtonEnum type;
+    private ItemStack blank = new ItemStack(Material.BROWN_STAINED_GLASS_PANE);
 
 
-    public buttonGUIs(mainGUI parent, int slot)
+    public ButtonGUIs(MainGUI parent, int slot)
     {
         this.parent = parent;
-        this.blank = TitanBox.changeName(this.blank,"-");
-        this.type = buttonEnum.EMPTY;
+        this.blank = Utilities.changeName(this.blank,"-");
+        this.type = ButtonEnum.EMPTY;
         this.slot = slot;
     }
 
@@ -36,7 +36,7 @@ public class buttonGUIs {
         this.blank = blank;
     }
 
-    public mainGUI getParent() {
+    public MainGUI getParent() {
         return parent;
     }
 
@@ -60,12 +60,12 @@ public class buttonGUIs {
     public void setMaterialTrue(ItemStack materialTrue) {
         this.materialTrue = materialTrue.clone();
     }
-    public void setToggle(buttonEnum bEnum)
+    public void setToggle(ButtonEnum bEnum)
     {
         type = bEnum;
         parent.getMyGui().setItem(getSlot(), getButton());
     }
-    public buttonEnum getToggle() {
+    public ButtonEnum getToggle() {
         return type;
     }
 
@@ -127,30 +127,30 @@ public class buttonGUIs {
 
                 if (materialTrue == null)
                 {
-                    battery = TitanBox.getSkull(textureTrue);
+                    battery = Utilities.getSkull(textureTrue);
                 }
                 else
                 {
                     battery = materialTrue.clone();
                 }
-                battery = TitanBox.changeName(battery, this.getName());
-                battery = TitanBox.addLore(true, battery, this.getLore());
+                battery = Utilities.changeName(battery, this.getName());
+                battery = Utilities.addLore(true, battery, this.getLore());
                 return battery.clone();
             case FALSE:
                 if (materialFalse == null)
                 {
-                    battery = TitanBox.getSkull(textureFalse);
+                    battery = Utilities.getSkull(textureFalse);
                 }
                 else
                 {
                     battery = materialFalse.clone();
                 }
-                battery = TitanBox.changeName(battery, this.getName());
-                battery = TitanBox.addLore(true, battery, this.getLore());
+                battery = Utilities.changeName(battery, this.getName());
+                battery = Utilities.addLore(true, battery, this.getLore());
                 return battery.clone();
             case BLANK:
-                battery = TitanBox.changeName(blank.clone(), this.getName());
-                battery = TitanBox.clearLore(battery);
+                battery = Utilities.changeName(blank.clone(), this.getName());
+                battery = Utilities.clearLore(battery);
                 return battery.clone();
             case EMPTY:
                 return null;

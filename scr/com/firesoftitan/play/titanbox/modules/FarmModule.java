@@ -1,11 +1,19 @@
 package com.firesoftitan.play.titanbox.modules;
 
-import com.firesoftitan.play.titanbox.TitanBox;
+import com.firesoftitan.play.titanbox.Utilities;
 import com.firesoftitan.play.titanbox.enums.ModuleTypeEnum;
+import com.firesoftitan.play.titansql.ResultData;
+import com.firesoftitan.play.titansql.TitanSQL;
 import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.Ageable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Crops;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public class FarmModule extends MainModule {
@@ -53,7 +61,7 @@ public class FarmModule extends MainModule {
             {
                 crops[i] = null;
             }
-            saveInfo();
+            needSaving();
             updateGUIClicked(player, this, false);
             player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "All crops removed!");
             return;
@@ -72,17 +80,28 @@ public class FarmModule extends MainModule {
         }
     }
     @Override
+    public void unLinkAll() {
+        this.link = null;
+        for(int i = 0; i < crops.length; i++)
+        {
+            crops[i] = null;
+        }
+        needSaving();
+    }
+
+    @Override
     public boolean setLink(Location link, Player player) {
+        super.setLink(link, player);
         this.link = null;
         ereasme = Long.valueOf(-1);
-        if (link.getBlock().getType() == Material.POTATO || link.getBlock().getType() == Material.CARROT || link.getBlock().getType() == Material.CROPS )
+        if (link.getBlock().getType() == Material.POTATO || link.getBlock().getType() == Material.CARROT || link.getBlock().getType() == Material.WHEAT )
         {
             for(int i = 0; i < crops.length; i++)
             {
                 if (crops[i] != null) {
                     if (crops[i].toString().equalsIgnoreCase(link.toString())) {
                         crops[i] = null;
-                        saveInfo();
+                        needSaving();
                         if (player != null) {
                             player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Crop removed!");
                         }
@@ -97,7 +116,7 @@ public class FarmModule extends MainModule {
                 {
                     crops[i] = link.clone();
 
-                    saveInfo();
+                    needSaving();
                     if (player != null) {
                         player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Crop added!");
                     }
@@ -106,7 +125,7 @@ public class FarmModule extends MainModule {
             }
 
     }
-    saveInfo();
+        needSaving();
         if (player != null) {
         if (getCrops() >= crops.length)
         {
@@ -120,16 +139,18 @@ public class FarmModule extends MainModule {
         return false;
     }
     @Override
-    public void loadInfo() {
-        super.loadInfo();
-        if (modules.contains("modules." + moduleid + ".slots.crops")) {
-            for(int i = 0; i < crops.length; i++) {
-                if (modules.contains("modules." + moduleid + ".slots.crops." + i)) {
-                    crops[i] = modules.getLocation("modules." + moduleid + ".slots.crops." + i);
-                }
-                else
-                {
-                    crops[i] = null;
+    public void loadInfo(HashMap<String, ResultData> result)
+    {
+        super.loadInfo(result);
+        if (result.get("locations") != null) {
+            List<String> tmpWarts = result.get("locations").getStringList();
+            if (tmpWarts != null) {
+                for (int i = 0; i < crops.length; i++) {
+                    if (tmpWarts.size() > i) {
+                        String loc = tmpWarts.get(i);
+                        Location place = TitanSQL.decodeLocation(loc);
+                        crops[i] = place.clone();
+                    }
                 }
             }
         }
@@ -138,9 +159,20 @@ public class FarmModule extends MainModule {
     @Override
     public void saveInfo() {
         super.saveInfo();
+        List<String> tmpWarts = new ArrayList<String>();
+        for(int i = 0; i < crops.length;i++) {
+            if (crops[i] != null)
+            {
+                String saver = TitanSQL.encode(crops[i]);
+                tmpWarts.add(saver);
+            }
+        }
+        modulesSQL.setDataField("locations", tmpWarts);
+        this.sendDate();
+        /*
         for(int i = 0; i < crops.length; i++) {
             modules.setValue("modules." + moduleid + ".slots.crops." + i, crops[i]);
-        }
+        }*/
     }
 
     @Override
@@ -190,26 +222,39 @@ public class FarmModule extends MainModule {
             lastran = System.currentTimeMillis();
             getNextWart();
             if (crops[treeIndex] != null) {
-                if (crops[treeIndex].getChunk().isLoaded()) {
-                    crops[treeIndex].getWorld().spawnParticle(Particle.VILLAGER_HAPPY, crops[treeIndex].clone().add(0.5f, 1, 0.5f), 3);
-                    if (crops[treeIndex].getBlock().getType() == Material.POTATO || crops[treeIndex].getBlock().getType() == Material.CARROT || crops[treeIndex].getBlock().getType() == Material.CROPS) {
-                        if (crops[treeIndex].getBlock().getData() >= 7) {
-                            crops[treeIndex].getBlock().setData((byte) 0);
-                            crops[treeIndex].getWorld().playEffect(crops[treeIndex], Effect.STEP_SOUND, crops[treeIndex].getBlock().getType());
-                            if (crops[treeIndex].getBlock().getType() == Material.CROPS) {
-                                TitanBox.addItemToStorage(owner, Material.WHEAT, 1);
-                                TitanBox.addItemToStorage(owner, Material.SEEDS, 1);
-                            }
-                            if (crops[treeIndex].getBlock().getType() == Material.POTATO) {
-                                TitanBox.addItemToStorage(owner, Material.POTATO_ITEM, 1);
-                            }
-                            if (crops[treeIndex].getBlock().getType() == Material.CARROT) {
-                                TitanBox.addItemToStorage(owner, Material.CARROT_ITEM, 1);
-                            }
+                if (crops[treeIndex].getChunk() != null) {
+                    if (Utilities.isLoaded(crops[treeIndex])) {
+                        Block block = crops[treeIndex].getBlock();
+                        crops[treeIndex].getWorld().spawnParticle(Particle.VILLAGER_HAPPY, crops[treeIndex].clone().add(0.5f, 1, 0.5f), 3);
+                        if (block.getType() == Material.POTATO || block.getType() == Material.CARROT || block.getType() == Material.WHEAT) {
+                            org.bukkit.material.Crops cropsState = (Crops) block.getState().getData();
 
-                        } else {
-                            if (TitanBox.hasItem(owner, Material.INK_SACK, (short) 15)) {
-                                crops[treeIndex].getBlock().setData((byte) 7);
+                            Ageable ageable = (Ageable)block.getBlockData();
+                            if (ageable.getAge() == ageable.getMaximumAge()) {
+                                ageable.setAge(0);
+                                block.setBlockData(ageable);
+                                crops[treeIndex].getWorld().playEffect(crops[treeIndex], Effect.STEP_SOUND, crops[treeIndex].getBlock().getType());
+
+                                if (block.getType() == Material.WHEAT || block.getType() == Material.WHEAT_SEEDS) {
+                                    Utilities.addItemToStorage(owner, Material.WHEAT, 1);
+                                    Utilities.addItemToStorage(owner, Material.WHEAT_SEEDS, 1);
+                                }
+                                else if (block.getType() == Material.POTATO) {
+                                    Utilities.addItemToStorage(owner, Material.POTATOES, 1);
+                                }
+                                else if (block.getType() == Material.CARROT) {
+                                    Utilities.addItemToStorage(owner, Material.CARROTS, 1);
+                                }
+                                else {
+                                    Utilities.addItemToStorage(owner, Material.NETHER_WART, 2);
+                                }
+
+                            } else {
+                                if (Utilities.hasItemInStorage(owner, Material.BONE_MEAL)) {
+                                    ageable.setAge(ageable.getMaximumAge());
+                                    block.setBlockData(ageable);
+
+                                }
                             }
                         }
                     }

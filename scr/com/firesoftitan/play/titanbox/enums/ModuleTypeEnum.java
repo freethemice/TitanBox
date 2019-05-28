@@ -9,9 +9,10 @@ public enum ModuleTypeEnum {
     Inventory("Inventory", "Linking Module", new ItemStack(Material.BOOKSHELF, 1)),
     Cobblestone("Cobblestone", "Cobblestone Module", new ItemStack(Material.COBBLESTONE, 1)),
     Bucket("Bucket", "Bucket Module", new ItemStack(Material.BUCKET, 1)),
-    Fishing("Fishing", "Fishing Module", new ItemStack(Material.FISHING_ROD, 1)),
-    Lumberjack("Lumberjack", "Lumberjack Module", new ItemStack(Material.DIAMOND_AXE, 1)),
+    //Fishing("Fishing", "Fishing Module", new ItemStack(Material.FISHING_ROD, 1)),
+    //Lumberjack("Lumberjack", "Lumberjack Module", new ItemStack(Material.DIAMOND_AXE, 1)),
     Ice("Ice", "Ice Module", new ItemStack(Material.ICE, 1)),
+    Placer("Placer", "Placer Module", new ItemStack(Material.DISPENSER, 1)),
     Item("Item", "Item Module", new ItemStack(Material.HOPPER, 1)),
     Killer("Killer", "Killer Module", new ItemStack(Material.DIAMOND_SWORD, 1)),
     Infernal("Infernal", "Infernal Module", new ItemStack(Material.NETHER_WART_BLOCK, 1)),
@@ -53,14 +54,14 @@ public enum ModuleTypeEnum {
         {
             return new BucketsModule();
         }
-        if (this.type.equals("Fishing"))
+        /*if (this.type.equals("Fishing"))
         {
             return new FisherModule();
-        }
-        if (this.type.equals("Lumberjack"))
+        }*/
+       /* if (this.type.equals("Lumberjack"))
         {
             return new LumberjackModule();
-        }
+        }*/
         if (this.type.equals("Ice"))
         {
             return new IceModule();
@@ -72,6 +73,10 @@ public enum ModuleTypeEnum {
         if (this.type.equals("Killer"))
         {
             return new KillerModule();
+        }
+        if (this.type.equals("Placer"))
+        {
+            return new PlacerModule();
         }
         if (this.type.equals("Infernal"))
         {

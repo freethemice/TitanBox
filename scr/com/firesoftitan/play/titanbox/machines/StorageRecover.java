@@ -1,8 +1,7 @@
 package com.firesoftitan.play.titanbox.machines;
 
-import com.firesoftitan.play.titanbox.TitanBox;
-import com.firesoftitan.play.titanbox.holders.ItemHolder;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import com.firesoftitan.play.titanbox.Utilities;
+import com.firesoftitan.play.titanbox.enums.ItemEnum;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -25,14 +24,15 @@ public class StorageRecover {
     }
     public static ItemStack getMeAsDrop()
     {
-        ItemStack BackpackRecover = TitanBox.getSkull(ItemHolder.STORAGE.getTexute());
-        BackpackRecover = TitanBox.changeName(BackpackRecover, ChatColor.YELLOW + "Storage Recover");
-        BackpackRecover = TitanBox.addLore(BackpackRecover, ChatColor.WHITE + "Recovers TitanBox Storage Units", ChatColor.WHITE + "Must have new Storage with same size or greater.", ChatColor.WHITE + "in your inventory");
+        ItemStack BackpackRecover = Utilities.getSkull(ItemEnum.STORAGE.getTexute());
+        BackpackRecover = Utilities.changeName(BackpackRecover, ChatColor.YELLOW + "Storage Recover");
+        BackpackRecover = Utilities.addLore(BackpackRecover, ChatColor.WHITE + "Recovers TitanBox Storage Units", ChatColor.WHITE + "Must have new Storage with same size or greater.", ChatColor.WHITE + "in your inventory");
 
         return BackpackRecover;
     }
     public static void openGui(Player player)
     {
+        Utilities.scanInventory(player);
         Inventory guiRecover = Bukkit.createInventory(null, 54, "TitanBox: Recover for " + player.getName());
         for(StorageUnit tmp: StorageUnit.StorageById.values())
         {
@@ -44,7 +44,7 @@ public class StorageRecover {
                 }
                 else
                 {
-                    TitanBox.placeSkull(tmp.getLocation().getBlock(), tmp.getMe().getTexute());
+                    Utilities.placeSkull(tmp.getLocation().getBlock(), tmp.getMe().getTexute());
                 }
             }
         }
@@ -53,12 +53,12 @@ public class StorageRecover {
     }
     public static void onInventoryClickEvent(InventoryClickEvent event) {
 
-        if (event.getInventory().getName().startsWith("TitanBox: Recover for "))
+        if (event.getView().getTitle().startsWith("TitanBox: Recover for "))
         {
             event.setCancelled(true);
 
             ItemStack item = event.getInventory().getItem(event.getRawSlot());
-            if (!TitanBox.isEmpty(item))
+            if (!Utilities.isEmpty(item))
             {
                 String id = ChatColor.stripColor(item.getItemMeta().getLore().get(0));
                 StorageUnit tmp = null;
@@ -66,32 +66,7 @@ public class StorageRecover {
                     tmp = StorageUnit.StorageById.get(id);
                 }
                 if (tmp !=null) {
-                    for (int i = 0; i < 36; i++) {
-                        ItemStack checking = event.getWhoClicked().getInventory().getItem(i);
-                        if (!TitanBox.isEmpty(checking)) {
-                            if (checking.hasItemMeta()) {
-                                if (checking.getItemMeta().hasDisplayName()) {
-                                    if (checking.getItemMeta().getDisplayName().startsWith(ChatColor.YELLOW + "New Storage Unit, Size: ")) {
-                                        int size = Integer.parseInt(ChatColor.stripColor(checking.getItemMeta().getDisplayName()).replace("New Storage Unit, Size: ", ""));
-                                        if (size >= tmp.getSize())
-                                        {
-                                            event.getWhoClicked().getInventory().addItem(item.clone());
-                                            if (checking.getAmount() > 1)
-                                            {
-                                                checking.setAmount(checking.getAmount() - 1);
-                                                event.getWhoClicked().getInventory().setItem(i, checking);
-                                            }
-                                            else
-                                            {
-                                                event.getWhoClicked().getInventory().setItem(i, null);
-                                            }
-                                            return;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    event.getWhoClicked().getInventory().addItem(item.clone());
                 }
             }
 
@@ -111,7 +86,7 @@ public class StorageRecover {
     public static void onBlockBreakEvent(BlockBreakEvent event)
     {
         Block Broken = event.getBlock();
-        if ((GriefPrevention.instance.allowBreak(event.getPlayer(), Broken, Broken.getLocation()) == null) || event.getPlayer().hasPermission("titanbox.admin")) {
+        if ((Utilities.hasBuildRights(event.getPlayer(),  Broken.getLocation())) ) {
             String key = getLocationKey(Broken.getLocation());
             if (key != null) {
                 if (BackpackRecover.recovers.contains("recovers.storage."  + key)) {
@@ -137,7 +112,7 @@ public class StorageRecover {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             if (event.getClickedBlock() != null) {
                 Block Broken = event.getClickedBlock();
-                if ((GriefPrevention.instance.allowBuild(event.getPlayer(), Broken.getLocation()) == null) || event.getPlayer().hasPermission("titanbox.admin")) {
+                if ((Utilities.hasBuildRights(event.getPlayer(), Broken.getLocation(), true)) ) {
                     String key = getLocationKey(Broken.getLocation());
                     if (key != null) {
                         if (BackpackRecover.recovers.contains("recovers.storage." + key)) {
@@ -148,22 +123,24 @@ public class StorageRecover {
             }
         }
     }
-    public static void onBlockPlaceEvent(BlockPlaceEvent event) {
+    public static boolean onBlockPlaceEvent(BlockPlaceEvent event) {
         ItemStack item = event.getItemInHand();
         if (item != null) {
             if (item.hasItemMeta()) {
                 if (item.getItemMeta().hasDisplayName()) {
                     if (item.getItemMeta().getDisplayName().startsWith(ChatColor.YELLOW + "Storage Recover")) {
                         Block Placed = event.getBlockPlaced();
-                        if ((GriefPrevention.instance.allowBuild(event.getPlayer(), Placed.getLocation()) == null) || event.getPlayer().hasPermission("titanbox.admin")) {
+                        if ((Utilities.hasBuildRights(event.getPlayer(), Placed.getLocation())) ) {
                             String key = getLocationKey(Placed.getLocation());
                             if (key != null) {
                                 BackpackRecover.recovers.setValue("recovers.storage." + key, true);
                             }
                         }
+                        return true;
                     }
                 }
             }
         }
+        return false;
     }
 }

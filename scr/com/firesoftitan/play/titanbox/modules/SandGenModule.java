@@ -1,14 +1,16 @@
 package com.firesoftitan.play.titanbox.modules;
 
-import com.firesoftitan.play.titanbox.TitanBox;
+import com.firesoftitan.play.titanbox.Utilities;
 import com.firesoftitan.play.titanbox.enums.ModuleTypeEnum;
 import com.firesoftitan.play.titanbox.machines.Pumps;
+import com.firesoftitan.play.titansql.ResultData;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 public class SandGenModule extends MainModule {
@@ -42,7 +44,7 @@ public class SandGenModule extends MainModule {
     public void OpenGui(Player player)
     {
         ItemStack mainHand = player.getInventory().getItemInMainHand();
-        if (!TitanBox.isEmpty(mainHand)) {
+        if (!Utilities.isEmpty(mainHand)) {
             MainModule mh = MainModule.getModulefromItem(mainHand);
             if (mh != null) {
                     mh.clearInfo();
@@ -59,7 +61,16 @@ public class SandGenModule extends MainModule {
 
     }
     @Override
+    public void unLinkAll()
+    {
+        this.link = null;
+        this.waterPump = null;
+        this.lavaPump = null;
+        needSaving();
+    }
+    @Override
     public boolean setLink(Location link, Player player) {
+        super.setLink(link, player);
         String pump = Pumps.getPumpType(link);
         this.link = null;
         if (pump != null)
@@ -67,7 +78,7 @@ public class SandGenModule extends MainModule {
             if (pump.equals("Water"))
             {
                 this.waterPump = link.clone();
-                saveInfo();
+                needSaving();
                 if (player != null) {
                     player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Water pummp linked!");
                 }
@@ -76,34 +87,42 @@ public class SandGenModule extends MainModule {
             if(pump.equals("Lava"))
             {
                 this.lavaPump = link.clone();
-                saveInfo();
+                needSaving();
                 if (player != null) {
                     player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "Lava pummp linked!");
                 }
                 return true;
             }
         }
-        saveInfo();
+        needSaving();
         return false;
     }
     @Override
-    public void loadInfo() {
-        super.loadInfo();
+    public void loadInfo(HashMap<String, ResultData> result)
+    {
+        super.loadInfo(result);
         waterPump = null;
         lavaPump = null;
-        if (modules.contains("modules." + moduleid + ".slots.waterpump")) {
-            waterPump = modules.getLocation("modules." + moduleid + ".slots.waterpump");
+        if (result.get("pump_a") != null) {
+            if (result.get("pump_a").getLocation() != null) {
+                waterPump = result.get("pump_a").getLocation().clone();
+            }
         }
-        if (modules.contains("modules." + moduleid + ".slots.lavapump")) {
-            lavaPump = modules.getLocation("modules." + moduleid + ".slots.lavapump");
+        if (result.get("pump_b") != null) {
+            if (result.get("pump_b").getLocation() != null) {
+                lavaPump = result.get("pump_b").getLocation().clone();
+            }
         }
     }
 
     @Override
     public void saveInfo() {
         super.saveInfo();
-        modules.setValue("modules." + moduleid + ".slots.waterpump", waterPump);
-        modules.setValue("modules." + moduleid + ".slots.lavapump", lavaPump);
+        modulesSQL.setDataField("pump_a", waterPump);
+        modulesSQL.setDataField("pump_b", lavaPump);
+        this.sendDate();
+        //modules.setValue("modules." + moduleid + ".slots.waterpump", waterPump);
+        //modules.setValue("modules." + moduleid + ".slots.lavapump", lavaPump);
     }
 
     @Override
@@ -115,20 +134,22 @@ public class SandGenModule extends MainModule {
     @Override
     public ItemStack getMeAsIcon()
     {
-        return new ItemStack(Material.SAND, 1);
+        if (isLoaded()) {
+            return new ItemStack(Material.SAND, 1);
+        }
+        return new ItemStack(Material.PAPER, 1);
     }
     @Override
     public boolean isLoaded()
     {
         if (waterPump != null && lavaPump !=null)
         {
-            if (waterPump.getChunk().isLoaded() && lavaPump.getChunk().isLoaded())
-            {
-                return  true;
-            }
-            else
-            {
-                return false;
+            if (waterPump.getChunk() != null) {
+                if (Utilities.isLoaded(waterPump) && Utilities.isLoaded(lavaPump)) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
         }
         return true;
@@ -140,19 +161,19 @@ public class SandGenModule extends MainModule {
         {
             if (Pumps.getLiquid(waterPump, "Water") && Pumps.getLiquid(lavaPump, "Lava"))
             {
-                TitanBox.addItemToStorage(owner, Material.SAND, 64);
-                TitanBox.addItemToStorage(owner, Material.SAND, 64);
+                Utilities.addItemToStorage(owner, Material.SAND, 64);
+                Utilities.addItemToStorage(owner, Material.SAND, 64);
             }
         }
         else
         {
-            if (TitanBox.hasItem(owner, Material.WATER_BUCKET))
+            if (Utilities.hasItemInStorage(owner, Material.WATER_BUCKET))
             {
-                if (TitanBox.hasItem(owner, Material.LAVA_BUCKET)) {
-                    TitanBox.addItemToStorage(owner, Material.SAND, 64);
-                    TitanBox.addItemToStorage(owner, Material.BUCKET, 1);
+                if (Utilities.hasItemInStorage(owner, Material.LAVA_BUCKET)) {
+                    Utilities.addItemToStorage(owner, Material.SAND, 64);
+                    Utilities.addItemToStorage(owner, Material.BUCKET, 1);
                 }
-                TitanBox.addItemToStorage(owner, Material.BUCKET, 1);
+                Utilities.addItemToStorage(owner, Material.BUCKET, 1);
             }
         }
     }

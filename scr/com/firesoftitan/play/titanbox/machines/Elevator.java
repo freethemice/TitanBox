@@ -1,8 +1,7 @@
 package com.firesoftitan.play.titanbox.machines;
 
-import com.firesoftitan.play.titanbox.TitanBox;
+import com.firesoftitan.play.titanbox.Utilities;
 import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -58,6 +57,7 @@ public class Elevator {
                 elevatorByLocation.put(key, myList);
             }
         }
+        System.out.println("[TitanBox]: All Elevators Loaded: " + elevatorByLocation.size());
     }
     public static void onPlayerMoveEvent(PlayerMoveEvent event) {
         Location to = event.getTo();
@@ -135,14 +135,15 @@ public class Elevator {
 
         }
     }
-    public static void onBlockPlaceEvent(BlockPlaceEvent event) {
+    public static boolean onBlockPlaceEvent(BlockPlaceEvent event) {
         ItemStack item = event.getItemInHand();
         if (item != null) {
             if (item.hasItemMeta()) {
                 if (item.getItemMeta().hasDisplayName()) {
                     if (item.getItemMeta().getDisplayName().startsWith(ChatColor.YELLOW + "Elevator")) {
                         Block Placed = event.getBlockPlaced();
-                        if ((GriefPrevention.instance.allowBuild(event.getPlayer(), Placed.getLocation()) == null) || event.getPlayer().hasPermission("titanbox.admin")) {
+                        if (Utilities.hasBuildRights(event.getPlayer(), Placed.getLocation()))
+                        {
                             List<Integer> floors = new ArrayList<Integer>();
                             String key = getKey(Placed.getLocation());
                             if (elevatorByLocation.containsKey(key))
@@ -156,10 +157,12 @@ public class Elevator {
                                 saveAllElevators();
                             }
                         }
+                        return true;
                     }
                 }
             }
         }
+        return false;
     }
     public static List<Integer> removeDuplicatesAndOrder(List<Integer> floor)
     {
@@ -181,7 +184,7 @@ public class Elevator {
     public static void onBlockBreakEvent(BlockBreakEvent event)
     {
         Block Broken = event.getBlock();
-        if ((GriefPrevention.instance.allowBreak(event.getPlayer(), Broken, Broken.getLocation()) == null) || event.getPlayer().hasPermission("titanbox.admin")) {
+        if ((Utilities.hasBuildRights(event.getPlayer(),Broken.getLocation())) ) {
             String key = getKey(Broken.getLocation());
             if (elevatorByLocation.containsKey(key)) {
                 List<Integer> floors = elevatorByLocation.get(key);
@@ -201,9 +204,9 @@ public class Elevator {
     }
     public static ItemStack getMeAsDrop()
     {
-        ItemStack elevator = new ItemStack(Material.SILVER_GLAZED_TERRACOTTA);
-        elevator = TitanBox.changeName(elevator, ChatColor.YELLOW + "Elevator");
-        elevator = TitanBox.addLore(elevator, ChatColor.WHITE + "Links to other elevators",  ChatColor.WHITE + "Directly above or below", ChatColor.WHITE + "Jump to go up", ChatColor.WHITE + "Sneak to go down");
+        ItemStack elevator = new ItemStack(Material.LIGHT_GRAY_GLAZED_TERRACOTTA);
+        elevator = Utilities.changeName(elevator, ChatColor.YELLOW + "Elevator");
+        elevator = Utilities.addLore(elevator, ChatColor.WHITE + "Links to other elevators",  ChatColor.WHITE + "Directly above or below", ChatColor.WHITE + "Jump to go up", ChatColor.WHITE + "Sneak to go down");
         return elevator;
 
     }

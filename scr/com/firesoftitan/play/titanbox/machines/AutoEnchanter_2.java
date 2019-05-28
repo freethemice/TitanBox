@@ -1,5 +1,6 @@
 package com.firesoftitan.play.titanbox.machines;
 
+import com.firesoftitan.play.titanbox.managers.SlimefunItemsManager;
 import me.mrCookieSlime.Slimefun.Lists.RecipeType;
 import me.mrCookieSlime.Slimefun.Objects.Category;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineHelper;
@@ -17,6 +18,7 @@ public class AutoEnchanter_2 extends AutoEnchanter {
     private long timepass = 0;
     public AutoEnchanter_2(Category category, ItemStack item, String name, RecipeType recipeType, ItemStack[] recipe) {
         super(category, item, name, recipeType, recipe);
+        SlimefunItemsManager.addTitanItem(item.clone());
     }
     @Override
     public String getInventoryTitle() {

@@ -1,169 +1,240 @@
 package com.firesoftitan.play.titanbox;
 
+import com.firesoftitan.play.titanbox.enums.ItemEnum;
 import com.firesoftitan.play.titanbox.enums.ModuleTypeEnum;
-import com.firesoftitan.play.titanbox.holders.ItemHolder;
-import com.firesoftitan.play.titanbox.holders.RouterHolder;
-import com.firesoftitan.play.titanbox.holders.SlimefunItemsHolder;
-import com.firesoftitan.play.titanbox.listeners.ListenerMain;
+import com.firesoftitan.play.titanbox.guis.DataCenterGUI;
+import com.firesoftitan.play.titanbox.guis.MailboxGUI;
+import com.firesoftitan.play.titanbox.guis.PickAPlayerGUI;
+import com.firesoftitan.play.titanbox.items.ChestMover;
+import com.firesoftitan.play.titanbox.listeners.*;
 import com.firesoftitan.play.titanbox.machines.*;
-import com.firesoftitan.play.titanbox.modules.InventoryModule;
+import com.firesoftitan.play.titanbox.managers.*;
+import com.firesoftitan.play.titanbox.managers.protection.ForceFieldManager;
+import com.firesoftitan.play.titanbox.managers.protection.PlayerProtectionManager;
+import com.firesoftitan.play.titanbox.managers.protection.WorldManager;
 import com.firesoftitan.play.titanbox.modules.MainModule;
-import com.firesoftitan.play.titanbox.runnables.MainRunnable;
-import com.firesoftitan.play.titanbox.runnables.RouterRunable;
-import com.firesoftitan.play.titanbox.runnables.SaverRunable;
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
+import com.firesoftitan.play.titanbox.runnables.*;
+import com.firesoftitan.play.titansql.CallbackResults;
+import com.firesoftitan.play.titansql.DataTypeEnum;
+import com.firesoftitan.play.titansql.ResultData;
+import com.firesoftitan.play.titansql.Table;
 import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
-import me.mrCookieSlime.CSCoreLibPlugin.general.World.CustomSkull;
+import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunItem;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AContainer;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.energy.EnergyNet;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
-import me.ryanhamshire.GriefPrevention.PlayerData;
-import net.milkbowl.vault.economy.Economy;
-import net.minecraft.server.v1_12_R1.*;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+import net.minecraft.server.v1_14_R1.MinecraftServer;
+import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import org.bukkit.*;
-import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Item;
+import org.bukkit.craftbukkit.v1_14_R1.CraftServer;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.*;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.text.NumberFormat;
+import java.lang.reflect.Method;
 import java.util.*;
 
 public class TitanBox extends JavaPlugin
 {
     public static SlimefunSetup setup;
     public static TitanBox instants;
-    public static ListenerMain listen;
-    public static Config config = new Config("plugins" + File.separator + "TitanBox" + File.separator  + "config.yml");
-    public static Config barcodes = new Config("data-storage" + File.separator + "TitanBox" + File.separator  + "barcodes.yml");
-    public Economy economy;
-    public static long cost = 10000;
-    public HashMap<String, EntityPlayer> npcs;
-    private static final NavigableMap<Long, String> suffixes = new TreeMap<> ();
-    private static HashMap<EntityType, String> bToMConversion;
+
+    public static MainListener listen;
+    public static ArmorListener armorListener;
+    public static ProtectionListener prolisten;
+    public static XRayListener xraylisten;
+    public static ShopListener shoplisten;
+
+    public static Config settings = new Config("plugins" + File.separator + "TitanBox" + File.separator  + "settings.yml");
+
+    public static Table mailbox_SQL;
+
     private RouterRunable RouterTimer = new RouterRunable();
     private SaverRunable SaverTimer = new SaverRunable();
+
+    public static List<UUID> bypassCommands = new ArrayList<UUID>();
+    public static List<UUID> bypassProtection = new ArrayList<UUID>();
+
+    public List<ForceFieldManager> adminList = new ArrayList<ForceFieldManager>();
+
+    public HashMap<UUID, PickAPlayerGUI> pickPlayer = new HashMap<UUID, PickAPlayerGUI>();
+    public HashMap<UUID, ChatGetterRunnable> chatPlayer = new HashMap<UUID, ChatGetterRunnable>();
+
+    public static List<String> packagesIDS = new ArrayList<String>();
+
+    public ChestMover chestMover = new ChestMover();
+
     public static long isRunning = 0;
-    static {
-        bToMConversion = new HashMap<EntityType, String> ();
-        bToMConversion.put(EntityType.MUSHROOM_COW, "mooshroom");
-        bToMConversion.put(EntityType.PIG_ZOMBIE, "zombie_pigman");
-        suffixes.put(1_000L, "k");
-        suffixes.put(1_000_000L, "M");
-        suffixes.put(1_000_000_000L, "G");
-        suffixes.put(1_000_000_000_000L, "T");
-        suffixes.put(1_000_000_000_000_000L, "P");
-        suffixes.put(1_000_000_000_000_000_000L, "E");
+
+    public UpdateChecker updateChecker;
+
+    public void getNextMessage(Player player, ChatGetterRunnable chatGetterRunnable, String message)
+    {
+        this.chatPlayer.put(player.getUniqueId(), chatGetterRunnable);
+        player.sendMessage(ChatColor.AQUA + message);
     }
 
-    public static String format(long value) {
-        //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
-        if (value == Long.MIN_VALUE) return format(Long.MIN_VALUE + 1);
-        if (value < 0) return "-" + format(-value);
-        if (value < 1000) return Long.toString(value); //deal with easy case
-
-        Map.Entry<Long, String> e = suffixes.floorEntry(value);
-        Long divideBy = e.getKey();
-        String suffix = e.getValue();
-
-        long truncated = value / (divideBy / 10); //the number part of the output times 10
-        boolean hasDecimal = truncated < 100 && (truncated / 10d) != (truncated / 10);
-        return hasDecimal ? (truncated / 10d) + suffix : (truncated / 10) + suffix;
-    }
-    public static String formatCommas(Long value)
-    {
-        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
-        String numberAsString = numberFormat.format(value);
-        return numberAsString;
-    }
-    public static String formatCommas(double value)
-    {
-        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
-        String numberAsString = numberFormat.format(value);
-        return numberAsString;
-    }
-    public static String convertToTimePasted(long lastping)
-    {
-        long last = System.currentTimeMillis() - lastping;
-        String time = " Seconds";
-        last = last / 1000;
-        if (last > 60)
-        {
-            time = " Minutes";
-            last = last / 60;
-            if (last > 60)
-            {
-                time = " Hours";
-                last = last / 60;
-            }
-        }
-        return last + time;
-    }
     public void onEnable()
     {
         instants = this;
 
-        listen = new ListenerMain();
+        listen = new MainListener();
         listen.registerEvents();
+
+        prolisten = new ProtectionListener();
+        prolisten.registerEvents();
+
+        armorListener = new ArmorListener();
+        armorListener.registerEvents();
+
+        xraylisten = new XRayListener();
+        xraylisten.registerEvents();
+        XRayManager.loadConfig();
+
+        EggsManager.loadConfig();
+
+        shoplisten = new ShopListener();
+        shoplisten.registerEvents();
+
+        updateChecker = new UpdateChecker(this, "65264");
+        updateChecker.runTaskLater(this, 3*20);
+
         loadConfig();
 
-        economy = getServer().getServicesManager().getRegistration(Economy.class).getProvider();
+        ConfigManager.loadConfig();
 
         MinecraftServer nmsServer = ((CraftServer) Bukkit.getServer()).getServer();
-        npcs = new HashMap<String, EntityPlayer>();
-        for (World world: Bukkit.getWorlds())
-        {
-            WorldServer nmsWorld = ((CraftWorld)world).getHandle();
-            EntityPlayer npc = new EntityPlayer(nmsServer, nmsWorld, new GameProfile(UUID.randomUUID(), "TB_NPC_" + world.getName()), new PlayerInteractManager(nmsWorld));
 
-            npc.setLocation(world.getSpawnLocation().getX(), world.getSpawnLocation().getY(), world.getSpawnLocation().getZ(), 0, 0);
-            CraftPlayer opCr = npc.getBukkitEntity();
-            opCr.setGameMode(GameMode.SURVIVAL);
-            opCr.getPlayer().setGameMode(GameMode.SURVIVAL);
-            opCr.getHandle().playerInteractManager.setGameMode(EnumGamemode.SURVIVAL);
+        NPCManager.load();
 
-            PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(opCr.getUniqueId());
-            playerData.ignoreClaims = true;
-
-            npcs.put(world.getName(), npc);
-        };
+        WorldManager.setupTable();
 
         setup = new SlimefunSetup();
 
-        InventoryModule.loadConfig();
+        WorldManager.loadProtection();
+
+        DataCenterGUI.load_config();
+
+        setupTable();
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new MainRunnable(),25, 25);
 
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new ForceFieldRunnable(), 15, 15);
+
+        Timer getPlayers = new Timer();
+        getPlayers.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                PickAPlayerGUI pickAPlayerGUI = new PickAPlayerGUI(null, new PickAPlayerRunnable() {
+                    @Override
+                    public void run() {
+                        //this is to remove the lag for the first time someone us it.
+                    }
+                });
+                pickAPlayerGUI.buildGUI(0);
+                pickAPlayerGUI = null;
+            }
+        }, 10);
 
 
 
     }
-    public static ItemStack getHead(String Texture)
+    public static void runCommands(Player player, int amount, Location location, List<String> commands)
     {
-        try
+        for(String command: commands)
         {
-            return CustomSkull.getItem(Texture);
-        }catch (Exception e)
-        {
-            return null;
+            runCommand(player, amount, location, command);
         }
+    }
+    public static void runCommand(Player player, int amount, Location location, String commands)
+    {
+        commands = replaceAllPlaceHolders(player, amount, location, commands);
+        if (commands.startsWith("@player "))
+        {
+            commands = commands.replace("@player ", "");
+            player.sendMessage(commands);
+        }
+        else
+        {
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), commands);
+        }
+    }
+    public static String replaceAllPlaceHolders(Player player, int amount, Location location, String command)
+    {
+        if (player != null) {
+            command = command.replace("<name>", player.getName());
+            command = command.replace("<uuid>", player.getUniqueId().toString());
+        }
+        if (location != null) {
+            command = command.replace("<x>", location.getBlockX() + "");
+            command = command.replace("<y>", location.getBlockY() + "");
+            command = command.replace("<z>", location.getBlockZ() + "");
+            command = command.replace("<world>", location.getWorld().getName());
+        }
+        command = command.replace("<amount>", amount +"");
+        command = ChatColor.translateAlternateColorCodes('&', command);
+        return command;
+    }
+    public static void setupTable()
+    {
+        mailbox_SQL = new Table("tb_mailbox");
+        mailbox_SQL.addDataType("id", DataTypeEnum.CHARARRAY, true, false, true);
+        mailbox_SQL.addDataType("topost", DataTypeEnum.UUID, false, false, false);
+        mailbox_SQL.addDataType("frompost", DataTypeEnum.UUID, false, false, false);
+        mailbox_SQL.addDataType("sentpost", DataTypeEnum.LONG, false, false, false);
+        mailbox_SQL.addDataType("item", DataTypeEnum.ITEMSTACK, false, false, false);
+        mailbox_SQL.addDataType("bulk", DataTypeEnum.BOOLEAN, false, false, false);
+        mailbox_SQL.addDataType("received", DataTypeEnum.STRINGLIST, false, false, false);
+        mailbox_SQL.createTable();
+
+        mailbox_SQL.search(new CallbackResults() {
+            @Override
+            public void onResult(List<HashMap<String, ResultData>> results) {
+                if (results != null && results.size() > 0) {
+                    for(int i = 0; i < results.size(); i++)
+                    {
+                        HashMap<String, ResultData> vaules = results.get(i);
+                        String id =vaules.get("id").getString();
+                        TitanBox.packagesIDS.add(id);
+
+                        UUID to = vaules.get("topost").getUUID();
+                        UUID from = vaules.get("frompost").getUUID();
+                        long sent = vaules.get("sentpost").getLong();
+                        ItemStack item = vaules.get("item").getItemStack();
+
+                        if (vaules.get("bulk").getBoolean() == null || !vaules.get("bulk").getBoolean()) {
+                            MailboxGUI mailboxGUI = MailboxGUI.getMailBox(to);
+                            mailboxGUI.loadData(vaules);
+                        }
+                        else {
+                            List<String> uuidsToBe = vaules.get("received").getStringList();
+                            BulkPackageManager packageHolder = new BulkPackageManager(from, to, item.clone(), sent, id);
+                            if (uuidsToBe != null) {
+                                for (String uuidS : uuidsToBe) {
+                                    packageHolder.playerReceived(UUID.fromString(uuidS));
+                                }
+                            }
+                            BulkPackageManager.addNewPackage(packageHolder);
+
+
+                        }
+                    }
+                }
+                for(OfflinePlayer offlinePlayer: Bukkit.getOfflinePlayers())
+                {
+                    MailboxGUI.getMailBox(offlinePlayer.getUniqueId());
+
+                }
+            }
+        });
     }
 
     public boolean checkforTitanStone(ItemStack itemA)
@@ -171,8 +242,8 @@ public class TitanBox extends JavaPlugin
         if (itemA != null) {
             if (itemA.getItemMeta() != null) {
                 if (itemA.getItemMeta().hasDisplayName() && itemA.getItemMeta().hasLore()) {
-                    if (itemA.getItemMeta().getDisplayName().equals(SlimefunItemsHolder.TitanStone.getItemMeta().getDisplayName())) {
-                        if (TitanBox.equalsLore(itemA.getItemMeta().getLore(), SlimefunItemsHolder.TitanStone.getItemMeta().getLore())) {
+                    if (itemA.getItemMeta().getDisplayName().equals(SlimefunItemsManager.TitanStone.getItemMeta().getDisplayName())) {
+                        if (Utilities.equalsLore(itemA.getItemMeta().getLore(), SlimefunItemsManager.TitanStone.getItemMeta().getLore())) {
                             return true;
                         }
                     }
@@ -183,85 +254,23 @@ public class TitanBox extends JavaPlugin
     }
 
 
-    public static void placeSkull(Block block, String skulltexture) {
-        // maybe one day Bukkit will have a block set method which takes a MaterialData
-        try {
-            if (block.getLocation().equals(block.getLocation())) {
-                if (CustomSkull.getItem(skulltexture) != null) {
-                    try {
-                        if (block.getType() != Material.SKULL) {
-                            block.setType(Material.SKULL);
-                        }
-                        if (block.getData() != (byte) 0x1) {
-                            block.setData((byte) 0x1); // Floor
-                        }
-                        Skull skullE = ((Skull) block.getState());
-                        if (skullE.getRotation() != BlockFace.NORTH) {
-                            skullE.setRotation(BlockFace.NORTH);
-                            skullE.update();
-                        }
-
-                        CustomSkull.setSkull(block, skulltexture);
-
-
-                    } catch (Exception e) {
-  //                      MaterialData md = new MaterialData(Material.BOOK);
-
-//                        block.setTypeIdAndData(getMaterialData().getItemTypeId(), getMaterialData().getData(), true);
-                    }
-
-                } else {
-                    //block.setTypeIdAndData(getMaterialData().getItemTypeId(), getMaterialData().getData(), true);
-                }
-            }
-        }
-        catch (Exception e)
-        {
-
-        }
-    }
-
-    public static GameProfile getNonPlayerProfile(String skinURL) {
-        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-        byte[] encodedData = Base64.getEncoder().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", skinURL).getBytes());
-        profile.getProperties().put("textures", new Property("textures", new String(encodedData)));
-
-
-        //GameProfile newSkinProfile = new GameProfile(UUID.randomUUID(), null);
-        //newSkinProfile.getProperties().put("textures", new Property("textures", Base64Coder.encodeString("{textures:{SKIN:{url:\"" + "http://textures.minecraft.net/texture/" + skinURL + "\"}}}")));
-        //newSkinProfile.getProperties().put("textures", new Property("textures", Base64Coder.encodeString("{textures:[{Value:\"" + skinURL + "\"}]}")));
-        //return newSkinProfile;
-        return profile;
-    }
     private void loadConfig()
     {
-
+        //ChargableBlock.registerChargableBlock("FOTStorageUnti", 100, true);
         EnergyNet.registerComponent("FOTStorageUnti", EnergyNet.NetworkComponent.CONSUMER);
 
         StorageUnit.loadStorage();
 
-        MainModule.loadAllModules();
+//        MainModule.loadAllModules();
 
-        RouterHolder.loadAllRouters();
+        //RouterManager.loadAllRouters();
 
         Elevator.loadAllElevators();
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(TitanBox.instants, SaverTimer, 12000, 12000);
 
-        //Bukkit.getScheduler().scheduleSyncRepeatingTask(TitanBox.instants, RouterTimer, 200, RouterHolder.speed);
+        //Bukkit.getScheduler().scheduleSyncRepeatingTask(TitanBox.instants, RouterTimer, 200, RouterManager.speed);
 
-    }
-    public List<Entity>  getNearbyEntities(Location loc)
-    {
-        return getNearbyEntities(loc, 5);
-    }
-    public List<Entity>  getNearbyEntities(Location loc, int rad)
-    {
-        EntityPlayer npc = TitanBox.instants.npcs.get(loc.getWorld().getName());
-        npc.setLocation(loc.getX(), loc.getY(), loc.getZ(), 0, 0);
-        CraftPlayer opCr = npc.getBukkitEntity();
-        List<Entity> nearEntity = opCr.getNearbyEntities(rad,rad,rad);
-        return nearEntity;
     }
     public void checkRegisterdPower()
     {
@@ -270,37 +279,95 @@ public class TitanBox extends JavaPlugin
             EnergyNet.registerComponent("FOTStorageUnti", EnergyNet.NetworkComponent.CONSUMER);
         }
     }
-
+    public boolean isInField(Location ofBlock) {
+        ForceFieldManager ffH = WorldManager.getWorldHolder(ofBlock.getWorld()).getFieldIn(ofBlock);
+        if (ffH != null)
+        {
+            return true;
+        }
+        return false;
+    }
+    public boolean isBlockPlayer(Location ofBlock, Player player) {
+        if (player == null) return false;
+        ForceFieldManager ffH = WorldManager.getWorldHolder(ofBlock.getWorld()).getFieldIn(ofBlock);
+        if (ffH != null)
+        {
+            if (!ffH.hasRights(player.getUniqueId()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
     private void setDefault(String name) {
 
 
     }
-    public static ItemStack getItemStackFromBlock(Location block)
-    {
-        return getItemStackFromBlock(block.getBlock());
-    }
-    public static ItemStack getItemStackFromBlock(Block block)
-    {
-        ItemStack test = block.getState().getData().toItemStack(1);
-        return test.clone();
-    }
+
     public void saveEveryThing()
     {
+        ItemRecovery.instance.kickOutProcessing();
+        DeathRecovery.instance.kickOutProcessing();
+        for(WorldManager worldManager : WorldManager.getAll())
+        {
+            worldManager.Save();
+        }
         StorageUnit.saveStorage();
-        MainModule.saveModules();
-        RouterHolder.saveRoutes();
         Pumps.savePumps();
         Elevator.saveElevators();
         BackpackRecover.saveRecovers();
-        barcodes.save();
-        config.save();
-        ElectricMiner.miners.save();
+        MainModule.saveALL();
+        ItemRoutingRouter.saveAll();
+
+        MailboxGUI.saveALL();
+
+        BulkPackageManager.saveAll();
+
+        BarcodeManager.save();
+
+        ConfigManager.save();
+        settings.save();
     }
 
     public void onDisable()
     {
+        System.out.println("[TitanBox]: Disabling...");
+        ejectEveryThing();
         saveEveryThing();
+        System.out.println("[TitanBox]: Disabled.");
     }
+    public void ejectEveryThing()
+    {
+        List<Block> removeme = new ArrayList<Block>();
+        for(Block block: AContainer.processing.keySet())
+        {
+            ItemStack[] item = AContainer.processing.get(block).getOutput().clone();
+            String id = BlockStorage.checkID(block);
+            BlockMenu inventory = BlockStorage.getInventory(block);
+            SlimefunItem slimefunItem = AContainer.getByID(id);
+            if (slimefunItem instanceof AContainer)
+            {
+                AContainer container = (AContainer)slimefunItem;
+                inventory.replaceExistingItem(22, new CustomItem(new MaterialData(Material.BLACK_STAINED_GLASS_PANE), " "));
+
+                try {
+                    Method method = AContainer.class.getDeclaredMethod("pushItems", new Class[]{Block.class, ItemStack[].class});
+                    method.setAccessible(true);
+                    method.invoke(container, block, item);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                removeme.add(block);
+            }
+        }
+        for(Block block: removeme)
+        {
+            AContainer.progress.remove(block);
+            AContainer.processing.remove(block);
+        }
+    }
+
 
     public static boolean checkStorageForItem(UUID owner,ItemStack toInsert)
     {
@@ -309,208 +376,13 @@ public class TitanBox extends JavaPlugin
             if (stH.getOwner().toString().equals(owner.toString())) {
                 for (int i =0; i < stH.getSize(); i++) {
                     ItemStack stack = stH.viewSlot(i);
-                    if (TitanBox.isItemEqual(toInsert, stack)) {
+                    if (Utilities.isItemEqual(toInsert, stack)) {
                         return true;
                     }
                 }
             }
         }
         return false;
-    }
-
-    public static ItemStack addItemToStorage(UUID owner, Material toInsert, int giveamount)
-    {
-        return addItemToStorage(owner,toInsert, giveamount, (short) 0);
-    }
-    public static ItemStack addItemToStorage(UUID owner, Material toInsert, int giveamount, short meta)
-    {
-        return addItemToStorage(owner, new ItemStack(toInsert, giveamount, (short)meta));
-    }
-    public static ItemStack addItemToStorage(UUID owner, ItemStack toInsert)
-    {
-        toInsert = toInsert.clone();
-        for (StorageUnit stH : StorageUnit.getStorageFromOwner(owner)) {
-            if (stH.getOwner().toString().equals(owner.toString())) {
-                ItemStack out = stH.insertItem(toInsert);
-                if (TitanBox.isEmpty(out))
-                {
-                    return null;
-                }
-                if (out.getAmount() < toInsert.getAmount())
-                {
-                    return out.clone();
-                }
-            }
-        }
-        return toInsert.clone();
-    }
-    public static void pickupItem(UUID owner, Location checkSapling, Material mat, int size) {
-        Entity pickupBat = checkSapling.getWorld().spawnEntity(checkSapling.add(0 , -2, 0), EntityType.BAT);
-        try {
-            List<Entity> listnear = pickupBat.getNearbyEntities(size, size, size);
-            for (Entity e : listnear) {
-                if (!e.isDead()) {
-                    if (e.getType() == EntityType.DROPPED_ITEM) {
-                        ItemStack dropped = ((Item) e).getItemStack().clone();
-                        if (mat == null)
-                        {
-                            ItemStack pickup = TitanBox.addItemToStorage(owner, dropped);
-                            if (pickup == null)
-                            {
-                                e.remove();
-                            }
-                            else {
-                                ((Item) e).setItemStack(pickup);
-                            }
-                        }
-                        else {
-                            if (dropped.getType() == mat) {
-                                TitanBox.addItemToStorage(owner, dropped);
-                                e.remove();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception e)
-        {
-
-        }
-        finally {
-            pickupBat.remove();
-        }
-    }
-    public static ItemStack getItem(UUID owner, Material typeBucket, short data) {
-        return getItem(owner, new ItemStack(typeBucket, 1, data));
-    }
-    public static ItemStack getItem(UUID owner, Material typeBucket) {
-        return getItem(owner, typeBucket, (short) 0);
-    }
-    public static ItemStack getItem(UUID owner, ItemStack typeBucket) {
-        for (StorageUnit stH : StorageUnit.getStorageFromOwner(owner)) {
-            if (stH.getOwner().toString().equals(owner.toString())) {
-                for(int i =0;i <stH.getSize(); i++)
-                {
-                    ItemStack view = stH.viewSlot(i);
-                    if (!TitanBox.isEmpty(view))
-                    {
-                        if (TitanBox.isItemEqual(view, typeBucket))
-                        {
-                            ItemStack getIt = stH.getItem(i, view.getMaxStackSize());
-                            if (!TitanBox.isEmpty(getIt))
-                            {
-                                return  getIt;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-    public static boolean hasItem(UUID owner, Material typeBucket, short data) {
-        return hasItem(owner, new ItemStack(typeBucket, 1, data));
-    }
-    public static boolean hasItem(UUID owner, Material typeBucket) {
-        return hasItem(owner, typeBucket, (short) 0);
-    }
-    public static boolean hasItem(UUID owner, ItemStack typeBucket) {
-        boolean foundbucket = false;
-        for (StorageUnit stH : StorageUnit.getStorageFromOwner(owner)) {
-            if (stH.getOwner().toString().equals(owner.toString())) {
-                for(int i =0;i <stH.getSize(); i++)
-                {
-                    ItemStack view = stH.viewSlot(i);
-                    if (!TitanBox.isEmpty(view))
-                    {
-                        if (TitanBox.isItemEqual(view, typeBucket))
-                        {
-                            ItemStack getIt = stH.getItem(i, 1);
-                            if (!TitanBox.isEmpty(getIt))
-                            {
-                                foundbucket = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return foundbucket;
-    }
-
-    /**
-     * Check if the given block contains a vanilla inventory,
-     *
-     * @param target the block to check
-     * @return true if this block holds a vanilla inventory; false otherwise
-     */
-    public static boolean isVanillaInventory(Block target) {
-        switch (target.getType()) {
-            case CHEST:
-            case TRAPPED_CHEST:
-            case DISPENSER:
-            case HOPPER:
-            case DROPPER:
-            case FURNACE:
-            case BREWING_STAND:
-            case BURNING_FURNACE:
-                return true;
-            default:
-                return false;
-        }
-    }
-    public static boolean isInventory(Block clicked)
-    {
-        BlockStorage storage =  BlockStorage.getStorage(clicked.getLocation().getWorld());
-
-        if (storage.hasUniversalInventory(clicked))
-        {
-            return true;
-
-        } else if (storage.hasInventory(clicked.getLocation()))
-        {
-            return true;
-
-        } else if (TitanBox.isVanillaInventory(clicked))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    /**
-     * Get the vanilla inventory for the given block.
-     *
-     * @param target the block containing the target inventory
-     * @return the block's inventory, or null if the block does not have one
-     */
-    public static Inventory getVanillaInventoryFor(Block target) {
-        Chest c;
-        switch (target.getType()) {
-            case TRAPPED_CHEST:
-            case CHEST:
-                c = (Chest) target.getState();
-                if (c.getInventory().getHolder() instanceof DoubleChest) {
-                    DoubleChest dc = (DoubleChest) c.getInventory().getHolder();
-                    return dc.getInventory();
-                } else {
-                    return c.getBlockInventory();
-                }
-            case DISPENSER:
-            case HOPPER:
-            case DROPPER:
-            case FURNACE:
-            case BREWING_STAND:
-            case BURNING_FURNACE:
-                return ((InventoryHolder) target.getState()).getInventory();
-            // any other vanilla inventory types ?
-            default:
-                return null;
-        }
     }
 
     public static List<ItemStack> loadListItemStack(Config config, String key)
@@ -532,307 +404,7 @@ public class TitanBox extends JavaPlugin
         }
         return  goingOut;
     }
-    public static ItemStack changeName(ItemStack toAdd, String Name) {
-        ItemMeta IM = toAdd.getItemMeta();
-        IM.setDisplayName(Name);
-        toAdd.setItemMeta(IM);
-        return toAdd.clone();
-    }
-    public static ItemStack addLore(ItemStack toAdd, List<String> lore)
-    {
-        return addLore(false, toAdd, lore);
-    }
-    public static int getLoreSize(ItemStack toAdd)
-    {
-        ItemMeta ITM = null;
-        if (toAdd.hasItemMeta()) {
-            ITM = toAdd.getItemMeta();
-            if (ITM.hasLore()) {
-                return ITM.getLore().size();
-            }
-        }
-        return -1;
-    }
-    public static boolean isEmpty(ItemStack toCheck)
-    {
-        if (toCheck == null)
-        {
-            return  true;
-        }
-        if (toCheck.getType().equals(Material.AIR))
-        {
-            return  true;
-        }
-        if (toCheck.getAmount() < 1)
-        {
-            return  true;
-        }
-        return false;
-    }
-    public static ItemStack removeLore(ItemStack toAdd, int line)
-    {
-        ItemMeta ITM = null;
-        if (toAdd.hasItemMeta()) {
-            ITM = toAdd.getItemMeta();
-            if (ITM.hasLore()) {
-                List<String> lore = ITM.getLore();
-                lore.remove(line);
-                ITM.setLore(lore);
-                toAdd.setItemMeta(ITM.clone());
-                return toAdd;
-            }
-        }
-        return toAdd.clone();
-    }
-    public static ItemStack addLore(boolean clear, ItemStack toAdd, List<String> lore)
-    {
 
-        ItemMeta ITM = null;
-        if (toAdd.hasItemMeta()) {
-            ITM = toAdd.getItemMeta();
-            if (!clear)
-            {
-                if (ITM.hasLore())
-                {
-                    List<String> lore2 = new ArrayList<String>();
-                    lore2.addAll(ITM.getLore());
-                    lore2.addAll(lore);
-                    lore.clear();
-                    lore = lore2;
-                }
-            }
-            ITM.setLore(lore);
-            toAdd.setItemMeta(ITM.clone());
-            return toAdd;
-        }
-        return toAdd.clone();
-    }
-    public static ItemStack clearLore(ItemStack toAdd)
-    {
-        List<String> lore = new ArrayList<String>();
-        ItemMeta ITM = null;
-        if (toAdd.hasItemMeta()) {
-            ITM = toAdd.getItemMeta();
-            ITM.setLore(lore);
-            toAdd.setItemMeta(ITM.clone());
-            return toAdd;
-        }
-        return toAdd.clone();
-    }
-    public static ItemStack addLore(boolean clear, ItemStack toAdd, String... lores)
-    {
-        List<String> lore = new ArrayList<String>();
-        for (String l : lores) {
-            lore.add(l);
-        }
-        toAdd = addLore(clear, toAdd, lore);
-        return toAdd.clone();
-    }
-    public static ItemStack addLore(ItemStack toAdd, String... lores)
-    {
-        return addLore(false, toAdd, lores);
-    }
-    public static ItemStack clearEnchanents(ItemStack toAdd)
-    {
-        Set<Enchantment> all = toAdd.getEnchantments().keySet();
-        for(Enchantment enc: all)
-        {
-            toAdd.removeEnchantment(enc);
-        }
-        return toAdd;
-    }
-    public static boolean equalsLore(List<String> lore, List<String> lore2) {
-        String string1 = "";
-        String string2 = "";
-        Iterator var4 = lore.iterator();
-
-        String string;
-        while(var4.hasNext()) {
-            string = (String)var4.next();
-            string1 = string1 + "-NEW LINE-" + string;
-        }
-
-        var4 = lore2.iterator();
-
-        while(var4.hasNext()) {
-            string = (String)var4.next();
-            string2 = string2 + "-NEW LINE-" + string;
-        }
-
-        return string1.equals(string2);
-    }
-    public static boolean equalsEnchants(Map<Enchantment, Integer> item1, Map<Enchantment, Integer> item2)
-    {
-        if (item1 == null && item2 == null) return true;
-        if (item1 != null && item2 == null) return false;
-        if (item2 != null && item1 == null) return false;
-        if (item1.size() != item2.size()) return false;
-        for(Enchantment e: item1.keySet())
-        {
-            if (!item2.containsKey(e)) return false;
-            if (item1.get(e) != item2.get(e)) return false;
-        }
-        return true;
-    }
-    public static boolean isItemEqual(ItemStack item, ItemStack SFitem) {
-        if (item == null) return SFitem == null;
-        if (SFitem == null) return false;
-        if (item.getType() == SFitem.getType()) {//&& item.getAmount() >= SFitem.getAmount()
-            if (item.getData().getData() != SFitem.getData().getData()) {
-                if (!(SFitem.getDurability() == item.getData().getData() && SFitem.getData().getData() == item.getDurability())) return false;
-            }
-            if (!equalsEnchants(item.getEnchantments(), SFitem.getEnchantments())) return false;
-            if (item.hasItemMeta() && SFitem.hasItemMeta()) {
-                ItemMeta a = item.getItemMeta();
-                ItemMeta b = SFitem.getItemMeta();
-                if (a instanceof BannerMeta && b instanceof BannerMeta)
-                {
-                    if(!((BannerMeta)a).getPatterns().equals(((BannerMeta)b).getPatterns())) return false;
-
-                    if (((BannerMeta)a).getBaseColor() == null && ((BannerMeta)b).getBaseColor() != null) return false;
-                    if (((BannerMeta)a).getBaseColor() != null && ((BannerMeta)b).getBaseColor() == null) return false;
-                    if (((BannerMeta)a).getBaseColor() != null && ((BannerMeta)b).getBaseColor() != null) {
-                        if (!((BannerMeta) a).getBaseColor().equals(((BannerMeta) b).getBaseColor())) return false;
-                    }
-                }
-                if (a instanceof EnchantmentStorageMeta && b instanceof EnchantmentStorageMeta)
-                {
-                    if (((EnchantmentStorageMeta)a).getEnchants() !=null && ((EnchantmentStorageMeta)b).getEnchants() ==null) return false;
-                    if (((EnchantmentStorageMeta)a).getEnchants() ==null && ((EnchantmentStorageMeta)b).getEnchants() !=null) return false;
-                    if (((EnchantmentStorageMeta)a).getEnchants() !=null && ((EnchantmentStorageMeta)b).getEnchants() !=null) {
-                        if (!((EnchantmentStorageMeta) a).getEnchants().equals(((EnchantmentStorageMeta) b).getEnchants()))
-                            return false;
-                    }
-                }
-                if (a instanceof SpawnEggMeta && b instanceof SpawnEggMeta)
-                {
-                    if (((SpawnEggMeta)a).getSpawnedType() !=null && ((SpawnEggMeta)b).getSpawnedType() ==null) return false;
-                    if (((SpawnEggMeta)a).getSpawnedType() ==null && ((SpawnEggMeta)b).getSpawnedType() !=null) return false;
-                    if (((SpawnEggMeta)a).getSpawnedType() !=null && ((SpawnEggMeta)b).getSpawnedType() !=null) {
-                        if (!((SpawnEggMeta) a).getSpawnedType().equals(((SpawnEggMeta) b).getSpawnedType()))
-                            return false;
-                    }
-                }
-                if (a instanceof SkullMeta && b instanceof SkullMeta)
-                {
-                    if (((SkullMeta)a).getOwningPlayer() != null && ((SkullMeta)b).getOwningPlayer() ==null) return false;
-                    if (((SkullMeta)a).getOwningPlayer() == null && ((SkullMeta)b).getOwningPlayer() !=null) return false;
-                    if (((SkullMeta)a).getOwningPlayer() != null && ((SkullMeta)b).getOwningPlayer() !=null) {
-                        if (!((SkullMeta) a).getOwningPlayer().equals(((SkullMeta) b).getOwningPlayer())) return false;
-                    }
-                }
-                if (a instanceof PotionMeta && b instanceof PotionMeta)
-                {
-                    if(!((PotionMeta)a).getCustomEffects().equals(((PotionMeta)b).getCustomEffects())) return false;
-                    if(!((PotionMeta)a).getBasePotionData().equals(((PotionMeta)b).getBasePotionData())) return false;
-                    if (((PotionMeta)a).getColor() !=null && ((PotionMeta)b).getColor() ==null) return false;
-                    if (((PotionMeta)a).getColor() ==null && ((PotionMeta)b).getColor() !=null) return false;
-                    if (((PotionMeta)a).getColor() !=null && ((PotionMeta)b).getColor() !=null) {
-                        if (!((PotionMeta) a).getColor().equals(((PotionMeta) b).getColor())) return false;
-                    }
-
-                }
-                if (a instanceof BookMeta && b instanceof BookMeta)
-                {
-                    if(!((BookMeta)a).getAuthor().equals(((BookMeta)b).getAuthor())) return false;
-                    if(!((BookMeta)a).getGeneration().equals(((BookMeta)b).getGeneration())) return false;
-                    if(!((BookMeta)a).getPages().equals(((BookMeta)b).getPages())) return false;
-                    if(!((BookMeta)a).getTitle().equals(((BookMeta)b).getTitle())) return false;
-                }
-                if (a instanceof LeatherArmorMeta && b instanceof LeatherArmorMeta)
-                {
-                    if(!((LeatherArmorMeta)a).getColor().equals(((LeatherArmorMeta)b).getColor())) return false;
-                }
-                if (a instanceof KnowledgeBookMeta && b instanceof KnowledgeBookMeta)
-                {
-                    if(!((FireworkMeta)a).getEffects().equals(((FireworkMeta)b).getEffects())) return false;
-                    if(((FireworkMeta)a).getPower() != ((FireworkMeta)b).getPower()) return false;
-                }
-                if (item.getItemMeta().hasDisplayName() && SFitem.getItemMeta().hasDisplayName()) {
-                    if (item.getItemMeta().getDisplayName().equals(SFitem.getItemMeta().getDisplayName())) {
-                        if (item.getItemMeta().hasLore() && !SFitem.getItemMeta().hasLore()) {
-                            return false;
-                        }
-                        if (item.getItemMeta().hasLore() && SFitem.getItemMeta().hasLore()) {
-                            return equalsLore(item.getItemMeta().getLore(), SFitem.getItemMeta().getLore());
-                        }
-                        else return !item.getItemMeta().hasLore() && !SFitem.getItemMeta().hasLore();
-                    }
-                    else return false;
-                }
-                else if (!item.getItemMeta().hasDisplayName() && !SFitem.getItemMeta().hasDisplayName()) {
-                    if (item.getItemMeta().hasLore() && !SFitem.getItemMeta().hasLore()) {
-                        return false;
-                    }
-                    if (item.getItemMeta().hasLore() && SFitem.getItemMeta().hasLore()) {
-                        return equalsLore(item.getItemMeta().getLore(), SFitem.getItemMeta().getLore());
-                    }
-                    else return !item.getItemMeta().hasLore() && !SFitem.getItemMeta().hasLore();
-
-                }
-                else return false;
-            }
-            else return !item.hasItemMeta() && !SFitem.hasItemMeta();
-        }
-        else return false;
-    }
-    public static boolean isArmor(ItemStack mat)
-    {
-        return isArmor(mat.getType());
-    }
-    public static boolean isArmor(Material mat)
-    {
-        switch (mat)
-        {
-            case DIAMOND_CHESTPLATE:LATE:
-                return true;
-            case CHAINMAIL_CHESTPLATE:
-                return true;
-            case GOLD_CHESTPLATE:
-                return true;
-            case IRON_CHESTPLATE:
-                return true;
-            case LEATHER_CHESTPLATE:
-                return true;
-            case DIAMOND_HELMET:
-                return true;
-            case LEATHER_HELMET:
-                return true;
-            case IRON_HELMET:
-                return true;
-            case CHAINMAIL_HELMET:
-                return true;
-            case GOLD_HELMET:
-                return true;
-            case DIAMOND_LEGGINGS:
-                return true;
-            case CHAINMAIL_LEGGINGS:
-                return true;
-            case GOLD_LEGGINGS:
-                return true;
-            case IRON_LEGGINGS:
-                return true;
-            case LEATHER_LEGGINGS:
-                return true;
-            case DIAMOND_BOOTS:
-                return true;
-            case CHAINMAIL_BOOTS:
-                return true;
-            case GOLD_BOOTS:
-                return true;
-            case IRON_BOOTS:
-                return true;
-            case LEATHER_BOOTS:
-                return true;
-            case ELYTRA:
-                return true;
-        }
-        return false;
-    }
-    public static boolean isWeapon(ItemStack mat)
-    {
-        return isWeapon(mat.getType());
-    }
     public static boolean isExpensive(ItemStack mat)
     {
         return isExpensive(mat.getType());
@@ -845,15 +417,15 @@ public class TitanBox extends JavaPlugin
                 return true;
             case BEACON:
                 return true;
-            case SKULL:
+            case SKELETON_SKULL:L:
                 return true;
-            case SKULL_ITEM:
+            case SKELETON_WALL_SKULL:
                 return true;
             case BOOKSHELF:
                 return true;
             case BOOK:
                 return true;
-            case BOOK_AND_QUILL:
+            case WRITABLE_BOOK:
                 return true;
             case ENCHANTED_BOOK:
                 return true;
@@ -865,13 +437,13 @@ public class TitanBox extends JavaPlugin
                 return true;
             case POTION:
                 return true;
-            case MOB_SPAWNER:
+            case SPAWNER:
                 return true;
             case CHEST:
                 return true;
             case DRAGON_EGG:
                 return true;
-            case DRAGONS_BREATH:
+            case DRAGON_BREATH:
                 return true;
             case ENDER_CHEST:
                 return true;
@@ -879,7 +451,7 @@ public class TitanBox extends JavaPlugin
                 return true;
             case FURNACE:
                 return true;
-            case WORKBENCH:
+            case CRAFTING_TABLE:
                 return true;
             case DISPENSER:
                 return true;
@@ -895,14 +467,24 @@ public class TitanBox extends JavaPlugin
                 return true;
             case HOPPER:
                 return true;
-            case ENCHANTMENT_TABLE:
+            case ENCHANTING_TABLE:
                 return true;
-            case BED:
-                return true;
-            case EXP_BOTTLE:
+            case EXPERIENCE_BOTTLE:
                 return true;
             case TRIPWIRE_HOOK:
                 return true;
+        }
+        if (mat.toString().contains("SKULL"))
+        {
+            return true;
+        }
+        if (mat.toString().contains("BOOK"))
+        {
+            return true;
+        }
+        if (mat.toString().contains("BED"))
+        {
+            return true;
         }
         if (mat.toString().contains("DOOR"))
         {
@@ -923,104 +505,6 @@ public class TitanBox extends JavaPlugin
         return false;
     }
 
-    public static boolean isWeapon(Material mat)
-    {
-        switch (mat)
-        {
-            case DIAMOND_SWORD:
-                return true;
-            case GOLD_SWORD:
-                return true;
-            case IRON_SWORD:
-                return true;
-            case STONE_SWORD:
-                return true;
-            case WOOD_SWORD:
-                return true;
-            case DIAMOND_AXE:
-                return true;
-            case GOLD_AXE:
-                return true;
-            case IRON_AXE:
-                return true;
-            case STONE_AXE:
-                return true;
-            case WOOD_AXE:
-                return true;
-            case SHIELD:
-                return true;
-        }
-        return false;
-    }
-    public static boolean isTool(ItemStack mat)
-    {
-        return isTool(mat.getType());
-    }
-    public static boolean isTool(Material mat)
-    {
-        switch (mat)
-        {
-            case DIAMOND_PICKAXE:
-            return true;
-            case GOLD_PICKAXE:
-                return true;
-            case IRON_PICKAXE:
-                return true;
-            case STONE_PICKAXE:
-                return true;
-            case WOOD_PICKAXE:
-                return true;
-            case DIAMOND_AXE:
-                return true;
-            case GOLD_AXE:
-                return true;
-            case IRON_AXE:
-                return true;
-            case STONE_AXE:
-                return true;
-            case WOOD_AXE:
-                return true;
-            case DIAMOND_SPADE:
-                return true;
-            case STONE_SPADE:
-                return true;
-            case GOLD_SPADE:
-                return true;
-            case IRON_SPADE:
-                return true;
-            case WOOD_SPADE:
-                return true;
-            case DIAMOND_HOE:
-                return true;
-            case GOLD_HOE:
-                return true;
-            case IRON_HOE:
-                return true;
-            case STONE_HOE:
-                return true;
-            case WOOD_HOE:
-                return true;
-            case SHEARS:
-                return true;
-            case FLINT_AND_STEEL:
-                return true;
-            case FISHING_ROD:
-                return true;
-        }
-        return false;
-    }
-    public static ItemStack getSkull(String texture)
-    {
-        try {
-            ItemStack placeMe = CustomSkull.getItem(texture).clone();
-            return placeMe;
-        }
-        catch (Exception e)
-        {
-
-        }
-        return  null;
-    }
     private String[] addRightEmptyLore(int size)
     {
         List<String> lore = new ArrayList<String>();
@@ -1053,31 +537,31 @@ public class TitanBox extends JavaPlugin
     }
     public static boolean isSuperItemHoler(ItemStack  toCheck)
     {
-        if (!TitanBox.isEmpty(toCheck)) {
-            if (toCheck.hasItemMeta()) {
-                ItemMeta itemMeta = toCheck.getItemMeta();
-                if (itemMeta.hasDisplayName()) {
-                    if (itemMeta.getDisplayName().equals(ChatColor.YELLOW + "Super Item Mover"))
-                    {
+        if (!Utilities.isEmpty(toCheck)) {
+
+            ItemMeta itemMeta = Utilities.getItemMeta(toCheck);
+            if (itemMeta.hasDisplayName()) {
+                if (itemMeta.getDisplayName().equals(ChatColor.YELLOW + "Super Item Mover"))
+                {
+                    return true;
+                }
+            }
+            if (itemMeta.hasLore())
+            {
+                List<String> lore = itemMeta.getLore();
+                for (String s : lore) {
+                    if (s.startsWith(ChatColor.YELLOW + "   ") || ChatColor.stripColor(s).startsWith("   ")) {
                         return true;
                     }
                 }
-                if (itemMeta.hasLore())
-                {
-                    List<String> lore = itemMeta.getLore();
-                    for (String s : lore) {
-                        if (s.startsWith(ChatColor.YELLOW + "   ") || ChatColor.stripColor(s).startsWith("   ")) {
-                            return true;
-                        }
-                    }
-                }
             }
+
         }
         return false;
     }
     public static Object[] returnSuperItemHolder(ItemStack SuperItemHolder)
     {
-        if (!TitanBox.isEmpty(SuperItemHolder)) {
+        if (!Utilities.isEmpty(SuperItemHolder)) {
             if (TitanBox.isSuperItemHoler(SuperItemHolder)) {
                 SuperItemHolder = SuperItemHolder.clone();
                 if (SuperItemHolder.hasItemMeta()) {
@@ -1105,11 +589,11 @@ public class TitanBox extends JavaPlugin
                         if (!name.equalsIgnoreCase("normal")) {
                             itemStackOut = SuperItemHolder.clone();
                             itemStackOut.setAmount(1);
-                            itemStackOut = TitanBox.changeName(itemStackOut, name);
+                            itemStackOut = Utilities.changeName(itemStackOut, name);
                         }
-                        itemStackOut = TitanBox.clearLore(itemStackOut);
+                        itemStackOut = Utilities.clearLore(itemStackOut);
                         if (Reaklore.size() > 0) {
-                            itemStackOut = TitanBox.addLore(itemStackOut, Reaklore);
+                            itemStackOut = Utilities.addLore(itemStackOut, Reaklore);
                         }
                         Object[] tmpout = {itemStackOut.clone(), amount};
                         return tmpout;
@@ -1123,7 +607,7 @@ public class TitanBox extends JavaPlugin
     public static ItemStack getSuperItemHolder(ItemStack mat, Long amount)
     {
         String name = "Normal";
-        if (!TitanBox.isEmpty(mat))
+        if (!Utilities.isEmpty(mat))
         {
             if (!TitanBox.isSuperItemHoler(mat)) {
                 mat = mat.clone();
@@ -1134,8 +618,8 @@ public class TitanBox extends JavaPlugin
                     }
                 }
                 mat.setAmount(1);
-                mat = TitanBox.changeName(mat, ChatColor.YELLOW + "Super Item Mover");
-                mat = TitanBox.addLore(mat, ChatColor.YELLOW + "   Name: " + ChatColor.WHITE + name, ChatColor.YELLOW + "   Amount: " + ChatColor.WHITE + TitanBox.format(amount), ChatColor.YELLOW + "   Barcode: " + ChatColor.MAGIC + amount);
+                mat = Utilities.changeName(mat, ChatColor.YELLOW + "Super Item Mover");
+                mat = Utilities.addLore(mat, ChatColor.YELLOW + "   Name: " + ChatColor.WHITE + name, ChatColor.YELLOW + "   Amount: " + ChatColor.WHITE + Utilities.format(amount), ChatColor.YELLOW + "   Barcode: " + ChatColor.MAGIC + amount);
                 return mat.clone();
             }
         }
@@ -1145,51 +629,98 @@ public class TitanBox extends JavaPlugin
     {
         try {
             if (sender instanceof Player) {
-                if (label.equalsIgnoreCase("titanbox") || label.equalsIgnoreCase("tb")) {
-                    if (args[0].equalsIgnoreCase("save")) {
-                        if (sender.hasPermission("titanbox.admin")) {
-                            saveEveryThing();
-                        }
+                if (label.equalsIgnoreCase("home")) {
+                    PlayerProtectionManager playerProtectionManager = PlayerProtectionManager.getPlayer(((Player) sender).getUniqueId());
+                    if (playerProtectionManager.count() > 0) {
+                        List<ForceFieldManager> forceFieldManagers = new ArrayList<ForceFieldManager>(playerProtectionManager.getForceFields());
+                        Location location = forceFieldManagers.get(0).getLocation().clone();
+                        Utilities.startTeleport((Player) sender, location, 15);
+                        ((Player) sender).closeInventory();
                     }
-                    if (args[0].equalsIgnoreCase("reload")) {
-                        if (sender.hasPermission("titanbox.admin")) {
-                            config.reload();
-                            RouterHolder.loadConfig();
-                            InventoryModule.loadConfig();
-                            sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + "Config reloaded, Server must be restart to update already loaded Modules!");
-                        }
-                    }
-                    if (args[0].equalsIgnoreCase("restart"))
+                    else
                     {
-                        if (sender.hasPermission("titanbox.admin")) {
-                            if (System.currentTimeMillis() - TitanBox.isRunning >  1000) {
-                                Bukkit.getScheduler().scheduleSyncRepeatingTask(TitanBox.instants, RouterTimer, 200, RouterHolder.speed);
-                                sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + "Restarted!");
-                            }
-                            sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + ChatColor.GREEN + TitanBox.convertToTimePasted(TitanBox.isRunning));
-                        }
+                        sender.sendMessage(ChatColor.RED + "You have no Force Fields to go home to.");
                     }
-                    if (args[0].equalsIgnoreCase("SIM")) {
-                        if (sender.hasPermission("titanbox.admin")) {
-                            Long amount = Long.valueOf(args[1]);
-                            ItemStack toCheat = ((Player) sender).getInventory().getItemInMainHand();
-                            if (!TitanBox.isEmpty(toCheat))
-                            {
-                                ItemStack gotit = TitanBox.getSuperItemHolder(toCheat, amount);
-                                ((Player) sender).getInventory().addItem(gotit.clone());
-                                sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + ChatColor.GREEN + "Done sir.");
-                            }
+                }
+                if (label.equalsIgnoreCase("override")) {
+                    if (bypassProtection.contains(((Player) sender).getUniqueId()))
+                    {
+                        bypassProtection.remove(((Player) sender).getUniqueId());
+                        sender.sendMessage(ChatColor.GREEN + "You are no longer over riding protections, this makes you sad =(");
+                    }
+                    else
+                    {
+                        bypassProtection.add(((Player) sender).getUniqueId());
+                        sender.sendMessage(ChatColor.RED + "You are over riding ALL protections on the server, You fell the power flow threw you.");
+                    }
+                    return true;
+                }
+                if (label.equalsIgnoreCase("titanbox") || label.equalsIgnoreCase("tb")) {
+                    if (args.length > 0) {
 
-                        }
-                    }
-                    if (args[0].equalsIgnoreCase("give")) {
-                        if (sender.hasPermission("titanbox.admin")) {
-                            if (args.length > 2)
-                            {
-                                giveItems((Player) sender, args[1], args[2]);
+                        if (args[0].equalsIgnoreCase("info")) {
+                            if (sender.hasPermission("titanbox.admin")) {
+                                ItemStack mainHand = ((Player) sender).getInventory().getItemInMainHand();
+                                if (!Utilities.isEmpty(mainHand))
+                                {
+                                    NBTTagCompound nbtTagCompound = Utilities.getNBTTag(mainHand);
+                                    if (nbtTagCompound != null)
+                                    {
+                                        int i = 0;
+                                        for(String key: nbtTagCompound.getKeys())
+                                        {
+                                            sender.sendMessage(i + ":" + key );
+                                            sender.sendMessage(i + ":" + nbtTagCompound.get(key) );
+                                            i++;
+                                        }
+                                    }
+                                }
                             }
-                            else {
-                                giveItems((Player) sender, args[1]);
+                        }
+                        if (args[0].equalsIgnoreCase("save")) {
+                            if (sender.hasPermission("titanbox.admin")) {
+                                saveEveryThing();
+                            }
+                        }
+                        if (args[0].equalsIgnoreCase("reload")) {
+                            if (sender.hasPermission("titanbox.admin")) {
+                                ConfigManager.reload();
+                                ConfigManager.loadConfig();
+                                settings.reload();
+                                RouterManager.loadConfig();
+                                sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + "Config reloaded, Server must be restart to update already loaded Modules!");
+                            }
+                        }
+                        if (args[0].equalsIgnoreCase("restart")) {
+                            if (sender.hasPermission("titanbox.admin")) {
+                                if (System.currentTimeMillis() - TitanBox.isRunning > 1000) {
+                                    Bukkit.getScheduler().scheduleSyncRepeatingTask(TitanBox.instants, RouterTimer, 200, ConfigManager.getRouter_Speed());
+                                    sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + "Restarted!");
+                                }
+                                sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + ChatColor.GREEN + Utilities.convertToTimePasted(TitanBox.isRunning));
+                            }
+                        }
+                        if (args[0].equalsIgnoreCase("SIM")) {
+                            if (sender.hasPermission("titanbox.admin")) {
+                                Long amount = Long.valueOf(args[1]);
+                                ItemStack toCheat = ((Player) sender).getInventory().getItemInMainHand();
+                                if (!Utilities.isEmpty(toCheat)) {
+                                    ItemStack gotit = TitanBox.getSuperItemHolder(toCheat, amount);
+                                    if (!Utilities.isEmpty(gotit)) {
+                                        ((Player) sender).getInventory().addItem(gotit.clone());
+                                        sender.sendMessage(ChatColor.GREEN + "[TitanBox]: " + ChatColor.GREEN + "Done sir.");
+                                    }
+                                }
+
+                            }
+                        }
+                        if (args[0].equalsIgnoreCase("give")) {
+                            if (sender.hasPermission("titanbox.admin")) {
+                                if (args.length > 2) {
+                                    giveItems((Player) sender, args[1], args[2]);
+                                } else {
+                                    giveItems((Player) sender, args[1]);
+                                }
                             }
                         }
                     }
@@ -1200,9 +731,18 @@ public class TitanBox extends JavaPlugin
             {
                 try {
                     if (label.equalsIgnoreCase("titanbox") || label.equalsIgnoreCase("tb")) {
+                        if (args[0].equalsIgnoreCase("command")) {
+                            Location location = new Location(Bukkit.getWorld(args[1]), 0, 123,0);
+                            String command = "";
+                            for (int i = 2; i < args.length; i++)
+                            {
+                                command = args[i] + " ";
+                            }
+                            NPCManager.sendCommand(location, command);
+                        }
                         if (args[0].equalsIgnoreCase("give")) {
                             Player player = Bukkit.getPlayer(args[args.length - 1]);
-                             if (args.length > 2)
+                            if (args.length > 2)
                             {
                                 giveItems(player, args[1], args[2]);
                             }
@@ -1215,10 +755,10 @@ public class TitanBox extends JavaPlugin
                         if (args[0].equalsIgnoreCase("restart"))
                         {
                             if (System.currentTimeMillis() - TitanBox.isRunning > 1000) {
-                                Bukkit.getScheduler().scheduleSyncRepeatingTask(TitanBox.instants, RouterTimer, 200, RouterHolder.speed);
+                                Bukkit.getScheduler().scheduleSyncRepeatingTask(TitanBox.instants, RouterTimer, 200, ConfigManager.getRouter_Speed());
                                 sender.sendMessage( "[TitanBox]: " + "Restarted!");
                             }
-                            sender.sendMessage("[TitanBox]: " + TitanBox.convertToTimePasted(TitanBox.isRunning));
+                            sender.sendMessage("[TitanBox]: " + Utilities.convertToTimePasted(TitanBox.isRunning));
                         }
                     }
                 }
@@ -1230,9 +770,41 @@ public class TitanBox extends JavaPlugin
         }
         catch (Exception e)
         {
-
+            e.printStackTrace();
         }
         return true;
+    }
+    public static boolean isUpgradeDevice(Player player, ItemStack item )
+    {
+        if (item != null) {
+            if (item.hasItemMeta()) {
+                if (item.getItemMeta().hasDisplayName()) {
+                    if (item.getItemMeta().getDisplayName().startsWith(ChatColor.YELLOW + "Upgrade Device")) {
+                        if (!BarcodeManager.hasBarcode(item))
+                        {
+                            //"This is an invalid device! Most likely an old one.");
+                            return false;
+                        }
+                        String barcode = BarcodeManager.scanBarcode(item);
+                        if (barcode == null)
+                        {
+                            // "This is an invalid device! Most likely an old one.");
+                            return false;
+                        }
+                        boolean barcodeTrue = Boolean.valueOf(barcode);
+                        if (barcodeTrue)
+                        {
+                            TitanBox.duppedAlert(player, item);
+                            return false;
+                        }
+                        BarcodeManager.setBarcodeTrue(item, player);
+                        //"Upgrade completed! " + ChatColor.WHITE  + tmp.getSize() + ChatColor.GREEN + "/" + ChatColor.WHITE + 45);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
     public ItemStack getItem(String whatItem)
     {
@@ -1247,11 +819,11 @@ public class TitanBox extends JavaPlugin
         if (whatItem.equalsIgnoreCase("a") || whatItem.equalsIgnoreCase("b") ||whatItem.equalsIgnoreCase("c") || whatItem.equalsIgnoreCase("d") || whatItem.equalsIgnoreCase("e"))
         {
             try {
-                ItemHolder me = ItemHolder.valueOf("UNIT_" + whatItem.toUpperCase());
+                ItemEnum me = ItemEnum.valueOf("UNIT_" + whatItem.toUpperCase());
                 if (me != null) {
                     ItemStack placeMe = me.getItem();
-                    placeMe = TitanBox.changeName(placeMe, ChatColor.YELLOW + "New Storage Unit, Size: " + me.getSize());
-                    placeMe = TitanBox.addLore(placeMe, addRightEmptyLore(me.getSize()));
+                    placeMe = Utilities.changeName(placeMe, ChatColor.YELLOW + "New Storage Unit, Size: " + me.getSize());
+                    placeMe = Utilities.addLore(placeMe, addRightEmptyLore(me.getSize()));
                     return  placeMe.clone();
                 }
             } catch (Exception e) {
@@ -1277,28 +849,28 @@ public class TitanBox extends JavaPlugin
         }
         if (whatItem.equalsIgnoreCase("router"))
         {
-            ItemHolder me = ItemHolder.ROUTER;
+            ItemEnum me = ItemEnum.ROUTER;
             if (me != null) {
                 ItemStack placeMe = me.getItem();
-                placeMe = TitanBox.changeName(placeMe, ChatColor.YELLOW + "Item Routing Router");
-                placeMe = TitanBox.addLore(placeMe,  "Links: " + ChatColor.WHITE + "Slimefun, Chest, and Storage units", ChatColor.WHITE + "45 J/s");
+                placeMe = Utilities.changeName(placeMe, ChatColor.YELLOW + "Item Routing Router");
+                placeMe = Utilities.addLore(placeMe,  "Links: " + ChatColor.WHITE + "Slimefun, Chest, and Storage units", ChatColor.WHITE + "45 J/s");
 
                 return  placeMe.clone();
             }
         }
         if (whatItem.equalsIgnoreCase("upgrade"))
         {
-            ItemHolder me = ItemHolder.UPGRADE;
+            ItemEnum me = ItemEnum.UPGRADE;
             if (me != null && giveFor != null) {
                 ItemStack placeMe = me.getItem();
-                placeMe = TitanBox.changeName(placeMe, ChatColor.YELLOW + "Upgrade Device");
-                placeMe = TitanBox.addLore(placeMe,  "Used On: " + ChatColor.WHITE + "Storage Unit, and Routers", ChatColor.WHITE + "Hold in main hand and click block thats placed!");
-                placeMe = TitanBox.getNewBarcode(placeMe);
-                placeMe = TitanBox.addLore(placeMe, ChatColor.YELLOW  + "User: " + ChatColor.WHITE + giveFor.getName(), ChatColor.GRAY + "If this item is dupped the above user will be perm banned!");
+                placeMe = Utilities.changeName(placeMe, ChatColor.YELLOW + "Upgrade Device");
+                placeMe = Utilities.addLore(placeMe,  "Used On: " + ChatColor.WHITE + "Storage Unit, and Routers", ChatColor.WHITE + "Hold in main hand and click block thats placed!");
+                placeMe = BarcodeManager.getNewBarcode(placeMe);
+                placeMe = Utilities.addLore(placeMe, ChatColor.YELLOW  + "User: " + ChatColor.WHITE + giveFor.getName(), ChatColor.GRAY + "If this item is dupped the above user will be banned!");
                 return  placeMe.clone();
             }
         }
-        if (whatItem.equalsIgnoreCase("killer") || whatItem.equalsIgnoreCase("water") || whatItem.equalsIgnoreCase("lava") || whatItem.equalsIgnoreCase("ice") || whatItem.equalsIgnoreCase("item"))
+        if (whatItem.equalsIgnoreCase("placer") ||whatItem.equalsIgnoreCase("killer") || whatItem.equalsIgnoreCase("water") || whatItem.equalsIgnoreCase("lava") || whatItem.equalsIgnoreCase("ice") || whatItem.equalsIgnoreCase("item"))
         {
             ItemStack pump = Pumps.getMeAsDrop(whatItem);
             return  pump.clone();
@@ -1326,14 +898,15 @@ public class TitanBox extends JavaPlugin
     public static void duppedAlert(Player player, ItemStack itemStack)
     {
         player.sendMessage(ChatColor.RED + "[TitanBox]: " + ChatColor.GREEN + "This is an invalid device! It has been duped and you have been reported.");
-        String command = "mail send freethemice ";
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command + "-----StartReport-----");
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command + player.getName() + " has used a dupped Upgrade Device!");
+        String message = "";
+        message = message  + "-----StartReport-----" + "<br>";
+        message = message  + player.getName() + " has used a dupped Upgrade Device!" + "<br>";
+        message = message  + "" + "<br>";
         if (itemStack.hasItemMeta())
         {
             if (itemStack.getItemMeta().hasDisplayName())
             {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command + "Item: " + itemStack.getItemMeta().getDisplayName());
+                message = message  + "Item: " + itemStack.getItemMeta().getDisplayName() + "<br>";
             }
             if (itemStack.getItemMeta().hasLore())
             {
@@ -1342,11 +915,15 @@ public class TitanBox extends JavaPlugin
                 {
                     i++;
                     String list = "Line " + i + ": " + ChatColor.stripColor(lore);
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command + list);
+                    message = message  + list + "<br>";
                 }
             }
         }
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command + "-----EndReport-----");
+        message = message  + "-----EndReport-----" + "<br>";
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(ConfigManager.getAdminAlerts());
+        if (offlinePlayer != null) {
+            MailboxGUI.mailLetter(player, offlinePlayer.getUniqueId(), message);
+        }
 
     }
     public void giveItems(Player sender, String whatItem) {
@@ -1354,117 +931,11 @@ public class TitanBox extends JavaPlugin
     }
     public void giveItems(Player sender, String whatItem, String sub) {
         ItemStack item = getItem(whatItem,sub, sender);
-        if (!isEmpty(item)) {
+        if (!Utilities.isEmpty(item)) {
             sender.getInventory().addItem(item);
         }
     }
-    public static String getName(ItemStack toName)
-    {
-        String name = toName.getType().name() + "_" + toName.getDurability();
-        if (toName.hasItemMeta())
-        {
-            if (toName.getItemMeta().hasDisplayName())
-            {
-                name = ChatColor.stripColor(toName.getItemMeta().getDisplayName());
-            }
-        }
-        return name;
-    }
-    public static boolean hasBarcodeGood(ItemStack toBarcode)
-    {
-        if (!TitanBox.isEmpty(toBarcode)) {
-            if (toBarcode.hasItemMeta()) {
-                if (toBarcode.getItemMeta().hasLore()) {
-                    String name = getName(toBarcode);
-                    List<String> check = toBarcode.getItemMeta().getLore();
-                    for(String s: check)
-                    {
-                        if (s.startsWith(ChatColor.MAGIC + "barcode:"))
-                        {
-                            String saltStr = s.replace(ChatColor.MAGIC + "barcode:", "");
-                            if (barcodes.contains(name + "." + saltStr)) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-    public static void setBarcodeTrue(ItemStack toBarcode, Player player)
-    {
-        if (!TitanBox.isEmpty(toBarcode)) {
-            if (toBarcode.hasItemMeta()) {
-                if (toBarcode.getItemMeta().hasLore()) {
-                    String name = getName(toBarcode);
-                    List<String> check = toBarcode.getItemMeta().getLore();
-                    int line = 0;
-                    String saltStr  = "";
-                    for(String s: check)
-                    {
-                        if (s.startsWith(ChatColor.MAGIC + "barcode:"))
-                        {
-                            saltStr = s.replace(ChatColor.MAGIC + "barcode:", "");
-                            if (barcodes.contains(name + "." + saltStr)) {
-                                barcodes.setValue(name + "." + saltStr, true);
-                            }
-                        }
-                    }
-                    barcodes.setValue(name + ".info." + saltStr + ".time" , System.currentTimeMillis());
-                    barcodes.setValue(name + ".info." + saltStr + ".user" , player.getName());
-                    barcodes.setValue(name + ".info." + saltStr + ".item" , toBarcode.getItemMeta().getDisplayName());
-                    for(String s: check) {
-                        barcodes.setValue(name + ".info." + saltStr + ".line" + line, s);
-                        line++;
-                    }
-                }
-            }
-        }
-    }
-    public static String readBarcode(ItemStack toBarcode)
-    {
-        if (!TitanBox.isEmpty(toBarcode)) {
-            if (toBarcode.hasItemMeta()) {
-                if (toBarcode.getItemMeta().hasLore()) {
-                    String name = getName(toBarcode);
-                    List<String> check = toBarcode.getItemMeta().getLore();
-                    for(String s: check)
-                    {
-                        if (s.startsWith(ChatColor.MAGIC + "barcode:"))
-                        {
-                            String saltStr = s.replace(ChatColor.MAGIC + "barcode:", "");
-                            if (barcodes.contains(name + "." + saltStr)) {
-                                return barcodes.getBoolean(name + "." + saltStr) + "";
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-    public static ItemStack getNewBarcode(ItemStack toBarcode)
-    {
-        if (!TitanBox.isEmpty(toBarcode)) {
-            String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
-            StringBuilder salt = new StringBuilder();
-            Random rnd = new Random(System.currentTimeMillis());
-            while (salt.length() < 36) { // length of the random string.
-                int index = (int) (rnd.nextFloat() * SALTCHARS.length());
-                salt.append(SALTCHARS.charAt(index));
-            }
-            String saltStr = salt.toString();
 
-            String name = getName(toBarcode);
-            if (barcodes.contains(name + "." + saltStr)) {
-                return getNewBarcode(toBarcode);
-            }
-            barcodes.setValue(name + "." + saltStr, false);
-            toBarcode = TitanBox.addLore(false, toBarcode.clone(), ChatColor.MAGIC + "barcode:" + saltStr);
-        }
-        return toBarcode;
-    }
 
 }
 

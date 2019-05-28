@@ -1,6 +1,7 @@
 package com.firesoftitan.play.titanbox.machines;
 
-import com.firesoftitan.play.titanbox.holders.SlimefunItemsHolder;
+import com.firesoftitan.play.titanbox.managers.SlimefunItemsManager;
+import com.firesoftitan.play.titanbox.managers.TitanItemManager;
 import me.mrCookieSlime.CSCoreLibPlugin.CSCoreLib;
 import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu.AdvancedMenuClickHandler;
@@ -33,7 +34,7 @@ import org.bukkit.material.MaterialData;
 
 import java.util.*;
 
-public abstract class AutomatedAncientAltarCrafter extends SlimefunItem {
+public abstract class AutomatedAncientAltarCrafter extends TitanItemManager {
 
 	private static final int[] border = {0, 1, 3, 4, 5, 7, 8, 13, 14, 15, 16, 17, 50, 51, 52, 53};
 	private static final int[] border_in = {9, 10, 11, 12, 13, 18, 22, 27, 31, 36, 40, 45, 46, 47, 48, 49};
@@ -54,7 +55,7 @@ public abstract class AutomatedAncientAltarCrafter extends SlimefunItem {
 			@Override
 			public void newInstance(final BlockMenu menu, final Block b) {
 				if (!BlockStorage.hasBlockInfo(b) || BlockStorage.getBlockInfo(b, "enabled") == null || BlockStorage.getBlockInfo(b, "enabled").equals("false")) {
-					menu.replaceExistingItem(6, new CustomItem(new MaterialData(Material.SULPHUR), "&7Enabled: &4\u2718", "", "&e> Click to enable this Machine"));
+					menu.replaceExistingItem(6, new CustomItem(new MaterialData(Material.GUNPOWDER), "&7Enabled: &4\u2718", "", "&e> Click to enable this Machine"));
 					menu.addMenuClickHandler(6, new MenuClickHandler() {
 
 						@Override
@@ -128,7 +129,7 @@ public abstract class AutomatedAncientAltarCrafter extends SlimefunItem {
 	@SuppressWarnings("deprecation")
 	protected void constructMenu(BlockMenuPreset preset) {
 		for (int i: border) {
-			preset.addItem(i, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 7), " "),
+			preset.addItem(i, new CustomItem(new MaterialData(Material.GRAY_STAINED_GLASS_PANE), " "),
 			new MenuClickHandler() {
 
 				@Override
@@ -139,7 +140,7 @@ public abstract class AutomatedAncientAltarCrafter extends SlimefunItem {
 			});
 		}
 		for (int i: border_in) {
-			preset.addItem(i, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 11), " "),
+			preset.addItem(i, new CustomItem(new MaterialData(Material.BLUE_STAINED_GLASS_PANE), " "),
 			new MenuClickHandler() {
 
 				@Override
@@ -150,7 +151,7 @@ public abstract class AutomatedAncientAltarCrafter extends SlimefunItem {
 			});
 		}
 		for (int i: border_out) {
-			preset.addItem(i, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 1), " "),
+			preset.addItem(i, new CustomItem(new MaterialData(Material.ORANGE_STAINED_GLASS_PANE), " "),
 			new MenuClickHandler() {
 
 				@Override
@@ -176,7 +177,7 @@ public abstract class AutomatedAncientAltarCrafter extends SlimefunItem {
 			});
 		}
 		try {
-			preset.addItem(2, new CustomItem(SlimefunItemsHolder.ANCIENT_ALTAR_CRAFTER_BLOCK, "&eRecipe", "", "&bPut in the Recipe you want to craft", "&6Ancient Altar Recipes ONLY"),
+			preset.addItem(2, new CustomItem(SlimefunItemsManager.ANCIENT_ALTAR_CRAFTER_BLOCK, "&eRecipe", "", "&bPut in the Recipe you want to craft", "&6Ancient Altar Recipes ONLY"),
 					new MenuClickHandler() {
 
 						@Override
@@ -206,7 +207,7 @@ public abstract class AutomatedAncientAltarCrafter extends SlimefunItem {
 		int size = BlockStorage.getInventory(b).toInventory().getSize();
 		Inventory inv = Bukkit.createInventory(null, size);
 		for (int i = 0; i < size; i++) {
-			inv.setItem(i, new CustomItem(Material.COMMAND, " &4ALL YOUR PLACEHOLDERS ARE BELONG TO US", 0));
+			inv.setItem(i, new CustomItem(Material.COMMAND_BLOCK, " &4ALL YOUR PLACEHOLDERS ARE BELONG TO US", 0));
 		}
 		for (int slot: getOutputSlots()) {
 			inv.setItem(slot, BlockStorage.getInventory(b).getItemInSlot(slot));

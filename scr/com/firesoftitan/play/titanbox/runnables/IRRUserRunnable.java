@@ -1,8 +1,8 @@
 package com.firesoftitan.play.titanbox.runnables;
 
 import com.firesoftitan.play.titanbox.TitanBox;
-import com.firesoftitan.play.titanbox.holders.RouterHolder;
 import com.firesoftitan.play.titanbox.machines.ItemRoutingRouter;
+import com.firesoftitan.play.titanbox.managers.ConfigManager;
 import com.firesoftitan.play.titanbox.modules.MainModule;
 
 import java.util.UUID;
@@ -14,21 +14,35 @@ public class IRRUserRunnable implements Runnable  {
 
     @Override
     public void run() {
-        TitanBox.instants.checkRegisterdPower();
-        if (itemRoutingRouter !=null) {
-            itemRoutingRouter.setLastTick();
-            if (itemRoutingRouter.hasModules()) {
-                UUID owner = itemRoutingRouter.getOwner();
-                int size = Math.min(itemRoutingRouter.getModules().size(), RouterHolder.bufferSize);
-                for (int i = 0; i < size; i++) {
-                    MainModule mh = itemRoutingRouter.getNextBuffered();
-                    if (mh != null) {
-                        if (mh.isLoaded()) {
-                            mh.runMe(owner);
+        try {
+            if (itemRoutingRouter != null) {
+                TitanBox.instants.checkRegisterdPower();
+                itemRoutingRouter.setLastTick();
+                if (itemRoutingRouter.hasModules()) {
+                    UUID owner = itemRoutingRouter.getOwner();
+                    int size = Math.min(itemRoutingRouter.getModules().size(), ConfigManager.getRouter_BufferSize());
+                    for (int i = 0; i < size; i++) {
+                        final MainModule mh = itemRoutingRouter.getNextBuffered();
+                        if (mh != null) {
+                            if (mh.isLoaded()) {
+                                long tmpStart = System.currentTimeMillis();
+                                mh.runMe(owner);
+                                if (tmpStart - System.currentTimeMillis() > 1000)
+                                {
+                                    long second = tmpStart - System.currentTimeMillis();
+                                    second = second /1000;
+                                    System.out.println("[TitanBox]: WARNING: " + mh.getModuleid() + " took to long " + second);
+                                }
+                            }
                         }
                     }
                 }
             }
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
     public void startCountDown()

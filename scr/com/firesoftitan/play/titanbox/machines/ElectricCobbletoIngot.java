@@ -1,11 +1,11 @@
 package com.firesoftitan.play.titanbox.machines;
 
-import com.firesoftitan.play.titanbox.holders.SlimefunItemsHolder;
+import com.firesoftitan.play.titanbox.containers.TitanAContainer;
+import com.firesoftitan.play.titanbox.managers.SlimefunItemsManager;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.InvUtils;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
 import me.mrCookieSlime.Slimefun.Lists.RecipeType;
 import me.mrCookieSlime.Slimefun.Objects.Category;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AContainer;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineHelper;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.Setup.SlimefunManager;
@@ -21,7 +21,7 @@ import org.bukkit.material.MaterialData;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ElectricCobbletoIngot extends AContainer {
+public abstract class ElectricCobbletoIngot extends TitanAContainer {
 
     public ElectricCobbletoIngot(Category category, ItemStack item, String name, RecipeType recipeType, ItemStack[] recipe) {
         super(category, item, name, recipeType, recipe);
@@ -34,7 +34,7 @@ public abstract class ElectricCobbletoIngot extends AContainer {
 
     @Override
     public ItemStack getProgressBar() {
-        return new ItemStack(Material.GOLD_SPADE);
+        return new ItemStack(Material.GOLDEN_SHOVEL);
     }
 
     @Override
@@ -72,12 +72,13 @@ public abstract class ElectricCobbletoIngot extends AContainer {
                 if (processing.get(b).getOutput() == null)
                 {
                     progress.remove(b);
+                    processing.remove(b);
                     return;
                 }
 
                 ChargableBlock.addCharge(b, -getEnergyConsumption());
 
-                BlockStorage.getInventory(b).replaceExistingItem(22, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 15), " "));
+                BlockStorage.getInventory(b).replaceExistingItem(22, new CustomItem(new MaterialData(Material.BLACK_STAINED_GLASS_PANE), " "));
                 pushItems(b, processing.get(b).getOutput());
 
                 progress.remove(b);
@@ -97,8 +98,8 @@ public abstract class ElectricCobbletoIngot extends AContainer {
                     else if (SlimefunStartup.chance(100, 25)) adding = me.mrCookieSlime.Slimefun.Lists.SlimefunItems.MAGNESIUM_INGOT;
                     else if (SlimefunStartup.chance(100, 25)) adding = me.mrCookieSlime.Slimefun.Lists.SlimefunItems.LEAD_INGOT;
                     else if (SlimefunStartup.chance(100, 25)) adding = me.mrCookieSlime.Slimefun.Lists.SlimefunItems.SILVER_INGOT;
-                    else if (SlimefunStartup.chance(1000, 1)) adding = SlimefunItemsHolder.EclipseIngot;
-                    else if (SlimefunStartup.chance(400, 10)) adding = SlimefunItemsHolder.LuckyIngot;
+                    else if (SlimefunStartup.chance(1000, 1)) adding = SlimefunItemsManager.EclipseIngot;
+                    else if (SlimefunStartup.chance(400, 10)) adding = SlimefunItemsManager.LuckyIngot;
                     adding = adding.clone();
                     adding.setAmount(1);
                     if (getSpeed() > 9)
