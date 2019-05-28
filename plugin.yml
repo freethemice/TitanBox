@@ -1,6 +1,6 @@
 name: TitanBox
 main: com.firesoftitan.play.titanbox.TitanBox
-version: 1.0.1_14
+version: 0.0.1_14
 author: [freethemice]
 depend: [CS-CoreLib, Slimefun, TitanSQL, SlimefunLuckyBlocks]
 api-version: 1.13
